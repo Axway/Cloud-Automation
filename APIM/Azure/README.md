@@ -36,10 +36,10 @@ For prerequisite, you must have enough permission on your subscription to create
 Please follow this [link](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/aks/kubernetes-service-principal.md) to configure one.
 
 Then create a Blob storage account in the target region with 3 containers :
-1. products : upload application package APIGateway, APIPortal and docker scripts. Go to Axway's support website [download page](https://download.axway.com).
+1. products : upload application package APIGateway, APIPortal and docker scripts. Go to Axway's support website [download page](https://support.axway.com/en/).
 2. dependencies : Upload the mysql jar library.
 3. data : Upload your Docker license key file and a fed with your configuration.
-4. helmcharts : Copy the helmchart source available [here](https://github.com/Axway/Cloud-Automation/APIM/Helmcharts) 
+4. helmcharts : Copy the helmchart source available [here](https://github.com/Axway/Cloud-Automation/tree/master/APIM/Helmchart) 
 
 ## Deployment
 Somes parameters change the deployment. Here is a resume:
@@ -95,4 +95,4 @@ The bash script is executed by a custom script extension in folder
 You can find also some log files stdout and stderror.
 A **Webhook MS teams** could be configured to receive all logs and defined error.
 
-Join the Cloud & automation community on [Axway website](https://community.axway.com/). And be sure to share your problem or idea.
+Join the Cloud & automation community on [Axway website](https://community.axway.com/s/group/0F92X000000CtYISA0/cloud-automation?t=1580717413613). And be sure to share your problem or idea.
