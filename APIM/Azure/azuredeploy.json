@@ -170,7 +170,7 @@
 
       "containerRegistryName": "[toLower(concat(parameters('projectName'),parameters('environment'), 'acr'))]",
 
-      "baseURL": "https://github.com/Axway/Cloud-Automation/APIM/Azure/Quickstart-deployment/",
+      "baseURL": "https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Azure/",
       "nestedTemplateURL": "[concat(variables('baseURL'),'armtemplates/nestedtemplates/')]",
       "scriptURL": "[concat(variables('baseURL'),'armtemplates/scripts/')]",
 
