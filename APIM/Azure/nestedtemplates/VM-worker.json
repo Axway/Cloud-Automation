@@ -1,0 +1,165 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vmName": {
+        "type": "string"
+      },
+      "vmNicName": {
+        "type": "string"
+      },
+      "vmDiskName": {
+        "type": "string"
+      },
+      "vmAdminName": {
+        "type": "string"
+      },
+      "vmExtensionName": {
+        "type": "string"
+      },
+      "URIStorageCustomScript": {
+        "type": "string"
+      },
+      "customScriptCommandToExecute": {
+        "type": "string"
+      },
+      "vmAdminPWD": {
+        "type": "securestring"
+      },
+      "subnetId": {
+        "type": "string"
+      },
+      "location": {
+        "type": "string"
+      },
+      "publicIPAddressName": {
+        "type": "string"
+      },
+      "dnsName": {
+        "type": "string"
+      },
+      "publicIPAddressId": {
+        "type": "string"
+      }
+    },
+    "variables": {
+      "imagePublisher": "OpenLogic",
+      "imageOffer": "CentOS",
+      "imageSKU": "7.5",
+      "vmSize" : "Standard_D2_v2"
+    },
+    "resources": [
+      {
+        "apiVersion": "2015-05-01-preview",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[parameters('publicIPAddressName')]",
+        "tags": {
+          "displayName": "Public IP"
+        },
+        "location": "[parameters('location')]",
+        "properties": {
+          "publicIPAllocationMethod": "Dynamic",
+          "dnsSettings": {
+            "domainNameLabel": "[parameters('dnsName')]"
+          }
+        }
+      },
+        {
+            "name": "[parameters('vmNicName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-10-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "displayName": "Temp Virtual Machine Nic"
+              },
+            "dependsOn": [
+              "[parameters('publicIPAddressName')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                    "name": "InternalIp01",
+                    "properties": {
+                        "subnet": {
+                            "id": "[parameters('subnetId')]"
+                        },
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                      "id": "[parameters('publicIPAddressId')]"
+                      }
+                    }
+                }
+              ]
+            }
+        },
+        {
+            "name": "[parameters('vmName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-10-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "displayName": "Temp Virtual Machine"
+              },
+            "dependsOn": [
+              "[concat('Microsoft.Network/networkInterfaces/', parameters('vmNicName'))]"
+            ],
+            "properties": {
+              "hardwareProfile": {
+                "vmSize": "[variables('vmSize')]"
+              },
+              "storageProfile": {
+                "osDisk": {
+                  "name": "[parameters('vmDiskName')]",
+                  "createOption": "FromImage",
+                  "managedDisk": {
+                    "storageAccountType": "Standard_LRS"
+                  }
+                },
+                "imageReference": {
+                  "publisher": "[variables('imagePublisher')]",
+                  "offer": "[variables('imageOffer')]",
+                  "sku": "[variables('imageSKU')]",
+                  "version": "latest"
+                }
+              },
+              "networkProfile": {
+                "networkInterfaces": [
+                {
+                  "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('vmNicName'))]"
+                }
+                ]
+              },
+              "osProfile": {
+                "computerName": "[parameters('vmName')]",
+                "adminUsername": "[parameters('vmAdminName')]",
+                "adminPassword": "[parameters('vmAdminPWD')]"
+              }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('vmName'),'/', parameters('vmExtensionName'))]",
+            "apiVersion": "2016-03-30",
+            "location": "[parameters('location')]",
+            "tags": {
+              "displayName": "Temp Virtual Machine Extension"
+            },
+            "dependsOn": [
+              "[resourceId('Microsoft.Compute/virtualMachines/',concat(parameters('vmName')))]"
+            ],
+            "properties": {
+              "publisher": "Microsoft.Azure.Extensions",
+              "type": "CustomScript",
+              "typeHandlerVersion": "2.0",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "fileUris": [
+                  "[parameters('URIStorageCustomScript')]"
+                ],
+                "commandToExecute": "[parameters('customScriptCommandToExecute')]"
+              }
+            }
+        }
+      ],
+      "outputs": {}
+    }

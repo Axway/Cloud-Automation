@@ -1,0 +1,21 @@
+{{- if eq .Values.apiportal.enabled true }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.apiportal.name | quote }}
+    version: {{ .Values.apiportal.buildTag }}
+  name: {{ .Values.apiportal.name | quote }}
+  namespace: {{ .Values.global.namespace | quote }}
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ .Values.apiportal.trafficPort }}
+    targetPort: {{ .Values.apiportal.trafficPort }}
+    protocol: TCP
+    name: {{ .Values.apiportal.name | quote }}
+  selector:
+    app: {{ .Values.apiportal.name | quote }}
+  sessionAffinity: None
+  type: ClusterIP
+{{- end }}

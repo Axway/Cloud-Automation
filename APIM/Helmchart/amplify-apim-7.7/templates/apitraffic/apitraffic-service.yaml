@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: {{ .Values.apitraffic.name }}
+    version: {{ .Values.apitraffic.buildTag }}
+  name: {{ .Values.apitraffic.name }}
+  namespace: {{ .Values.global.namespace | quote }} 
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: {{ .Values.apitraffic.portManager }}
+    targetPort: {{ .Values.apitraffic.portManager }}
+    name: trafficmanager
+    protocol: TCP
+  - port: {{ .Values.apitraffic.portGateway }}
+    targetPort: {{ .Values.apitraffic.portGateway }}
+    name: trafficgateway
+    protocol: TCP
+  - port: {{ .Values.apitraffic.portGatewaySSL }}
+    targetPort: {{ .Values.apitraffic.portGatewaySSL }}
+    name: trafficgatewayssl
+    protocol: TCP
+  selector:
+    app: {{ .Values.apitraffic.name }}
+  sessionAffinity: None

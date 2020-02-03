@@ -1,0 +1,89 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "clusterName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "nodesName": {
+            "type": "string"
+        },
+        "kubernetesVersion": {
+            "type": "string"
+        },
+        "dnsPrefix": {
+            "type": "string"
+        },
+        "subnetID": {
+            "type": "string"
+        },
+        "dockerBridgeCidr": {
+            "type": "string"
+        },
+        "serviceCidr": {
+            "type": "string"
+        },
+        "dnsServiceIP": {
+            "type": "string"
+        },
+        "SPClientID": {
+            "type": "securestring"
+        },
+        "SPClientSecret": {
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "NodeOSDiskSize": 100,
+        "MaxPodsPerNodes": 30,
+        "NodeOsType": "Linux",
+        "RbacPermission": "[bool('true')]",
+        "networkPlugin": "azure",
+        "networkPolicy": "azure",
+        "aksSizingNodes": "Standard_DS3_v2",
+        "aksNumberNodes": 3
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ContainerService/managedClusters",
+            "apiVersion": "2019-08-01",
+            "name": "[parameters('clusterName')]",
+            "location": "[parameters('location')]",
+            "tags": {
+            },
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "dnsPrefix": "[parameters('dnsPrefix')]",
+                "enableRBAC": "[variables('RbacPermission')]",
+                "agentPoolProfiles": [
+                    {
+                        "name": "[parameters('nodesName')]",
+                        "count": "[variables('aksNumberNodes')]",
+                        "vmSize": "[variables('aksSizingNodes')]",
+                        "osDiskSizeGB": "[variables('NodeOSDiskSize')]",
+                        "storageProfile": "ManagedDisks",
+                        "subnetID": "[parameters('subnetID')]",
+                        "maxPods": "[variables('MaxPodsPerNodes')]",
+                        "osType": "[variables('NodeOsType')]",
+                        "type": "VirtualMachineScaleSets"                        
+                    }
+                ],
+                "servicePrincipalProfile": {
+                    "clientId": "[parameters('SPClientID')]",
+                    "secret": "[parameters('SPClientSecret')]"
+                },
+                "networkProfile": {
+                    "loadBalancerSku": "standard",
+                    "networkPolicy": "[variables('networkPolicy')]",
+                    "networkPlugin": "[variables('networkPlugin')]",
+                    "serviceCidr": "[parameters('serviceCidr')]",
+                    "dnsServiceIP": "[parameters('dnsServiceIP')]",
+                    "dockerBridgeCidr": "[parameters('dockerBridgeCidr')]"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gatewaymanager
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"  
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "API-Gateway-Manager-UI"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.anm.ingressName }}
+    secretName: tls-secret-anm
+  rules:
+  - host: {{ .Values.anm.ingressName }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Values.anm.name }}
+          servicePort: {{ .Values.anm.trafficPort }}
+        path: /

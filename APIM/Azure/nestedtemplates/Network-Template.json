@@ -1,0 +1,149 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "type": "string"
+        },
+        "vnetId": {
+            "type": "string"
+        },
+        "vnetPrefix": {
+            "type": "string"
+        },
+        "snetAksName": {
+            "type": "string"
+        },
+        "snetAksPrefix": {
+            "type": "string"
+        },
+        "snetBastionName": {
+            "type": "string"
+        },
+        "snetBastionPrefix": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "uriNsgTemplate": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "nsgBastionName": "bastion-nsg",
+        "nsgBastionId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgBastionName'))]",
+        "nsgAksName": "aks-nsg",
+        "nsgAksId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgAksName'))]"
+    },
+    "resources": [
+        {
+            "name": "LinkedNSGTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri":"[parameters('uriNsgTemplate')]"
+                },
+                "parameters": {
+                    "Location":{"value": "[parameters('location')]"},
+                    "aksNsgName":{"value": "[variables('nsgAksName')]"},
+                    "bastionNsgName":{"value": "[variables('nsgBastionName')]"}
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-12-01",
+            "name": "[parameters('vnetName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "LinkedNSGTemplate"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('vnetPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('snetAksName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('snetAksPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[variables('nsgAksId')]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    },
+                    {
+                        "name": "[parameters('snetBastionName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('snetBastionPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[variables('nsgBastionId')]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    }
+                ],
+                "virtualNetworkPeerings": [],
+                "enableDdosProtection": false,
+                "enableVmProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('vnetName'), '/', parameters('snetAksName'))]",
+            "dependsOn": [
+                "LinkedNSGTemplate",
+                "[parameters('vnetId')]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('snetAksPrefix')]",
+                "networkSecurityGroup": {
+                    "id": "[variables('nsgAksId')]"
+                },
+                "serviceEndpoints": [
+                    {
+                        "service": "Microsoft.Storage",
+                        "locations": [
+                            "northeurope"
+                        ]
+                    }
+                ],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('vnetName'), '/', parameters('snetBastionName'))]",
+            "dependsOn": [
+                "LinkedNSGTemplate",
+                "[parameters('vnetId')]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'),parameters('snetAksName'))]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('snetBastionPrefix')]",
+                "networkSecurityGroup": {
+                    "id": "[variables('nsgBastionId')]"
+                },
+                "serviceEndpoints": [
+                    {
+                        "service": "Microsoft.Storage",
+                        "locations": [
+                            "northeurope"
+                        ]
+                    }
+                ],
+                "delegations": []
+            }
+        }
+    ]
+}

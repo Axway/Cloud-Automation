@@ -1,0 +1,131 @@
+# Default values for apimgr-ext-cass.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# minikube, AWS, esx, AZURE
+platform: "AZURE"
+
+global:
+   pullPolicy: Always
+   # The image used for initContainers
+   initImageTag: "busybox:1.30"
+   updateStrategy: "RollingUpdate"
+   editor: "Axway"
+   apimVersion: "APIM-VERSION-VALUE"
+   namespace: "APIM-NAMESPACE-VALUE"
+   dockerRegistries:
+      apimName: DOCKER-REGISTRY-USER-NAME-VALUE
+      apimSecret: DOCKER-REGISTRY-USER-PWD-VALUE
+   share:
+      secret: azure-file
+      name: apimlogs
+      quota: 5
+
+anm:
+   name: anm
+   buildTag: "ANM-IMAGE-TAG-VALUE"
+   imageName: "apim-anm"
+   ingressName: "ANM-DNS-NAME-VALUE"
+   replicaCount: 1
+   pvcQuota: 1
+   trafficPort: 8090
+   logTraceToFile: "true"
+   logTraceJSONtoSTDOUT: "true"
+   emt_heap_size_mb: "1024"
+   emt_topology_ttl: 10
+   emt_trace_level: "INFO"
+
+apimgr:
+   name: apimgr
+   buildTag: "7.7-SP1"
+   imageName: "apim-mgr"
+   ingressName: "APIMGR-DNS-NAME-VALUE"
+   replicaCount: 1
+   trafficPort: 8075
+   logTraceToFile: "true"
+   logTraceJSONtoSTDOUT: "true"
+   logOpenTrafficOutput: "stdout"
+   emt_trace_level: "INFO"
+   emt_heap_size_mb: "1024"
+
+apitraffic:
+   name: traffic
+   buildTag: "7.7-SP1"
+   imageName: "apim-mgr"
+   apiManager:
+      ingressName: "APITRAFFICMANAGER-DNS-NAME-VALUE"
+   apiDefault:
+      enabled: false
+      ingressName: "APITRAFFICDEFAULT-DNS-NAME-VALUE"
+   portManager: 8065
+   portGateway: 8080
+   portGatewaySSL: 8081
+   replicaCount: 3
+   autoscaling:
+      minReplicas: 3
+      maxReplicas: 6
+      averageUtilization: 70
+   logTraceToFile: "true"
+   logTraceJSONtoSTDOUT: "true"
+   logOpenTrafficOutput: "stdout"
+   emt_trace_level: "INFO"
+   emt_heap_size_mb: "1512"
+   test_import: false
+   share:
+      secret: "TRAFFIC-SHARE-SECRET-NAME-VALUE"
+      name: "TRAFFIC-SHARE-NAME-VALUE"
+      path: "/opt/Axway/apigateway/events"
+      quota: 1
+
+apiportal:
+   enabled: false
+   name: "api-portal"
+   buildTag: "7.6.2"
+   imageName: "apim-ptl"
+   ingressName: "APIPORTAL-DNS-NAME-VALUE"
+   trafficPort: 443
+   replicaCount: 1
+   share:
+      secret: "APIPORTAL-SHARE-SECRET-NAME-VALUE"
+      name: "APIPORTAL-SHARE-NAME-VALUE"
+
+mysqlAnalytics:
+   enabled: true
+   name: mysql-aga
+   imageName: "mysql"
+   buildTag: "5.7.26"
+   replicaCount: 1
+   dbName: "analytics"
+   adminUser: report
+   quotaStorage: 10
+   port: 3306
+
+mysqlPortal:
+   enabled: false
+   name: "mysql-portal"
+   imageName: "mysql"
+   buildTag: "5.7.26"
+   replicaCount: 1
+   dbName: "portal"
+   adminUser: "portal"
+   quotaStorage: 10
+   port: 3306
+
+cassandra:
+   enabled: true
+   name: "cassandra"
+   portCql: 9042
+   portJmx: 7199
+   portIntraNode: 7000
+   portTlsIntraNode: 7001
+   buildTag: v13
+   registry: "gcr.io/google-samples/cassandra"
+   replicaCount: 3
+   clusterName: "APIM"
+   keyspace: "apim_demo_1"
+
+oauth:
+   enabled: false
+   name: "oauth"
+   ingressName: "OAUTH-DNS-NAME-VALUE"
+   trafficPort: 8089

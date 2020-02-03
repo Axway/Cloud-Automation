@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.apimgr.name | quote }}
+    version: {{ .Values.apimgr.buildTag }}
+  name: {{ .Values.apimgr.name | quote }}
+  namespace: {{ .Values.global.namespace | quote }}
+spec:
+  replicas: {{ .Values.apimgr.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.apimgr.name | quote }}
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.apimgr.name | quote }}
+    spec:
+      containers:
+      - args:
+        - /opt/Axway/apigateway/posix/bin/start-emt-instance
+        env:
+        - name: CASS_HOST
+          value: {{ .Values.cassandra.name | quote }}
+        - name: EMT_ANM_HOSTS
+          value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
+        - name: CASS_KEYSPACE
+          value: {{ .Values.cassandra.keyspace | quote }}
+        - name: EMT_TOPOLOGY_TTL
+          value: "10"
+        - name: APIGW_LOG_TRACE_TO_FILE
+          value: "{{ .Values.apimgr.logTraceToFile }}"
+        - name: APIGW_LOG_TRACE_JSON_TO_STDOUT
+          value: "{{ .Values.apimgr.logTraceJSONtoSTDOUT }}"
+        - name: APIGW_LOG_OPENTRAFFIC_OUTPUT
+          value: "{{ .Values.apimgr.logOpenTrafficOutput }}"
+        - name: METRICS_DB_URL
+          value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL=false
+        - name: METRICS_DB_USERNAME
+          value: {{ .Values.mysqlAnalytics.adminUser }}
+        - name: MYSQL_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: apim-password
+              key: dbmysqlanalytics
+        - name: EMT_DEPLOYMENT_ENABLED
+          value: "true"
+        image: {{ .Values.global.dockerRegistries.apimName }}/{{ .Values.apimgr.imageName }}:{{ .Values.apimgr.buildTag }}
+        imagePullPolicy: {{ .Values.global.pullPolicy | quote }}
+        name: {{ .Values.apimgr.name | quote }}
+        ports:
+        - containerPort: {{ .Values.apimgr.trafficPort }}
+          protocol: TCP
+        resources: {}
+        readinessProbe:
+          httpGet:
+            httpHeaders:
+            - name: k8sprobe
+              value: readiness.{{ .Values.apimgr.name }}
+            path: /healthcheck
+            port: {{ .Values.apimgr.trafficPort }}
+            scheme: HTTPS
+          initialDelaySeconds: 50
+          periodSeconds: 15
+          failureThreshold: 10
+        livenessProbe:
+          httpGet:
+            httpHeaders:
+            - name: k8sprobe
+              value: liveness.{{ .Values.apimgr.name }}
+            path: /healthcheck
+            port: {{ .Values.apimgr.trafficPort }}
+            scheme: HTTPS
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 5
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: {{ .Values.apitraffic.share.path | quote }}
+          name: events
+      initContainers:
+      - name: init-cassandra
+        image: {{ .Values.global.initImageTag }}
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.name }} 9042; do echo waiting for cassandra-0; sleep 2; done;']
+      - name: init-mysql
+        image: {{ .Values.global.initImageTag }}
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysqlAnalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
+      - name: init-anm
+        image: {{ .Values.global.initImageTag }}
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.anm.name }} 8090; do echo waiting for anm; sleep 2; done;']
+      imagePullSecrets:
+      - name: {{ .Values.global.dockerRegistries.apimSecret }}      
+      #dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: events
+        azureFile:
+          secretName: {{ .Values.apitraffic.share.secret | quote }}
+          shareName: {{ .Values.apitraffic.share.name | quote }}
+          readOnly: false

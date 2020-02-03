@@ -1,0 +1,55 @@
+{{- if eq .Values.apiportal.enabled true }}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.mysqlPortal.name }}
+  namespace: {{ .Values.global.namespace | quote }} 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+       app: {{ .Values.mysqlPortal.name }}
+  strategy: 
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.mysqlPortal.name }}
+    spec:
+      containers:
+      - image: {{ .Values.mysqlPortal.imageName }}:{{ .Values.mysqlPortal.buildTag }}
+        name: {{ .Values.mysqlPortal.name }}
+        args:
+        - "--ignore-db-dir=lost+found"
+        env:
+        - name: MYSQL_DATABASE
+          value: {{ .Values.mysqlPortal.dbName }}
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: apim-password
+              key: dbmysqlroot
+        - name: MYSQL_USER
+          value: {{ .Values.mysqlPortal.adminUser }}
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: apim-password
+              key: dbmysqlportal
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.mysqlAnalytics.port }}
+          protocol: TCP
+          name: {{ .Values.mysqlPortal.name }}
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-portal-pvc
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+{{- end }}

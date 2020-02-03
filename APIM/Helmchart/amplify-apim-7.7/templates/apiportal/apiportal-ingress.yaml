@@ -1,0 +1,30 @@
+{{- if eq .Values.apiportal.enabled true }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.apiportal.name }}
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "API-Portal"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.apiportal.ingressName }}
+    secretName: tls-secret-portal
+  rules:
+  - host: {{ .Values.apiportal.ingressName }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Values.apiportal.name }}
+          servicePort: {{ .Values.apiportal.trafficPort }}
+        path: /
+{{- end }}

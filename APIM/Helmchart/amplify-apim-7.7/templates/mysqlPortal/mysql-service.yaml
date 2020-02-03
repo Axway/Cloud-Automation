@@ -1,0 +1,18 @@
+{{- if eq .Values.apiportal.enabled true }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: {{ .Values.mysqlPortal.name }}
+  name: {{ .Values.mysqlPortal.name }}
+  namespace: {{ .Values.global.namespace | quote }}
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ .Values.mysqlPortal.port }}
+    targetPort: {{ .Values.mysqlPortal.port }}
+    protocol: TCP
+  selector:
+    app: {{ .Values.mysqlPortal.name }}
+  clusterIP: None
+{{- end }}

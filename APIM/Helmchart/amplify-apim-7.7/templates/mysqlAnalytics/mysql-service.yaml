@@ -1,0 +1,18 @@
+{{- if eq .Values.mysqlAnalytics.enabled true }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: {{ .Values.mysqlAnalytics.name }}
+  name: {{ .Values.mysqlAnalytics.name }}
+  namespace: {{ .Values.global.namespace | quote }}
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ .Values.mysqlAnalytics.port }}
+    targetPort: {{ .Values.mysqlAnalytics.port }}
+    protocol: TCP
+  selector:
+    app: {{ .Values.mysqlAnalytics.name }}
+  clusterIP: None
+{{- end }}

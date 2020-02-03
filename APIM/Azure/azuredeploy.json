@@ -1,0 +1,329 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "projectName": {
+        "type": "string",
+        "defaultValue": "APIM",
+        "metadata": {
+          "description": "Name of your project. Used as prefix for all objects."
+        }
+      },
+      "apimVersion": {
+          "type": "string",
+          "allowedValues": [
+              "7.6.2",
+              "7.7"
+          ],
+          "defaultValue": "7.6.2",
+          "metadata": {
+              "description": "Version of Axway's. This value will be used to search packages."
+          }
+      },
+      "domainName": {
+        "type": "string",
+        "metadata": {
+          "description": "DomainName that you want to use for ingress."
+        }
+      },
+      "manageDNS": {
+        "type": "string",
+        "defaultValue": "false",
+        "allowedValues": [
+            "true",
+            "false"
+        ],
+        "metadata": {
+          "description": "specify if the zone is managed by Azure DNS. The install script will configure it automatically.Be carreful, the Service Principal must be allowed to add records on this domain."
+        }
+      },
+      "dnsRGName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the resource group for DNS managed zone."
+        }
+      },
+      "userAdmin": {
+        "type": "string",
+        "defaultValue": "demo",
+        "metadata": {
+          "description": "Set the name of admin user. It will be used for Bastion and other Interface "
+        }
+      },
+      "_adminPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Set the Password for admin UI and VM Bastion"
+        }
+      },
+      "vnetPrefix": {
+        "type": "string",
+        "defaultValue": "10.245.0.0/24",
+        "metadata": {
+          "description": "Url of the Service Principal Name"
+        }
+      },
+      "snetAksPrefix": {
+        "type": "string",
+        "defaultValue": "10.245.0.128/25",
+        "metadata": {
+          "description": "Url of the Service Principal Name"
+        }
+      },
+      "serviceCidr": {
+        "type": "string",
+        "defaultValue": "10.0.0.0/16"
+      },
+      "dnsServiceIP": {
+        "type": "string",
+        "defaultValue": "10.0.0.10"
+      },
+      "dockerBridgeCidr": {
+        "type": "string",
+        "defaultValue": "172.17.0.1/16"
+      },
+      "snetBastionPrefix": {
+        "type": "string",
+        "defaultValue": "10.245.0.0/28",
+        "metadata": {
+          "description": "Url of the Service Principal Name"
+        }
+      },
+      "servicePrincipalName": {
+        "type": "string",
+        "metadata": {
+          "description": "Url of the Service Principal Name"
+        }
+      },
+      "_servicePrincipalID": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Client ID with permissions to Build RBAC AKS Cluster. See Prerequisites to do this !"
+        }
+      },
+      "_servicePrincipalSecret": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Secret of the registration APP."
+        }
+      },
+      "_tenantID": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Tenant ID"
+        }
+      },
+      "email": {
+        "type": "string",
+        "metadata": {
+          "description": "Email to receive all informations and "
+        }
+      },
+      "environment": {
+        "type": "string",
+        "defaultValue": "demo",
+        "metadata": {
+            "description": "environment type by default : Demo."
+        }
+      },
+      "sourceBlobStorageName": {
+          "type": "string",
+          "metadata": {
+              "description": "Name of Blob storage where sources files and arm templates are stored"
+          }
+      },
+      "portal": {
+        "type": "string",
+          "allowedValues": [
+              "true",
+              "false"
+          ],
+        "defaultValue": "true",
+        "metadata": {
+            "description": "environment type by default : Demo."
+        }
+      },
+      "webhookUrl": {
+        "type": "string",
+        "defaultValue": "None",
+        "metadata": {
+          "description": "Microsoft Teams URL used to report deployment steps. If value at None, logs will written only on VM."
+        }
+      }
+    },
+  "variables": {
+      "productName": "AMPLIFY API MANAGEMENT",
+
+      "bastionVMName": "[concat('bastion-',parameters('projectName'),'-',parameters('environment'),'-vm')]",
+      "bastionVMNicName": "[concat('bastion-',parameters('projectName'),'-',parameters('environment'),'-nic')]",
+      "bastionVMDiskName": "[concat('bastion-',parameters('projectName'),'-',parameters('environment'),'-dsk')]",
+      "publicIPAddressName": "[toLower(concat('bastion-',parameters('projectName'),'-',parameters('environment'),'-ip'))]",
+      "dnsName": "[concat(toLower(parameters('projectName')),'-dns')]",
+      "publicIPAddressId": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
+
+      "vnetName": "[toLower(concat(parameters('projectName'),'-',parameters('environment'),'-vnet'))]",
+      "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+      "snetAksName": "aks-snet",
+      "snetAksId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('snetAksName'))]",
+      "snetBastionName":"bastion-snet",
+      "snetBastionId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('snetBastionName'))]",
+
+      "containerRegistryName": "[toLower(concat(parameters('projectName'),parameters('environment'), 'acr'))]",
+
+      "baseURL": "https://github.com/Axway/Cloud-Automation/APIM/Azure/Quickstart-deployment/",
+      "nestedTemplateURL": "[concat(variables('baseURL'),'armtemplates/nestedtemplates/')]",
+      "scriptURL": "[concat(variables('baseURL'),'armtemplates/scripts/')]",
+
+      "uriNetworkTemplate": "[uri(variables('nestedTemplateURL'), 'Network-Template.json')]",
+      "uriAKSTemplate": "[uri(variables('nestedTemplateURL'), 'AKS-Template.json')]",
+      "uriNSGTemplate": "[uri(variables('nestedTemplateURL'), 'NSG-Template.json')]",            
+      "uriStorageAccountTemplate": "[uri(variables('nestedTemplateURL'), 'StorageAccount-Template.json')]",
+      "uriStorageCustomScript": "[uri(variables('scriptURL'), variables('scriptFileName'))]",
+      "uriVMBastionTemplate": "[uri(variables('nestedTemplateURL'), 'VM-worker.json')]",
+      "uriACRTemplate": "[uri(variables('nestedTemplateURL'), 'ACR-Template.json')]",
+
+      "SAFilePremiumName": "[toLower(concat(parameters('projectName'),parameters('environment')))]",
+
+      "aksNodeNamePrefix": "[toLower(concat(parameters('projectName'),parameters('environment')))]",
+      "aksClusterName": "[toLower(concat(parameters('projectName'),parameters('environment')))]",
+      "aksDnsPrefix": "[toLower(concat(parameters('projectName'), '-dns'))]",
+      "aksVersion": "1.15.5",
+  
+      "scriptFileName": "Deploy-APIM-v1.0.sh",
+      "vmExtensionName": "[concat(variables('bastionVMName'),'-scriptextension')]",
+      "customScriptCommandToExecute": "[concat('bash ', variables('scriptFileName'), ' --rg=', resourceGroup().name, ' --av=', parameters('apimVersion'), ' --kn=',  variables('aksClusterName'), ' --kv=',  variables('aksVersion'), ' --user=', parameters('userAdmin'), ' --crn=', variables('containerRegistryName'), ' --usn=', parameters('sourceBlobStorageName'), ' --spnn=', parameters('servicePrincipalName'), ' --spni=', parameters('_servicePrincipalID'), ' --spnp=', parameters('_servicePrincipalSecret'), ' --tid=', parameters('_tenantID'), ' --env=', parameters('environment'), ' --sfn=', variables('SAFilePremiumName'), ' --pn=', parameters('projectName'), ' --mail=', parameters('email'), ' --wbk=', replace(parameters('webhookUrl'),'&','*'), ' --dns=', toLower(parameters('domainName')), ' --zoneRGN=', parameters('dnsRGName'), ' --prt=', toLower(parameters('portal')), ' --mdm=', parameters('manageDNS'))]"
+    },
+  "functions": [],
+  "resources": [
+    {
+      "name": "pid-13f885f9-8843-4cfd-a12b-9b1009d58361",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+          "mode": "Incremental",
+          "template": {
+              "$schema":"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+              "contentversion": "1.0.0.0",
+              "resources": []
+          }
+      }
+    },
+    {
+      "name": "storageProvisionning",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+              "uri":"[variables('uriStorageAccountTemplate')]"
+          },
+          "parameters": {
+              "Location":{"value": "[resourceGroup().location]"},
+              "storageAccountName":{"value": "[variables('SAFilePremiumName')]"}
+          }
+      }
+    },
+    {
+        "name": "networkCreation",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2019-08-01",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri":"[variables('uriNetworkTemplate')]"
+            },
+            "debugSetting": {
+              "detailLevel": "requestContent, responseContent"
+          },
+            "parameters": {
+                "vnetName":{"value": "[variables('vnetName')]"},
+                "vnetId":{"value": "[variables('vnetId')]"},
+                "vnetPrefix":{"value": "[parameters('vnetPrefix')]"},
+                "snetAksName":{"value": "[variables('snetAksName')]"},
+                "snetAksPrefix":{"value": "[parameters('snetAksPrefix')]"},
+                "snetBastionName":{"value": "[variables('snetBastionName')]"},
+                "snetBastionPrefix":{"value": "[parameters('snetBastionPrefix')]"},
+                "location":{"value": "[resourceGroup().location]"},
+                "uriNsgTemplate":{"value": "[variables('uriNSGTemplate')]"}
+            }
+        }
+    },
+    {
+      "name": "LinkedACRTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2018-05-01",
+      "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+              "uri":"[variables('URIACRTemplate')]"
+          },
+          "debugSetting": {
+            "detailLevel": "requestContent, responseContent"
+        },
+          "parameters": {
+              "Location":{"value": "[resourceGroup().location]"},
+              "DeploymentType":{"value": "[parameters('environment')]"},
+              "ACRName":{"value": "[variables('containerRegistryName')]"}
+          }
+      }
+    },
+    {
+        "name": "AKSCreation",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2019-08-01",
+        "dependsOn": [
+          "networkCreation"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri":"[variables('uriAKSTemplate')]"
+            },
+            "parameters": {
+                "clusterName":{"value": "[variables('AKSClusterName')]"},
+                "location":{"value": "[resourceGroup().location]"},
+                "dnsPrefix":{"value": "[variables('aksDnsPrefix')]"},
+                "SPClientID":{"value": "[parameters('_servicePrincipalID')]"},
+                "SPClientSecret":{"value": "[parameters('_servicePrincipalSecret')]"},
+                "subnetID":{"value": "[variables('snetAksId')]"},
+                "nodesName":{"value": "[variables('AKSNodeNamePrefix')]"},
+                "kubernetesVersion":{"value": "[variables('aksVersion')]"},
+                "dockerBridgeCidr":{"value": "[parameters('dockerBridgeCidr')]"},
+                "serviceCidr":{"value": "[parameters('serviceCidr')]"},
+                "dnsServiceIP":{"value": "[parameters('dnsServiceIP')]"}
+            }
+        }
+    },
+    {
+        "name": "VMBastion",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2019-08-01",
+        "dependsOn": [
+          "networkCreation",
+          "AKSCreation"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri":"[variables('uriVMBastionTemplate')]"
+            },
+            "parameters": {
+                "vmName":{"value": "[variables('bastionVMName')]"},
+                "vmNicName":{"value": "[variables('bastionVMNicName')]"},
+                "vmDiskName":{"value": "[variables('bastionVMDiskName')]"},
+                "vmExtensionName":{"value": "[variables('vmExtensionName')]"},
+                "vmAdminName":{"value": "[parameters('userAdmin')]"},
+                "vmAdminPWD":{"value": "[parameters('_adminPassword')]"},
+                "publicIPAddressName":{"value": "[variables('publicIPAddressName')]"},
+                "dnsName":{"value": "[variables('dnsName')]"},
+                "location":{"value": "[resourceGroup().location]"},
+                "subnetId":{"value": "[variables('snetBastionId')]"},
+                "publicIPAddressId":{"value": "[variables('publicIPAddressId')]"},
+                "URIStorageCustomScript":{"value": "[variables('uriStorageCustomScript')]"},
+                "customScriptCommandToExecute":{"value": "[variables('customScriptCommandToExecute')]"}
+              }
+        }
+    }
+  ],
+  "outputs": {  }
+}

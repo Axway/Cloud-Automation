@@ -1,0 +1,16 @@
+{{- if eq .Values.apiportal.enabled true }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    data: mysql-portal
+  name: mysql-portal-pvc
+  namespace: {{ .Values.global.namespace | quote }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: {{ .Values.mysqlPortal.quotaStorage }}Gi
+{{- end }}

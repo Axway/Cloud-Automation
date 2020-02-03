@@ -1,0 +1,16 @@
+{{- if eq .Values.mysqlAnalytics.enabled true }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    data: mysql-analytics
+  name: mysql-analytics-pvc
+  namespace: {{ .Values.global.namespace | quote }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: {{ .Values.mysqlAnalytics.quotaStorage }}Gi
+{{- end }}
