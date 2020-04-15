@@ -238,7 +238,7 @@ function f_Get_Sources ()
         sourcePackageName=$(basename $apimSourceLocation)
         log "Apim sources package finded. Use package $sourcePackageName"
         tar -xzf $apimSourceLocation --directory $productsFolder
-        emtFolder=$(ls $productsFolder | grep emt-containers)
+        emtFolder=$(ls $productsFolder | grep apigw-emt)
         mv $productsFolder/$emtFolder/* $installFolder 
     else
         log "Installation aborted! Apim emt source not found."
@@ -351,7 +351,7 @@ function f_Setup_Helm ()
 
     kubectl create serviceaccount $serviceAccountName --namespace $namespaceHelm
 	kubectl create clusterrolebinding $serviceAccountName \
-			--clusterrole $clusterRole \
+			--clusterrole=$clusterRole \
 			--serviceaccount=$namespaceHelm:$serviceAccountName
 
     helm init -c
