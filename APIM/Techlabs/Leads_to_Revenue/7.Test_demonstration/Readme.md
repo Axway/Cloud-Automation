@@ -16,6 +16,7 @@ You can monitor the flow execution in Application Integration:
 - Click **"Flow"**.
 - Find the flow instance in the list and click **" Executions"**.
 - Click an object ID tile to reveal execution step tiles.
+On the following screenshots, you see all the steps as the monitoring has been enabled.
 ![test2.png](./imgs/test2.png)
 
 Now Annie can create leads in Salesforce and keep informed all her colleagues automatically. Sweet!
