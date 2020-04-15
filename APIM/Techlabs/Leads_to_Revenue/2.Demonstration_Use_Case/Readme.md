@@ -15,4 +15,4 @@ And we will create a new instance of the flow, to link connectors to  flow insta
 
 Finally, we will test the demonstration.
 
-**Next:** [Let's start with testing the connection to the interfaces Slack, Salesforce and AMPLIFY platform.](../3. Connect to interfaces)
+**Next:** [Let's start with testing the connection to the interfaces Slack, Salesforce and AMPLIFY platform.](../3.Connect_to_interfaces)

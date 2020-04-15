@@ -31,4 +31,4 @@ Connect to AMPLIFY Application Integration
 ![Connect_AMPLIFY.png](./imgs/Connect_AMPLIFY.png)
 
 
-**Next:** [Now let's create instances of the cloud connectors in the AMPLIFY platform.](../4. Instantiate cloud connectors)
+**Next:** [Now let's create instances of the cloud connectors in the AMPLIFY platform.](../4.Instantiate_cloud_connectors)

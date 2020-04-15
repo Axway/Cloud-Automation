@@ -66,5 +66,5 @@ The completed flow diagram should look like the following image :
 
 ![Create_flow7.png](./imgs/Create_flow7.png)
 
-**Next:** [Now let's create an instance of our flow](../6. Instantiate Cloud2Cloud flow)
+**Next:** [Now let's create an instance of our flow](../6.Instantiate_Cloud2Cloud_flow)
 

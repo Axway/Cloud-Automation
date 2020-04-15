@@ -22,4 +22,4 @@ Now Annie can create leads in Salesforce and keep informed all her colleagues au
 
 The exercice is finished. If you want to play around with AMPLIFY platform, you can also create your own account on the platform.
 
-**Next:** [Create your AMPLIFY platform account](../8. Access to AMPLIFY Platform)
+**Next:** [Create your AMPLIFY platform account](../8.Access_to_AMPLIFY_Platform)

@@ -10,3 +10,4 @@ The different scenarios are:
 - [API Management](./API_Management), presenting how to virtualize, publish and consume APIs 
 - [Policy Studio](./Policy_Studio), capable to design complex integration and security policies, presented through a nice quota system example
 - [Container deployment benefits](./Container_deployment_benefits), leveraging benefits of a container deployment of the solution 
+- [Leads to revenue](./Leads_to_Revenue), to advertise new business opportunities from Salesforce to Slack, with an easy cloud2cloud integration with Integration Builder

@@ -30,4 +30,4 @@ The AMPLIFY platform is the Axway **HIP** (**Hybrid Integration Platform**).
 
 Now let's see the demonstration use case.
 
-**Next:** [Now let's see the demonstration use case.](../2. Demonstration Use Case)
+**Next:** [Now let's see the demonstration use case.](../2.Demonstration_Use_Case)

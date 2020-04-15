@@ -40,6 +40,6 @@ You are prompted to log on to Salesforce.
 
 ![Slack3.png](./imgs/Slack3.png)
 
-**Next:** [Now, let's create a cloud2cloud flow](../5. Create Cloud2Cloud flow)
+**Next:** [Now, let's create a cloud2cloud flow](../5.Create_Cloud2Cloud_flow)
 
 

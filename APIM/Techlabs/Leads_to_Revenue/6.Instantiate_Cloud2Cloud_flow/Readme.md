@@ -17,4 +17,4 @@
 
 ![Instance_flow2.png](./imgs/Instance_flow2.png)
 
-**Next:** [And finally, let's test our new Salesforce to Slack integration!](../7. Test demonstration)
+**Next:** [And finally, let's test our new Salesforce to Slack integration!](../7.Test_demonstration)
