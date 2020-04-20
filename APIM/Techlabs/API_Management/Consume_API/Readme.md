@@ -13,22 +13,23 @@ So let's move to API Portal web UI.
 
 Let's connect as Dave:
 - Open a new tab in Firefox (blue **"+"** button)
-- Click on the **"Portal"** shortcut available 
+- Click on the **"Portal"** shortcut available or enter the url of the Portal : https://\<hostname\>
 ![apiportal_new_tab.png](./imgs/apiportal_new_tab.png)
 
 The welcome screen opens:
 - Click **"Sign In"**
+
 ![apiportal_signin.png](./imgs/apiportal_signin.png)
 
 Provide user credentials:
 - **Login Name**: dave
-- **Password**: dave
+- **Password**: dave for the local reference environment or given by your techlab animator.
 
 ### API Catalog
 
 First, let’s access the API catalog:
 - The menu API Catalog should already be open. Click **"APIs"** if it is not the case.
-- Click **"OMSv1"** for more details
+- Click **"OMS_\<your name\>_v1"** for more details
 ![apiportal_catalog.png](./imgs/apiportal_catalog.png)
 
 The documentation allows an application developer to discover the functionality of an API.
@@ -47,14 +48,14 @@ The creation of an API key is done through the creation of an **"Application"**.
 - Click **"Create application"**
 ![create_application.png](./imgs/create_application.png)
 
-- Enter **"My shop"** in the field **"Application name"** 
+- Enter **"\<your name\> shop"** in the field **"Application name"** 
 - Check **"Enable application"** to activate the application
-- On the bottom, in the table **"Select APIs"**, check the box corresponding to **"OMSv1"**
+- On the bottom, in the table **"Select APIs"**, check the box corresponding to **"OMS_\<your name\>_v1"**
 - Click **"Save application"**.
 ![create_application.png](./imgs/create_application.png)
 
 Now we will continue with the generation of authentication elements.
-- Click the newly created application **"My shop"**
+- Click the newly created application **"\<your name\> shop"**
 ![application_list.png](./imgs/application_list.png)
 
 - Click **"Edit application"**

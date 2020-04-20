@@ -22,7 +22,7 @@ This is a very simple and efficient model.
 Now let's apply it in our environment.
 “OMSv1” belongs to the organization “API Development”. This organization is capable of virtualization and intended only for internal developers.
 To make the “OMSv1” API available to a broader audience, we need to grant its access. Let's do it with the “Partners” organization:
-- Select a check box next to the “OMSv1” API in the “Manage frontend API” screen
+- Select a check box next to the “OMS_\<your name\>_v1” API in the “Manage frontend API” screen
 - Click “Manage selected” in the top menu
 
 ![oms_grant.png](./imgs/oms_grant.png)
@@ -50,4 +50,4 @@ There is the Organization administrator role, able to manage users in an organiz
 
 Now, let's play the role of a consumer.
 
-**Next:** [And finall, let's consume our API](../Consume_API)
+**Next:** [And finally, let's consume our API](../Consume_API)

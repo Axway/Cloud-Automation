@@ -12,8 +12,8 @@ We tested the API, so it works already. But is it a good enough for API consumpt
 Let’s go back to the **"Frontend API"** to change the authentication mechanism:
 - Go back to **"API Manager"** web UI
 - Select **"Frontend API"** in the menu **"API"**
-- Type **"oms"** in filter API to find it easily
-- Click **"OMSv1"**
+- Type **"oms"** in filter APIs and find the OMS API with your name
+- Click on it
  
 ![frontend_filter.png](./imgs/frontend_filter.png)
 
@@ -35,17 +35,18 @@ Now calling our API requires an API Key.
 ### Update the documentation
 Now we will complete information related to this API. 
 - Click the **"API"** tab.
-- Enter **"Order Management System"** in the field **"API Summary"**
-
-![oms_description.png](./imgs/oms_description.png) 
-
 - Click **"Add image"**
 
 ![oms_add_image.png](./imgs/oms_add_image.png)
 
 The menu **"File Upload"** opens:
+
+If you are working on a local virtual machine, get the file locally here :
 - Click **"Axway"** -> **"TechLab"** -> **"TechLabs Resources"** 
-- Select **"OMS.jpg"**
+
+If you are working on a remote browser,  download the file in attachment OMS.jpg
+
+- Then select **"OMS.jpg"**
 - Click **"Open"**
  
 ![](./imgs/)
@@ -77,7 +78,7 @@ The update of the **"Frontend API"** is now finished.
 ### Change API status
 
 The last step consists of publishing the API from **"Manage frontend API"**:
-- Check the box next to the **"OMSv1"** API
+- Check the box next to the **"OMS_\<your name\>_v1"** API
 
 ![oms_publish.png](./imgs/oms_publish.png)
 
@@ -107,7 +108,7 @@ To limit the number of transactions on a system level (100 transactions per seco
 ![quota_system_link.png](./imgs/quota_system_link.png)
 
 - Click **"Add API"**
-- In the list, select **"OMSv1"** (you may start typing in the **"Filter"** text box for quick selection of an API)
+- In the list, select **"OMS_\<your name\>_v1"** (you may start typing in the **"Filter"** text box for quick selection of an API)
 
 ![quota_system_select_api.png](./imgs/quota_system_select_api.png)
 
@@ -127,7 +128,7 @@ To limit the number of transactions per application (a transaction every 3 secon
 ![quota_application_link.png](./imgs/quota_application_link.png)
 
 - Click **"Add API"**
-- Select **"OMSv1"** 
+- Select **"OMS_\<your name\>_v1"** 
 ![quota_application_select_api.png](./imgs/quota_application_select_api.png)
 
 - Set the number of messages as **"1"** and the number of seconds as **"3"**
