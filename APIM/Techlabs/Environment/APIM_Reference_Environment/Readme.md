@@ -4,9 +4,25 @@ All AMPLIFY API Management components are installed in this standalone virtual m
 ![apim_reference_environment_components](./imgs/apim_reference_environment_components.png)
 
 APIM Reference Environment is generally used for enablement, workshop or as a sandbox. It can be downloaded by Axway partners from [Partner portal](https://axway.channeltivity.com/) or is provided by Axway people. It is not under the scope of Axway support. It is 
-maintained and supported by the Technical Success Team (TST).
+maintained and supported by the Digital Success Specialists (DSS).
 
 A complete user guide is provided along the virtual machine. This section will focus on what you need for the scenarios. 
+
+### Licenses
+
+- For internal usage (Axway employees), the environment is delivered with valid internal licenses for API Gateway and Decision Insight.
+- For external usage (partners or customers), ask your your Axway alliance/account manager for API Management and API analytics demonstration licenses (Not For Resale).
+
+Place all the API Gateway licenses into this folder : 
+/opt/Axway/APIM/apigateway/conf/licenses
+
+Place the analytics license (the license with « analytics=1 ») into this folder : 
+/opt/Axway/APIM/analytics/conf/licenses
+
+Note : The analytics license allows to show monitoring dashboards in API Manager and API Portal.
+
+ 
+
 
 ### Access VM
 
