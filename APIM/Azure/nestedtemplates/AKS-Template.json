@@ -5,12 +5,6 @@
         "clusterName": {
             "type": "string"
         },
-        "location": {
-            "type": "string"
-        },
-        "nodesName": {
-            "type": "string"
-        },
         "kubernetesVersion": {
             "type": "string"
         },
@@ -37,13 +31,16 @@
         }
     },
     "variables": {
-        "NodeOSDiskSize": 100,
+        "apimNodePoolName": "apimpool",
+        "infraNodePoolName": "infrapool",
+        "NodeOSDiskSize": 1024,
         "MaxPodsPerNodes": 30,
         "NodeOsType": "Linux",
         "RbacPermission": "[bool('true')]",
         "networkPlugin": "azure",
         "networkPolicy": "azure",
-        "aksSizingNodes": "Standard_DS3_v2",
+        "infraPoolSizingNodes": "Standard_DS2_v2",
+        "apimPoolSizingNodes": "Standard_DS2_v2",
         "aksNumberNodes": 3
     },
     "resources": [
@@ -51,7 +48,7 @@
             "type": "Microsoft.ContainerService/managedClusters",
             "apiVersion": "2019-08-01",
             "name": "[parameters('clusterName')]",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "tags": {
             },
             "properties": {
@@ -60,15 +57,41 @@
                 "enableRBAC": "[variables('RbacPermission')]",
                 "agentPoolProfiles": [
                     {
-                        "name": "[parameters('nodesName')]",
+                        "name": "[variables('infraNodePoolName')]",
+                        "count": 1,
+                        "vmSize": "[variables('infraPoolSizingNodes')]",
+                        "osDiskSizeGB": "[variables('NodeOSDiskSize')]",
+                        "vnetSubnetID": "[parameters('subnetID')]",
+                        "maxPods": "[variables('MaxPodsPerNodes')]",
+                        "type": "VirtualMachineScaleSets",
+                        "availabilityZones": [
+                            "1",
+                            "2",
+                            "3"
+                        ],
+                        "enableAutoScaling": false,
+                        "orchestratorVersion": "[parameters('kubernetesVersion')]",
+                        "enableNodePublicIP": false,
+                        "osType": "[variables('NodeOsType')]"
+                    },
+                    {
+                        "name": "[variables('apimNodePoolName')]",
                         "count": "[variables('aksNumberNodes')]",
-                        "vmSize": "[variables('aksSizingNodes')]",
+                        "vmSize": "[variables('apimPoolSizingNodes')]",
                         "osDiskSizeGB": "[variables('NodeOSDiskSize')]",
                         "storageProfile": "ManagedDisks",
-                        "subnetID": "[parameters('subnetID')]",
+                        "vnetSubnetID": "[parameters('subnetID')]",
                         "maxPods": "[variables('MaxPodsPerNodes')]",
                         "osType": "[variables('NodeOsType')]",
-                        "type": "VirtualMachineScaleSets"                        
+                        "orchestratorVersion": "[parameters('kubernetesVersion')]",
+                        "enableNodePublicIP": false,
+                        "enableAutoScaling": false,
+                        "type": "VirtualMachineScaleSets",
+                        "availabilityZones": [
+                            "1",
+                            "2",
+                            "3"
+                        ],
                     }
                 ],
                 "servicePrincipalProfile": {

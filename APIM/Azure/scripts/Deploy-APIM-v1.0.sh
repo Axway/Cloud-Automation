@@ -142,35 +142,17 @@ function f_Install_Helm ()
 
 	if ! [ -x "$(command -v helm)" ]; then 
 		log "[INFO]  Helm installation in progress"
-    	curl -LO $uriGitHelm
-    	chmod 700 get_helm.sh
-    	./get_helm.sh
-		rm -f get_helm.sh
-        mkdir /root/.helm
-        export HELM_HOME=/root/.helm
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
 	else
 		log "[INFO]  Helm already installed. Nothing to do."
 	fi
+    log "[INFO]  Add stable repository"
+    helm repo add stable https://kubernetes-charts.storage.googleapis.com
 }
 
-function f_Build_Bastion ()
-{
-    log "[INFO]  Install XFCE and xrdp"
-    yum update -y --exclude=WALinuxAgent
-    yum install -y epel-release
-    yum install -y xrdp
-    systemctl enable xrdp
-    systemctl start xrdp
-    yum groupinstall -y "Xfce"
-    for i in $(ls -d /home/)
-    do
-        echo "xfce4-session" >> $i/.XClients
-        chmod a+x $i/.XClients
-    done
-    
-    systemctl restart xrdp
-    log "[INFO]  Bastion configuration finished."
-}
+
 
 function f_Azure_Login () 
 {
@@ -183,6 +165,7 @@ function f_Get_Sources ()
 	local licenceName=""
     local apimPackageName=""
     licenseLocation=""
+    fedLocationANM=""
     fedLocationGW=""
     envLocationGW=""
     dbLibLocation="$installFolder/dependencies/mysql-connector-java-5.1.46.jar"
@@ -238,7 +221,7 @@ function f_Get_Sources ()
         sourcePackageName=$(basename $apimSourceLocation)
         log "Apim sources package finded. Use package $sourcePackageName"
         tar -xzf $apimSourceLocation --directory $productsFolder
-        emtFolder=$(ls $productsFolder | grep apigw-emt)
+        emtFolder=$(ls $productsFolder | grep 'emt-containers\|apigw-emt')
         mv $productsFolder/$emtFolder/* $installFolder 
     else
         log "Installation aborted! Apim emt source not found."
@@ -265,7 +248,7 @@ function f_Get_Sources ()
                     --pattern APIPortal_$apimVersion* \
                     --destination $productsFolder \
                     --output tsv
-        portalProductLocation=$(ls $productsFolder/APIPortal_$apimVersion*.tgz)
+        portalProductLocation=$(ls $productsFolder/APIPortal_$apimVersion*.tar)
         if [[ $(echo $portalProductLocation | wc -l) -eq 1 ]]; then
             portalPackageName=$(basename $portalProductLocation)
             log "Portal package find. Use package $portalPackageName"
@@ -285,21 +268,23 @@ function f_Get_Sources ()
     chmod 755 $installFolder/Dockerfiles/emt-analytics/scripts/*
 
     #Search .fed in customer Folder
-    if [ -e $dataFolder/*.fed ]; then
-        log "fed file found in customer blob !"
-        fedLocationGW="$(ls $dataFolder/*.fed)"
+    if [ -e $dataFolder/FED-GW*.fed ]; then
+        log "GW fed file found in customer blob !"
+        fedLocationGW="$(ls $dataFolder/FED-GW*.fed)"
     else
-        log "No customer fed. Use default fed by Axway"
+        log "No customer GW fed. Use default GW fed provided by Axway"
         fedLocationGW="$(ls $installFolder/quickstart/defaultfed.fed)"
     fi
 
-    #if [ -e $dataFolder/*.env ]; then
-    #    log "env file found in customer blob !"
-    #    envLocationGW="$(ls $userDestinationFile/envSettings.props)"
-    #else
-    #    log "No customer fed. Use default fed by Axway"
-    #    envLocationGW="$(ls $installFolder/quickstart/envSettings.props)"
-    #fi
+    #Search .fed in customer Folder
+    if [ -e $dataFolder/FED-ANM*.fed ]; then
+        log "ANM fed file found in customer blob !"
+        fedLocationANM="$(ls $dataFolder/FED-ANM*.fed)"
+    else
+        log "No customer ANM fed. Use default ANM fed provided by Axway"
+        fedLocationANM="$(ls $installFolder/quickstart/defaultfed.fed)"
+    fi
+
 }
 
 function f_Setup_ACR ()
@@ -338,52 +323,6 @@ function f_Setup_AFP ()
     fi
 
     log "[INFO]  End configuration of Azure file"
-}
-
-function f_Setup_Helm ()
-{
-	local serviceAccountName="tiller"
-	local namespaceHelm="kube-system"
-	local clusterRole="cluster-admin"
-	local helmClientVersion=""
-	local helmServerVersion=""
-    local retryDelay=5
-
-    kubectl create serviceaccount $serviceAccountName --namespace $namespaceHelm
-	kubectl create clusterrolebinding $serviceAccountName \
-			--clusterrole=$clusterRole \
-			--serviceaccount=$namespaceHelm:$serviceAccountName
-
-    helm init -c
-    helm init --service-account $serviceAccountName --node-selectors "beta.kubernetes.io/os"="linux" --tiller-namespace $namespaceHelm
-    helm repo update
-    if [ -d /root/.helm/repository ]; then
-        log "[INFO]  Helm client correctly configured for current user"
-    else
-        log "[ERROR] Helm client not configured. /root/.helm/repository does not exist."
-        f_sendLog
-        exit 1
-    fi
-
-	#Verify if Tiller is correctly deploy on AKS cluster : 
-    sleep 10
-	while [[ ! $(kubectl get pods --namespace $namespaceHelm | grep "$serviceAccountName" | grep "Running" || true ) ]]; do 
-		log "[INFO]  Pod $serviceAccountName has not already deployed. Retry in ${retryDelay}s"  
-		sleep $retryDelay
-	done
-    sleep 15
-    log "[INFO]  Tiller should now be deployed on AKS cluster"
-
-    #Verify helm version for both (client & server) after 30s :
-    helmClientVersion=$(helm version --short | sed '1d;s/.*: //')
-    helmServerVersion=$(helm version --short | sed '2d;s/.*: //')
-    if [ "$helmClientVersion" = "$helmServerVersion" ]; then
-        log "[INFO]  Installation complete. Helm $helmClientVersion is deployed on client and server"
-    else
-		log "[ERROR] Helm Client ($helmClientVersion) is different with Server($helmServerVersion)."
-        f_sendLog
-        exit 1
-    fi
 }
 
 f_push_images () {
@@ -439,18 +378,17 @@ function f_Setup_Ingress ()
 {
     local retryDelay=5
     local kubeCertFile="certfile.yaml"
-    local certManagerVersion="0.11"
-    local namespaceCM="cert-manager"
+    local certManagerVersion="0.14.1"
+    local namespaceCM="system-cert-manager"
 
     log "[INFO]  Deploy Helm Cert-manager package."
-    kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-${certManagerVersion}/deploy/manifests/00-crds.yaml
+    kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v${certManagerVersion}/cert-manager.crds.yaml
     kubectl create namespace $namespaceCM
     kubectl label namespace $namespaceCM cert-manager.io/disable-validation=true
     helm repo add jetstack https://charts.jetstack.io
     helm repo update
-    helm install jetstack/cert-manager --namespace $namespaceCM \
-            --name cert-manager \
-            --version v${certManagerVersion}.0 \
+    helm install cert-manager jetstack/cert-manager --namespace $namespaceCM \
+            --version v${certManagerVersion} \
             --set webhook.enabled=false
 
 cat <<EOF > $kubeCertFile
@@ -461,22 +399,19 @@ metadata:
   namespace: "$apimNamespace"
 spec:
   acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
     email: $adminEmail
     privateKeySecretRef:
       name: letsencrypt-prod
-    http01: {}
+    solvers:
+    - http01:
+        ingress:
+          class: azure/application-gateway
 EOF
 
     log "[INFO]  Deploy Helm Nginx Package."
-    helm install stable/nginx-ingress --namespace $apimNamespace --set controller.replicaCount=2 \
-            --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-            --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
-            --set controller.service.externalTrafficPolicy=Local \
-            --set controller.service.loadBalancerIP="$aksPublicIP" \
-            --set-string controller.config.use-http2=false \
-            --set-string controller.ssl_procotols=TLSv1.2 \
-            --set rbac.create=true
+    helm install nginx-ingress stable/nginx-ingress --namespace $apimNamespace --set controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.service.externalTrafficPolicy=Local,controller.service.loadBalancerIP="$aksPublicIP",rbac.create=true \
+            --set-string controller.config.use-http2=false,controller.ssl_procotols=TLSv1.2
     log "[INFO]  nginx ingress deployment complete with helm ! "
 
 	while [[ $(kubectl get service -l app=nginx-ingress --namespace $apimNamespace | grep "pending") ]]; do 
@@ -547,7 +482,6 @@ function f_Manage_Certificate ()
 		log "[INFO]  Certificat found in customer data!"
 		csrLocation="$(ls /home/axway/customerdata/*.csr)"
 		python gen_domain_cert.py --domain-id=mydomain --pass-file=/tmp/pass.txt --out=csr --O=MyOrg
-        #Partie à revoir et à tester ultérieurement
         certLocation=$(dirname $(ls certs/*/*cert.pem))
         certDomainKey="DefaultDomain-key.pem"
         certDomainPass="pass.txt"
@@ -567,7 +501,7 @@ function f_Build_ImageBase ()
     ((stepNb++))
     logTitle="Step $stepNb: Build base image"
 	local osType="centos7"
-	baseImageName="apigw-base"
+	baseImageName="apim-base"
     baseImage=$baseImageName:$buildTag
 
     log "[INFO]  Start Creating base image"
@@ -597,7 +531,6 @@ f_build_portal () {
 f_Build_anm () {
     ((stepNb++))
     logTitle="Step $stepNb: Build Admin Node Manager image"
-    local fipsModeEnable=""
     local apimProductName="$(basename $installFolder/Packages/API*.run)"
     local mergeFolder="$installFolder/Dockerfiles/emt-nodemanager/apigateway"
     local mergeFolderDblib="$mergeFolder/ext/lib/"
@@ -606,7 +539,7 @@ f_Build_anm () {
     local _adminANMPass="changeme"
     local metricsDbPassFile="$installFolder/metricsdbpass.txt"
     local anmPassFile="$installFolder/anmdbpass.txt"
-	anmImageName="apigw-anm"
+	anmImageName="apim-anm"
     anmImage=$anmImageName:$buildTag
 
 	cd $installFolder
@@ -623,14 +556,10 @@ f_Build_anm () {
             --domain-cert $certLocation/$certDomainCert \
             --domain-key $certLocation/$certDomainKey \
             --domain-key-pass-file $certLocation/$certDomainPass \
+            --fed $fedLocationANM \
             --license $licenseLocation \
             --anm-username=$anmUsername \
-            --anm-pass-file=$anmPassFile \
-            --metrics \
-            --metrics-db-url jdbc:mysql://mysql-aga:${dbPort}/$dbAnalyticsName \
-            --metrics-db-username $dbAnalyticsUsername \
-            --metrics-db-pass-file $metricsDbPassFile \
-            --merge-dir $mergeFolder
+            --anm-pass-file=$anmPassFile
         rm -f $metricsDbPassFile $anmPassFile
 
     f_push_images $containerRegistryURL $anmImage
@@ -646,7 +575,7 @@ f_build_gw () {
     local mergeFolder="$installFolder/Dockerfiles/emt-gateway/apigateway"
     local mergeFolderDblib="$mergeFolder/ext/lib/"
     #local mergeFolderEnvlib="$mergeFolder/groups/emt-group/emt-service/conf"
-	mgrImageName="apigw-mgr"
+	mgrImageName="apim-mgr"
 	mgrImage=$mgrImageName:$buildTag
 
     cd $installFolder
@@ -768,7 +697,8 @@ timestamp=$(date +%s)
 aksStorageFileShareEvents="gw-events"
 aksStorageFileShareLogs="apim-logs"
 apimNamespace="$projectName-$environment"
-apimVersionLt=${apimVersion%.*}
+apimVersionLt=${apimVersion%-*}
+apimRelease=${apimVersion#*-}
 buildTag=$apimVersion.$timestamp
 licenseType="docker"
 
@@ -776,7 +706,7 @@ dataContainerName="data"
 depContainerName="dependencies"
 productsContainerName="products"
 helmContainerName="helmcharts"
-installFolder="/opt/axway/amplify-apim-$apimVersion"
+installFolder="/opt/axway/amplify-apim-$apimVersionLt"
 dataFolder="$installFolder/$dataContainerName"
 productsFolder="$installFolder/$productsContainerName"
 depFolder="$installFolder/$depContainerName"
@@ -838,7 +768,6 @@ f_Setup_AKS
 if [ $manageDnsRecord == "true" ];then
     f_Manage_Dns
 fi
-f_Setup_Helm
 f_Setup_Ingress
 log "Step $stepNb: Completed"
 f_sendLog
@@ -856,32 +785,12 @@ f_build_helm
 logTitle="Step $stepNb: Deploy Packages HELM"
 az acr helm repo add --name $containerRegistryName
 helm repo update
-helm install $containerRegistryName/$helmPackageName --name $helmDeployName --namespace $apimNamespace
-            --set global.namespace=$apimNamespace
-            --set global.apimVersion=$apimVersion
-            --set global.apimName=$containerRegistryURL
-            --set global.apimSecret=$aksSecretDockerName
-            --set anm.buildtag=$buildTag
-            --set anm.ingressName=$dnsIngressAnm
-            --set apimgr.buildtag=$buildTag
-            --set apimgr.ingressName=$dnsIngressManager
-            --set apitraffic.buildTag=$buildTag
-            --set apitraffic.ingressName=$dnsIngressTraffic
-            --set apitraffic.share.secret=$aksSecretFileName
-            --set apitraffic.share.name=$aksStorageFileShareEvents
-            --set cassandra.keyspace=${projectName}_${environment}_1
-            --set apiportal.ingressName=$dnsIngressPortal \
-            --set apiportal.share.secret=$aksSecretFileName \
-            --set apiportal.share.name=$aksStorageFilePortalContent \
-            --set apiportal.enabled=$apiportal
+echo "helm install $helmDeployName $containerRegistryName/$helmPackageName --namespace=$apimNamespace --set platform=AZURE,managedIngress=true,global.apimVersion=$apimVersion,global.namespace=$apimNamespace,global.dockerRegistries.apimName=$containerRegistryURL,global.dockerRegistries.apimSecret=$aksSecretDockerName,anm.buildTag=$buildTag,anm.ingressName=$dnsIngressAnm,apimgr.buildTag=$buildTag,apimgr.ingressName=$dnsIngressManager,apitraffic.buildTag=$buildTag,apitraffic.ingressName=$dnsIngressTraffic,apitraffic.share.secret=$aksSecretFileName,apitraffic.share.name=$aksStorageFileShareEvents,mysqlAnalytics.enabled=true,mysqlAnalytics.external=true,mysqlAnalytics.host=$mysqlHost,cassandra.external=false,cassandra.keyspace=${projectName}_${environment}_1,apiportal.enabled=$apiportal,apiportal.buildTag=$buildTag,apiportal.ingressName=$dnsIngressPortal,apiportal.share.secret=$aksSecretFileName,apiportal.share.name=$aksStorageFilePortalContent,oauth.enabled=false"
+helm install $helmDeployName $containerRegistryName/$helmPackageName --namespace=$apimNamespace --set platform=ESX,managedIngress=false,global.apimVersion=$apimVersion,global.namespace=$apimNamespace,global.dockerRegistries.apimName=$containerRegistryURL,global.dockerRegistries.apimSecret=$aksSecretDockerName,anm.buildTag=$buildTag,anm.ingressName=$dnsIngressAnm,apimgr.buildTag=$buildTag,apimgr.ingressName=$dnsIngressManager,apitraffic.buildTag=$buildTag,apitraffic.ingressName=$dnsIngressTraffic,apitraffic.share.secret=$aksSecretFileName,apitraffic.share.name=$aksStorageFileShareEvents,mysqlAnalytics.enabled=true,mysqlAnalytics.external=false,mysqlAnalytics.host=$mysqlHost,cassandra.external=false,cassandra.keyspace=${projectName}_${environment}_1,apiportal.enabled=$apiportal,apiportal.buildTag=$buildTag,apiportal.ingressName=$dnsIngressPortal,apiportal.share.secret=$aksSecretFileName,apiportal.share.name=$aksStorageFilePortalContent,oauth.enabled=false
+
 log "Step $stepNb: End Packages HELM deployement"
 f_sendLog
 
-((stepNb++))
-logTitle="Step $stepNb: Configure Bastion"
-f_Build_Bastion
-log "Step $stepNb: End Bastion configuration"
-f_sendLog
 
 ((stepNb++))
 logTitle="Step $stepNb: Post installation"

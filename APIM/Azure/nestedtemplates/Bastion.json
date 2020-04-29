@@ -14,22 +14,10 @@
       "vmAdminName": {
         "type": "string"
       },
-      "vmExtensionName": {
-        "type": "string"
-      },
-      "URIStorageCustomScript": {
-        "type": "string"
-      },
-      "customScriptCommandToExecute": {
-        "type": "string"
-      },
       "vmAdminPWD": {
         "type": "securestring"
       },
       "subnetId": {
-        "type": "string"
-      },
-      "location": {
         "type": "string"
       },
       "publicIPAddressName": {
@@ -56,7 +44,7 @@
         "tags": {
           "displayName": "Public IP"
         },
-        "location": "[parameters('location')]",
+        "location": "[resourceGroup().location]",
         "properties": {
           "publicIPAllocationMethod": "Dynamic",
           "dnsSettings": {
@@ -68,9 +56,9 @@
             "name": "[parameters('vmNicName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-10-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "tags": {
-                "displayName": "Temp Virtual Machine Nic"
+                "displayName": "Bastion Virtual Machine Nic"
               },
             "dependsOn": [
               "[parameters('publicIPAddressName')]"
@@ -96,9 +84,9 @@
             "name": "[parameters('vmName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2018-10-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "tags": {
-                "displayName": "Temp Virtual Machine"
+                "displayName": "Bastion Virtual Machine"
               },
             "dependsOn": [
               "[concat('Microsoft.Network/networkInterfaces/', parameters('vmNicName'))]"
@@ -133,30 +121,6 @@
                 "computerName": "[parameters('vmName')]",
                 "adminUsername": "[parameters('vmAdminName')]",
                 "adminPassword": "[parameters('vmAdminPWD')]"
-              }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('vmName'),'/', parameters('vmExtensionName'))]",
-            "apiVersion": "2016-03-30",
-            "location": "[parameters('location')]",
-            "tags": {
-              "displayName": "Temp Virtual Machine Extension"
-            },
-            "dependsOn": [
-              "[resourceId('Microsoft.Compute/virtualMachines/',concat(parameters('vmName')))]"
-            ],
-            "properties": {
-              "publisher": "Microsoft.Azure.Extensions",
-              "type": "CustomScript",
-              "typeHandlerVersion": "2.0",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "fileUris": [
-                  "[parameters('URIStorageCustomScript')]"
-                ],
-                "commandToExecute": "[parameters('customScriptCommandToExecute')]"
               }
             }
         }

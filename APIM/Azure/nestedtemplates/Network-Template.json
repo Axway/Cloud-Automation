@@ -23,44 +23,35 @@
         "snetBastionPrefix": {
             "type": "string"
         },
-        "location": {
+        "snetDataName": {
             "type": "string"
         },
+        "snetDataPrefix": {
+            "type": "string"
+        },
+        "nsgBastionId": {
+            "type": "string"
+        },
+        "nsgAksId": {
+            "type": "string"
+        },
+        "nsgDataId": {
+            "type": "string"
+        },
+
+
         "uriNsgTemplate": {
             "type": "string"
         }
     },
-    "variables": {
-        "nsgBastionName": "bastion-nsg",
-        "nsgBastionId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgBastionName'))]",
-        "nsgAksName": "aks-nsg",
-        "nsgAksId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgAksName'))]"
-    },
+    "variables": {},
     "resources": [
-        {
-            "name": "LinkedNSGTemplate",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri":"[parameters('uriNsgTemplate')]"
-                },
-                "parameters": {
-                    "Location":{"value": "[parameters('location')]"},
-                    "aksNsgName":{"value": "[variables('nsgAksName')]"},
-                    "bastionNsgName":{"value": "[variables('nsgBastionName')]"}
-                }
-            }
-        },
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2018-12-01",
             "name": "[parameters('vnetName')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "LinkedNSGTemplate"
-            ],
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -73,10 +64,51 @@
                         "properties": {
                             "addressPrefix": "[parameters('snetAksPrefix')]",
                             "networkSecurityGroup": {
-                                "id": "[variables('nsgAksId')]"
+                                "id": "[parameters('nsgAksId')]"
                             },
-                            "serviceEndpoints": [],
-                            "delegations": []
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.Storage",
+                                    "locations": [
+                                        "[resourceGroup().location]"
+                                    ]
+                                },
+                                {
+                                    "service": "Microsoft.ContainerRegistry",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "service": "Microsoft.Sql",
+                                    "locations": [
+                                        "[resourceGroup().location]"
+                                    ]
+                                }
+                            ],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[parameters('snetDataName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('snetDataPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[parameters('nsgDataId')]"
+                            },
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.Storage",
+                                    "locations": [
+                                        "[resourceGroup().location]"
+                                    ]
+                                }
+                            ],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     },
                     {
@@ -84,10 +116,25 @@
                         "properties": {
                             "addressPrefix": "[parameters('snetBastionPrefix')]",
                             "networkSecurityGroup": {
-                                "id": "[variables('nsgBastionId')]"
+                                "id": "[parameters('nsgBastionId')]"
                             },
-                            "serviceEndpoints": [],
-                            "delegations": []
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.Storage",
+                                    "locations": [
+                                        "[resourceGroup().location]"
+                                    ]
+                                },
+                                {
+                                    "service": "Microsoft.Sql",
+                                    "locations": [
+                                        "[resourceGroup().location]"
+                                    ]
+                                }
+                            ],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     }
                 ],
@@ -98,22 +145,34 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks/subnets",
-            "apiVersion": "2018-12-01",
+            "apiVersion": "2019-09-01",
             "name": "[concat(parameters('vnetName'), '/', parameters('snetAksName'))]",
             "dependsOn": [
-                "LinkedNSGTemplate",
+                "NSG",
                 "[parameters('vnetId')]"
             ],
             "properties": {
                 "addressPrefix": "[parameters('snetAksPrefix')]",
                 "networkSecurityGroup": {
-                    "id": "[variables('nsgAksId')]"
+                    "id": "[parameters('nsgAksId')]"
                 },
                 "serviceEndpoints": [
                     {
                         "service": "Microsoft.Storage",
                         "locations": [
-                            "northeurope"
+                            "[resourceGroup().location]"
+                        ]
+                    },
+                    {
+                        "service": "Microsoft.ContainerRegistry",
+                        "locations": [
+                            "*"
+                        ]
+                    },
+                    {
+                        "service": "Microsoft.Sql",
+                        "locations": [
+                            "[resourceGroup().location]"
                         ]
                     }
                 ],
@@ -122,23 +181,61 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks/subnets",
-            "apiVersion": "2018-12-01",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('vnetName'), '/', parameters('snetDataName'))]",
+            "dependsOn": [
+                "NSG",
+                "[parameters('vnetId')]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'),parameters('snetBastionName'))]"
+
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('snetDataPrefix')]",
+                "networkSecurityGroup": {
+                    "id": "[parameters('nsgDataId')]"
+                },
+                "serviceEndpoints": [
+                    {
+                        "service": "Microsoft.Storage",
+                        "locations": [
+                            "[resourceGroup().location]"
+                        ]
+                    }
+                ],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2019-09-01",
             "name": "[concat(parameters('vnetName'), '/', parameters('snetBastionName'))]",
             "dependsOn": [
-                "LinkedNSGTemplate",
+                "NSG",
                 "[parameters('vnetId')]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'),parameters('snetAksName'))]"
             ],
             "properties": {
                 "addressPrefix": "[parameters('snetBastionPrefix')]",
                 "networkSecurityGroup": {
-                    "id": "[variables('nsgBastionId')]"
+                    "id": "[parameters('nsgBastionId')]"
                 },
                 "serviceEndpoints": [
                     {
                         "service": "Microsoft.Storage",
                         "locations": [
-                            "northeurope"
+                            "[resourceGroup().location]"
+                        ]
+                    },
+                    {
+                        "service": "Microsoft.ContainerRegistry",
+                        "locations": [
+                            "*"
+                        ]
+                    },
+                    {
+                        "service": "Microsoft.Sql",
+                        "locations": [
+                            "[resourceGroup().location]"
                         ]
                     }
                 ],

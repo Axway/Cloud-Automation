@@ -2,28 +2,46 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
+        "storageAccountName": {
             "type": "string"
         },
-        "storageAccountName": {
+        "vnetName": {
+            "type": "string"
+        },
+        "snetAksName": {
+            "type": "string"
+        },
+        "snetBastionName": {
             "type": "string"
         }
     },
     "variables": {
         "supportsHttpsTrafficOnly": "true",
         "Kind": "FileStorage",
-        "accountType": "Premium_LRS"
+        "accountType": "Premium_LRS",
+        "tierPlan": "Premium"
     },
     "resources": [
         {
             "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2018-07-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "networkAcls": {
-                    "bypass": "AzureServices",
-                    "virtualNetworkRules": [],
+                    "bypass": "Logging,AzureServices",
+                    "virtualNetworkRules": [
+                        {
+                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Network/virtualNetworks/',parameters('vnetName'), '/subnets/',parameters('snetAksName'))]",
+                            "action": "Allow",
+                            "state": "Succeeded"
+                        },
+                        {
+                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Network/virtualNetworks/',parameters('vnetName'), '/subnets/',parameters('snetBastionName'))]",
+                            "action": "Allow",
+                            "state": "Succeeded"
+                        }
+                    ],
                     "ipRules": [],
                     "defaultAction": "Allow"
                 },
@@ -31,7 +49,8 @@
             },
             "dependsOn": [],
             "sku": {
-                "name": "[variables('accountType')]"
+                "name": "[variables('accountType')]",
+                "tier": "[variables('tierPlan')]"
             },
             "kind": "[variables('kind')]",
             "tags": {
