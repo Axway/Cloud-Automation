@@ -1,4 +1,5 @@
 {{- if eq .Values.mysqlAnalytics.enabled true }}
+{{- if eq .Values.mysqlAnalytics.external false }} 
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -46,4 +47,5 @@ spec:
         # to add to the container
         name: analytics
    restartPolicy: Never
+{{- end }}
 {{- end }}

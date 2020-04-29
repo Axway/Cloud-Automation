@@ -1,4 +1,5 @@
 {{- if eq .Values.mysqlAnalytics.enabled true }}
+{{- if eq .Values.mysqlAnalytics.external false }}
 apiVersion: v1
 data:
   analytics.sql: "/* MySQL SQL Script */\n\n/* Don't Drop the Tables when running
@@ -97,4 +98,5 @@ kind: ConfigMap
 metadata:
   name: analytics
   namespace: {{ .Values.global.namespace | quote }}
+{{- end }}
 {{- end }}

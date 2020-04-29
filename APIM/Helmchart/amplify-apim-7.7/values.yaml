@@ -4,14 +4,14 @@
 
 # minikube, AWS, esx, AZURE
 platform: "AZURE"
+managedIngress: true
 
 global:
    pullPolicy: Always
-   # The image used for initContainers
    initImageTag: "busybox:1.30"
    updateStrategy: "RollingUpdate"
    editor: "Axway"
-   apimVersion: "APIM-VERSION-VALUE"
+   apimVersion: "7.7-20200130"
    namespace: "APIM-NAMESPACE-VALUE"
    dockerRegistries:
       apimName: DOCKER-REGISTRY-USER-NAME-VALUE
@@ -23,12 +23,13 @@ global:
 
 anm:
    name: anm
-   buildTag: "ANM-IMAGE-TAG-VALUE"
+   buildTag: "7.7-20200130"
    imageName: "apim-anm"
    ingressName: "ANM-DNS-NAME-VALUE"
    replicaCount: 1
    pvcQuota: 1
    trafficPort: 8090
+   trafficPortUI: 8091
    logTraceToFile: "true"
    logTraceJSONtoSTDOUT: "true"
    emt_heap_size_mb: "1024"
@@ -37,7 +38,7 @@ anm:
 
 apimgr:
    name: apimgr
-   buildTag: "7.7-SP1"
+   buildTag: "7.7-20200130"
    imageName: "apim-mgr"
    ingressName: "APIMGR-DNS-NAME-VALUE"
    replicaCount: 1
@@ -50,13 +51,9 @@ apimgr:
 
 apitraffic:
    name: traffic
-   buildTag: "7.7-SP1"
+   buildTag: "7.7-20200130"
    imageName: "apim-mgr"
-   apiManager:
-      ingressName: "APITRAFFICMANAGER-DNS-NAME-VALUE"
-   apiDefault:
-      enabled: false
-      ingressName: "APITRAFFICDEFAULT-DNS-NAME-VALUE"
+   ingressName: "TRAFFIC-DNS-NAME-VALUE"
    portManager: 8065
    portGateway: 8080
    portGatewaySSL: 8081
@@ -80,7 +77,7 @@ apitraffic:
 apiportal:
    enabled: false
    name: "api-portal"
-   buildTag: "7.6.2"
+   buildTag: "7.7-20200130"
    imageName: "apim-ptl"
    ingressName: "APIPORTAL-DNS-NAME-VALUE"
    trafficPort: 443
@@ -91,7 +88,10 @@ apiportal:
 
 mysqlAnalytics:
    enabled: true
+   external: false
+   host: "externalUri"
    name: mysql-aga
+   ssl: true
    imageName: "mysql"
    buildTag: "5.7.26"
    replicaCount: 1
@@ -100,19 +100,9 @@ mysqlAnalytics:
    quotaStorage: 10
    port: 3306
 
-mysqlPortal:
-   enabled: false
-   name: "mysql-portal"
-   imageName: "mysql"
-   buildTag: "5.7.26"
-   replicaCount: 1
-   dbName: "portal"
-   adminUser: "portal"
-   quotaStorage: 10
-   port: 3306
-
 cassandra:
    enabled: true
+   external: false
    name: "cassandra"
    portCql: 9042
    portJmx: 7199
@@ -123,6 +113,21 @@ cassandra:
    replicaCount: 3
    clusterName: "APIM"
    keyspace: "apim_demo_1"
+   host1: "ip_host1"
+   host2: "ip_host2"
+   host3: "ip_host3"
+
+mysqlPortal:
+   enabled: false
+   external: true
+   name: "mysql-portal"
+   imageName: "mysql"
+   buildTag: "5.7.26"
+   replicaCount: 1
+   dbName: "portal"
+   adminUser: "portal"
+   quotaStorage: 10
+   port: 3306
 
 oauth:
    enabled: false

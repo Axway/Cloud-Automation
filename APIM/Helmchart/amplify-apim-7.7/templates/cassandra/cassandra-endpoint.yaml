@@ -1,0 +1,14 @@
+{{- if eq .Values.cassandra.external true }}
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: {{ .Values.cassandra.name }}
+  namespace: {{ .Values.global.namespace }}
+subsets:
+  - addresses:
+      - ip: {{ .Values.cassandra.host1 }}
+      - ip: {{ .Values.cassandra.host2 }}
+      - ip: {{ .Values.cassandra.host3 }}
+    ports:
+      - port: {{ .Values.cassandra.portCql }}
+{{- end }}

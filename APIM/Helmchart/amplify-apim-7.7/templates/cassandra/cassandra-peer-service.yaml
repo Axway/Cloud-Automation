@@ -1,4 +1,5 @@
 # Headless service that allows us to get the IP addresses of our Cassandra nodes
+{{- if eq .Values.cassandra.external false }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -15,3 +16,4 @@ spec:
      name: tls-intra-node-communication
   selector:
    app: {{ .Values.cassandra.name }}
+{{- end }}

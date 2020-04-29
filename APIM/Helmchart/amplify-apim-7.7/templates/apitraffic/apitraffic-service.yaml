@@ -3,7 +3,6 @@ kind: Service
 metadata:
   labels:
     name: {{ .Values.apitraffic.name }}
-    version: {{ .Values.apitraffic.buildTag }}
   name: {{ .Values.apitraffic.name }}
   namespace: {{ .Values.global.namespace | quote }} 
 spec:

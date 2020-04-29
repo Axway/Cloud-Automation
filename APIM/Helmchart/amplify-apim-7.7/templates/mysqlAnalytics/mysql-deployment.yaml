@@ -1,4 +1,5 @@
 {{- if eq .Values.mysqlAnalytics.enabled true }}
+{{- if eq .Values.mysqlAnalytics.external false }}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -16,6 +17,15 @@ spec:
       labels:
         app: {{ .Values.mysqlAnalytics.name }}
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values: 
+                - podpool
       containers:
       - image: {{ .Values.mysqlAnalytics.imageName }}:{{ .Values.mysqlAnalytics.buildTag }}
         name: {{ .Values.mysqlAnalytics.name }}
@@ -52,4 +62,5 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 30
+{{- end }}
 {{- end }}

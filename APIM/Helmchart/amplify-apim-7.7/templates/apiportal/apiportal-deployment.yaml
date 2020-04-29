@@ -8,7 +8,6 @@ metadata:
   name: {{ .Values.apiportal.name  | quote }}
   namespace: {{ .Values.global.namespace | quote }}
 spec:
-  serviceName: {{ .Values.apiportal.name }}
   replicas: {{ .Values.apiportal.replicaCount }}
   selector:
     matchLabels:
@@ -19,6 +18,14 @@ spec:
         app: {{ .Values.apiportal.name | quote }}
     spec:
       affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values: 
+                - podpool
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 100
@@ -61,6 +68,20 @@ spec:
         name: {{ .Values.apiportal.name }}
         image: {{ .Values.global.dockerRegistries.apimName }}/{{ .Values.apiportal.imageName }}:{{ .Values.apiportal.buildTag }}
         imagePullPolicy: {{ .Values.global.pullPolicy }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 443
+            scheme: HTTPS
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 443
+            scheme: HTTPS
+          initialDelaySeconds: 30
+          periodSeconds: 5
         ports:
         - containerPort: {{ .Values.apiportal.trafficPort }} 
           protocol: TCP
@@ -78,9 +99,7 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-  updateStrategy:
-    rollingUpdate:
-      partition: 0
-    type: RollingUpdate
+  strategy:
+    type: {{ .Values.global.updateStrategy }}
 status: {}
 {{- end }}

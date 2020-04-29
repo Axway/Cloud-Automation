@@ -1,30 +1,36 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    apigw.version: {{ .Values.global.apimVersion }}
-    apigw.editor: {{ .Values.global.editor }}
+    apigw.version: {{ .Values.global.apimVersion | quote }}
+    apigw.editor: {{ .Values.global.editor | quote }}
   labels:
     app: {{ .Values.anm.name }}
   name: {{ .Values.anm.name }}
   namespace: {{ .Values.global.namespace }}
 spec:
   replicas: {{ .Values.anm.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.anm.name | quote }}  
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-      minReadySeconds: 10
-      progressDeadlineSeconds : 140
     type: {{ .Values.global.updateStrategy }}
   template:
     metadata:
       labels:
-        app: {{ .Values.anm.name }}
-        version: {{ .Values.anm.buildTag }}
+        app: {{ .Values.anm.name | quote }}
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values: 
+                - apimpool
       containers:
-      - name: {{ .Values.anm.name }}
+      - name: {{ .Values.anm.name | quote }}
         image: {{ .Values.global.dockerRegistries.apimName }}/{{ .Values.anm.imageName }}:{{ .Values.anm.buildTag }}
         imagePullPolicy: {{ .Values.global.pullPolicy }}
         env:
@@ -43,7 +49,7 @@ spec:
         - name: APIGW_LOG_TRACE_JSON_TO_STDOUT
           value: "{{ .Values.anm.logTraceJSONtoSTDOUT }}"
         - name: METRICS_DB_URL
-          value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL=false
+          value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}
         - name: METRICS_DB_USERNAME
           value: {{ .Values.mysqlAnalytics.adminUser }}
         - name: METRICS_DB_PASS
@@ -55,6 +61,8 @@ spec:
           - /opt/Axway/apigateway/posix/bin/start-emt-nodemanager
         ports:
         - containerPort: {{ .Values.anm.trafficPort }}
+          protocol: TCP
+        - containerPort: {{ .Values.anm.trafficPortUI }}
           protocol: TCP
         resources:
           limits:
@@ -69,9 +77,9 @@ spec:
             - name: k8sprobe
               value: liveness.{{ .Values.anm.name }}
             path: /healthcheck
-            port: {{ .Values.anm.trafficPort }}
+            port: {{ .Values.anm.trafficPortUI }}
             scheme: HTTPS
-          initialDelaySeconds: 30
+          initialDelaySeconds: 40
           periodSeconds: 30
           failureThreshold: 5
         readinessProbe:
@@ -80,11 +88,15 @@ spec:
             - name: k8sprobe
               value: readiness.{{ .Values.anm.name }}
             path: /healthcheck
-            port: {{ .Values.anm.trafficPort }}
+            port: {{ .Values.anm.trafficPortUI }}
             scheme: HTTPS
           initialDelaySeconds: 30
           periodSeconds: 10
           failureThreshold: 6
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sleep","90"]
         volumeMounts:
         - name: events
           mountPath: {{ .Values.apitraffic.share.path | quote }}
@@ -100,6 +112,7 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 101
       securityContext:
         runAsUser: 1000
         fsGroup: 1000

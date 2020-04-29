@@ -16,6 +16,15 @@ spec:
       labels:
         app: {{ .Values.mysqlPortal.name }}
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values:
+                - podpool
       containers:
       - image: {{ .Values.mysqlPortal.imageName }}:{{ .Values.mysqlPortal.buildTag }}
         name: {{ .Values.mysqlPortal.name }}

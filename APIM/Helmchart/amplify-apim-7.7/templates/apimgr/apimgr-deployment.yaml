@@ -17,6 +17,15 @@ spec:
       labels:
         app: {{ .Values.apimgr.name | quote }}
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values: 
+                - podpool
       containers:
       - args:
         - /opt/Axway/apigateway/posix/bin/start-emt-instance
@@ -27,8 +36,12 @@ spec:
           value: /opt/Axway/apigateway/trace/groups/topologylinks/emt-group-emt-service/trace
         - name: CASS_HOST
           value: {{ .Values.cassandra.name | quote }}
+        - name: CASS_PORT
+          value: {{ .Values.cassandra.portCql | quote }}
         - name: CASS_KEYSPACE
-          value: {{ .Values.cassandra.keyspace | quote }}
+          value: {{ .Values.cassandra.keyspace }}
+        - name: CASS_TKEYSPACE
+          value: t_{{ .Values.cassandra.keyspace }}
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
         - name: EMT_TOPOLOGY_TTL
@@ -43,11 +56,11 @@ spec:
           value: "{{ .Values.apimgr.logTraceJSONtoSTDOUT }}"
         - name: APIGW_LOG_OPENTRAFFIC_OUTPUT
           value: "{{ .Values.apimgr.logOpenTrafficOutput }}"
-        - name: METRIC_DB_URL
-          value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL=false
+        - name: METRICS_DB_URL
+          value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}
         - name: METRICS_DB_USERNAME
           value: {{ .Values.mysqlAnalytics.adminUser }}
-        - name: MYSQL_DB_PASS
+        - name: METRICS_DB_PASS
           valueFrom:
             secretKeyRef:
               name: apim-password
@@ -88,6 +101,10 @@ spec:
         volumeMounts:
         - mountPath: {{ .Values.apitraffic.share.path | quote }}
           name: events
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sleep","90"]
       initContainers:
       - name: init-cassandra
         image: {{ .Values.global.initImageTag }}
@@ -100,13 +117,12 @@ spec:
         command: ['sh', '-c', 'until nc -w 3 -v anm 8090; do echo waiting for anm; sleep 2; done;']
       imagePullSecrets:
       - name: {{ .Values.global.dockerRegistries.apimSecret }}      
-      #dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 101
       volumes:
       - name: events
         azureFile:

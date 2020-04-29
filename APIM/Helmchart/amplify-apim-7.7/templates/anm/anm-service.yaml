@@ -8,10 +8,14 @@ metadata:
 spec:
   clusterIP: None
   ports:
-  - port: {{ .Values.anm.trafficPort }} 
+  - name: gatewaymanager
+    port: {{ .Values.anm.trafficPort }} 
     targetPort: {{ .Values.anm.trafficPort }}
     protocol: TCP
-    name: {{ .Values.anm.name | quote }}
+  - name: gatewaymanagerui
+    port: {{ .Values.anm.trafficPortUI }}
+    targetPort: {{ .Values.anm.trafficPortUI }}
+    protocol: TCP
   selector:
     app: {{ .Values.anm.name | quote }}
   sessionAffinity: ClientIP

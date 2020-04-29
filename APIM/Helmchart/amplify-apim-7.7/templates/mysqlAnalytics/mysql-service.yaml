@@ -7,6 +7,10 @@ metadata:
   name: {{ .Values.mysqlAnalytics.name }}
   namespace: {{ .Values.global.namespace | quote }}
 spec:
+{{- if eq .Values.mysqlAnalytics.external true }}
+  type: ExternalName
+  externalName: {{ .Values.mysqlAnalytics.host }}
+{{- else }}
   clusterIP: None
   ports:
   - port: {{ .Values.mysqlAnalytics.port }}
@@ -15,4 +19,5 @@ spec:
   selector:
     app: {{ .Values.mysqlAnalytics.name }}
   clusterIP: None
+{{- end }}
 {{- end }}

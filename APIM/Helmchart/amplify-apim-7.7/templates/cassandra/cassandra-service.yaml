@@ -11,5 +11,7 @@ spec:
     - name: cql
       port: {{ .Values.cassandra.portCql }}
       targetPort: {{ .Values.cassandra.portCql }}
+{{- if eq .Values.cassandra.external false }}
   selector:
     app: {{ .Values.cassandra.name }}
+{{- end }}

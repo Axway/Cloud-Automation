@@ -3,11 +3,9 @@ kind: Deployment
 metadata:
   labels:
     app: {{ .Values.apitraffic.name }}
-    version: {{ .Values.apitraffic.buildTag }}
   name: {{ .Values.apitraffic.name }}
   namespace: {{ .Values.global.namespace | quote }} 
 spec:
-  serviceName: {{ .Values.apitraffic.name }}
   replicas: {{ .Values.apitraffic.replicaCount }}
   selector:
     matchLabels:
@@ -18,6 +16,14 @@ spec:
         app: {{ .Values.apitraffic.name }}
     spec:
       affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values:
+                - podpool
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 100
@@ -39,8 +45,14 @@ spec:
           value: /opt/Axway/apigateway
         - name: GW_TRACE_DIR
           value: /opt/Axway/apigateway/groups/topologylinks/emt-group-emt-service/trace
-        - name: CASS_HOSTS
+        - name: CASS_HOST
           value: {{ .Values.cassandra.name }}
+        - name: CASS_PORT
+          value: {{ .Values.cassandra.portCql | quote }}
+        - name: CASS_KEYSPACE
+          value: {{ .Values.cassandra.keyspace }}
+        - name: CASS_TKEYSPACE
+          value: t_{{ .Values.cassandra.keyspace }}
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
         - name: EMT_TOPOLOGY_TTL
@@ -58,7 +70,7 @@ spec:
         - name: EMT_DEPLOYMENT_ENABLED
           value: "{{ .Values.apitraffic.enabled }}"
         - name: METRICS_DB_URL
-          value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}
+          value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}
         - name: METRICS_DB_USERNAME
           value: {{ .Values.mysqlAnalytics.adminUser }}
         - name: METRICS_DB_PASS
@@ -94,7 +106,7 @@ spec:
             path: /healthcheck
             port: {{ .Values.apitraffic.portManager }}
             scheme: HTTPS
-          initialDelaySeconds: 30
+          initialDelaySeconds: 40
           periodSeconds: 30
           failureThreshold: 5
         livenessProbe:
@@ -113,18 +125,18 @@ spec:
         lifecycle:
           preStop:
             exec:
-              command: ["/bin/bash", "-c", "sleep 10"]
+              command: ["/bin/bash", "-c", "sleep 90"]
       initContainers:
-      - name: init-cassandra-int
+      - name: init-cassandra
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.name }} 9042; do echo waiting for cassandra; sleep 60; done;']
-      - name: init-mysql
+      - name: init-dbanalytics
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysqlAnalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
       - name: init-anm
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.anm.name }} 8090; do echo waiting for anm; sleep 2; done;']
-      - name: init-mgmt
+      - name: init-apimanager
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.apimgr.name }} 8075; do echo waiting for mgmt; sleep 2; done;']
       dnsPolicy: ClusterFirst
@@ -139,8 +151,6 @@ spec:
           secretName: {{ .Values.apitraffic.share.secret | quote }}
           shareName: {{ .Values.apitraffic.share.name | quote }}
           readOnly: false
-      terminationGracePeriodSeconds: 30
-  updateStrategy:
-    rollingUpdate:
-      partition: 0
-    type: RollingUpdate
+      terminationGracePeriodSeconds: 100
+  strategy:
+    type: {{ .Values.global.updateStrategy }}
