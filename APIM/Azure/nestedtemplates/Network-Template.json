@@ -43,6 +43,22 @@
     },
     "resources": [
         {
+            "name": "NSG",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri":"[parameters('uriNsgTemplate')]"
+                },
+                "parameters": {
+                    "Location":{"value": "[parameters('location')]"},
+                    "aksNsgName":{"value": "[variables('nsgAksName')]"},
+                    "bastionNsgName":{"value": "[variables('nsgBastionName')]"}
+                }
+            }
+        },
+        {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2018-12-01",
             "name": "[parameters('vnetName')]",
