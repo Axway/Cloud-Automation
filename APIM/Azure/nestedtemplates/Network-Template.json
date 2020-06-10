@@ -52,7 +52,6 @@
                     "uri":"[parameters('uriNsgTemplate')]"
                 },
                 "parameters": {
-                    "Location":{"value": "[parameters('location')]"},
                     "aksNsgName":{"value": "[variables('nsgAksName')]"},
                     "bastionNsgName":{"value": "[variables('nsgBastionName')]"}
                 }
