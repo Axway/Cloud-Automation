@@ -29,22 +29,18 @@
         "snetDataPrefix": {
             "type": "string"
         },
-        "nsgBastionId": {
-            "type": "string"
-        },
-        "nsgAksId": {
-            "type": "string"
-        },
-        "nsgDataId": {
-            "type": "string"
-        },
-
-
         "uriNsgTemplate": {
             "type": "string"
         }
     },
-    "variables": {},
+    "variables": {
+        "nsgBastionName": "bastion-nsg",
+        "nsgBastionId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgBastionName'))]",
+        "nsgAksName": "aks-nsg",
+        "nsgAksId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgAksName'))]",
+        "nsgDataName": "data-nsg",
+        "nsgDataId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgDataName'))]"
+    },
     "resources": [
         {
             "type": "Microsoft.Network/virtualNetworks",
@@ -64,7 +60,7 @@
                         "properties": {
                             "addressPrefix": "[parameters('snetAksPrefix')]",
                             "networkSecurityGroup": {
-                                "id": "[parameters('nsgAksId')]"
+                                "id": "[variables('nsgAksId')]"
                             },
                             "serviceEndpoints": [
                                 {
@@ -96,7 +92,7 @@
                         "properties": {
                             "addressPrefix": "[parameters('snetDataPrefix')]",
                             "networkSecurityGroup": {
-                                "id": "[parameters('nsgDataId')]"
+                                "id": "[variables('nsgDataId')]"
                             },
                             "serviceEndpoints": [
                                 {
@@ -116,7 +112,7 @@
                         "properties": {
                             "addressPrefix": "[parameters('snetBastionPrefix')]",
                             "networkSecurityGroup": {
-                                "id": "[parameters('nsgBastionId')]"
+                                "id": "[variables('nsgBastionId')]"
                             },
                             "serviceEndpoints": [
                                 {
@@ -154,7 +150,7 @@
             "properties": {
                 "addressPrefix": "[parameters('snetAksPrefix')]",
                 "networkSecurityGroup": {
-                    "id": "[parameters('nsgAksId')]"
+                    "id": "[variables('nsgAksId')]"
                 },
                 "serviceEndpoints": [
                     {
@@ -192,7 +188,7 @@
             "properties": {
                 "addressPrefix": "[parameters('snetDataPrefix')]",
                 "networkSecurityGroup": {
-                    "id": "[parameters('nsgDataId')]"
+                    "id": "[variables('nsgDataId')]"
                 },
                 "serviceEndpoints": [
                     {
@@ -217,7 +213,7 @@
             "properties": {
                 "addressPrefix": "[parameters('snetBastionPrefix')]",
                 "networkSecurityGroup": {
-                    "id": "[parameters('nsgBastionId')]"
+                    "id": "[variables('nsgBastionId')]"
                 },
                 "serviceEndpoints": [
                     {
