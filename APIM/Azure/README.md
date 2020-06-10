@@ -35,7 +35,7 @@ For prerequisite, you must have enough permission on your subscription to create
 - Owner on the target resource group deployment.
 Please follow this [link](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/aks/kubernetes-service-principal.md) to configure one.
 
-Then create a Blob storage account in the target region with 3 containers :
+Then create a Storage account in the resource group with 4 blob containers :
 1. products : upload application package APIGateway, APIPortal and docker scripts. Go to Axway's support website [download page](https://support.axway.com/en/).
 2. dependencies : Upload the mysql jar library.
 3. data : Upload your Docker license key file and a fed with your configuration.

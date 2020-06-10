@@ -34,11 +34,12 @@
             "false"
         ],
         "metadata": {
-          "description": "specify if the zone is managed by Azure DNS. The install script will configure it automatically.Be carreful, the Service Principal must be allowed to add records on this domain."
+          "description": "specify if the zone is managed by Azure DNS and available in the subscription. Note: the Service Principal must have permission to modify Azure zone."
         }
       },
       "dnsRGName": {
         "type": "string",
+        "defaultValue": "novalue",
         "metadata": {
           "description": "Name of the resource group for DNS managed zone."
         }
@@ -120,16 +121,10 @@
           "description": "Tenant ID"
         }
       },
-      "_artifactsStorageAccountSASToken": {
-        "type": "securestring",
-        "metadata": {
-          "description": "Tenant ID"
-        }
-      },
       "email": {
         "type": "string",
         "metadata": {
-          "description": "Email to receive all informations and "
+          "description": "Email used for let's encrypt certificate"
         }
       },
       "environment": {
@@ -142,7 +137,7 @@
       "sourceBlobStorageName": {
           "type": "string",
           "metadata": {
-              "description": "Name of Blob storage where sources files and arm templates are stored"
+              "description": "Blob storage name where sources files are stored."
           }
       },
       "portal": {
@@ -153,7 +148,7 @@
           ],
         "defaultValue": "false",
         "metadata": {
-            "description": "environment type by default : Demo."
+            "description": "Set true to deploy APIPortal in container mode. This mode isn't supported in production."
         }
       },
       "webhookUrl": {
@@ -187,20 +182,19 @@
       "snetBastionId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('snetBastionName'))]",
 
       "containerRegistryName": "[toLower(concat(parameters('projectName'),parameters('environment'), 'acr'))]",
-      "baseURL": "https://customersources.blob.core.windows.net/",
-      "nestedTemplateURL": "[concat(variables('baseURL'),'armtemplates/nestedtemplates/')]",
-      "scriptURL": "[concat(variables('baseURL'),'armtemplates/scripts/')]",
+      "baseURL": "https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Azure",
+      "nestedTemplateURL": "[concat(variables('baseURL'),'/nestedtemplates/')]",
+      "scriptURL": "[concat(variables('baseURL'),'/scripts/')]",
 
-      "uriNetworkTemplate": "[concat(variables('nestedTemplateURL'), 'Network-Template.json', parameters('_artifactsStorageAccountSASToken'))]",
-      "uriAKSTemplate": "[concat(variables('nestedTemplateURL'), 'AKS-Template.json', parameters('_artifactsStorageAccountSASToken'))]",
-      "uriNSGTemplate": "[concat(variables('nestedTemplateURL'), 'NSG-Template.json', parameters('_artifactsStorageAccountSASToken'))]",            
-      "uriStorageAccountTemplate": "[concat(variables('nestedTemplateURL'), 'StorageAccount-Template.json', parameters('_artifactsStorageAccountSASToken'))]",
-      "uriStorageCustomScript": "[concat(variables('scriptURL'), variables('scriptFileName'), parameters('_artifactsStorageAccountSASToken'))]",
-      "uriVMBastionTemplate": "[concat(variables('nestedTemplateURL'), 'Bastion.json', parameters('_artifactsStorageAccountSASToken'))]",
-      "uriACRTemplate": "[concat(variables('nestedTemplateURL'), 'ACR-Template.json', parameters('_artifactsStorageAccountSASToken'))]",
-      "uriAPIMTemplate": "[concat(variables('nestedTemplateURL'), 'APIM.json', parameters('_artifactsStorageAccountSASToken'))]",
-      "uriCASSTemplate": "[concat(variables('nestedTemplateURL'), 'cassandra.json', parameters('_artifactsStorageAccountSASToken'))]",
-
+      "uriNetworkTemplate": "[concat(variables('nestedTemplateURL'), 'Network-Template.json')]",
+      "uriAKSTemplate": "[concat(variables('nestedTemplateURL'), 'AKS-Template.json')]",
+      "uriNSGTemplate": "[concat(variables('nestedTemplateURL'), 'NSG-Template.json')]",            
+      "uriStorageAccountTemplate": "[concat(variables('nestedTemplateURL'), 'StorageAccount-Template.json')]",
+      "uriStorageCustomScript": "[concat(variables('scriptURL'), variables('scriptFileName'))]",
+      "uriVMBastionTemplate": "[concat(variables('nestedTemplateURL'), 'Bastion.json')]",
+      "uriACRTemplate": "[concat(variables('nestedTemplateURL'), 'ACR-Template.json')]",
+      "uriAPIMTemplate": "[concat(variables('nestedTemplateURL'), 'APIM.json')]",
+      "uriCASSTemplate": "[concat(variables('nestedTemplateURL'), 'cassandra.json')]",
 
       "SAFilePremiumName": "[toLower(concat(parameters('projectName'),parameters('environment')))]",
 
