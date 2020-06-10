@@ -194,7 +194,6 @@
       "uriVMBastionTemplate": "[concat(variables('nestedTemplateURL'), 'Bastion.json')]",
       "uriACRTemplate": "[concat(variables('nestedTemplateURL'), 'ACR-Template.json')]",
       "uriAPIMTemplate": "[concat(variables('nestedTemplateURL'), 'APIM.json')]",
-      "uriCASSTemplate": "[concat(variables('nestedTemplateURL'), 'cassandra.json')]",
 
       "SAFilePremiumName": "[toLower(concat(parameters('projectName'),parameters('environment')))]",
 
