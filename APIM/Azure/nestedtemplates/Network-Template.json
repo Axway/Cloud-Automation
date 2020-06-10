@@ -53,6 +53,7 @@
                 },
                 "parameters": {
                     "aksNsgName":{"value": "[variables('nsgAksName')]"},
+                    "dataNsgName":{"value": "[variables('nsgDataName')]"},
                     "bastionNsgName":{"value": "[variables('nsgBastionName')]"}
                 }
             }
