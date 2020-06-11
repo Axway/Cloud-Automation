@@ -27,7 +27,10 @@ In a new window, **"API Key Device"** appears:
 
  ![frontend_inbound_security_api_key_panel.png](./imgs/frontend_inbound_security_api_key_panel.png)
 
-- Click **"OK"** (Leave the default options, the API key is passed in an http header)
+**"API key field name"** will be the name of the field containing API Key (it will be passed in an http header)
+**"API key location"** will be the location of the API key field
+
+- Click **"OK"** (Leaving the default options, the API key is passed in an http header)
 
 Now calling our API requires an API Key.
 
@@ -77,7 +80,8 @@ The update of the **"Frontend API"** is now finished.
 
 ### Change API status
 
-The last step consists of publishing the API from **"Manage frontend API"**:
+The last step consists of publishing the API into **API catalog** from **"Manage frontend API"** menu
+
 - Check the box next to the **"OMS_\<your name\>_v1"** API
 
 ![oms_publish.png](./imgs/oms_publish.png)
@@ -100,6 +104,7 @@ The status of the API becomes **"Published"**: your API is now published!
 Now we will set quota to protect our backend servers and allocate resources between the applications. We will configure two types of quota:
 - A global system quota: API Manager calculates the total amount of transactions for all the applications
 - A quota per **"Application"**: API Manager measures the number of transactions per application
+
 To limit the number of transactions on a system level (100 transactions per second):
 - Select the menu **"Clients"**
 - Click **"Default Quotas"**

@@ -69,6 +69,7 @@ Remark: the URL is deducted from the machine name as defined in the settings tab
 ![frontend_inbound_security_passthrough.png](./imgs/frontend_inbound_security_passthrough.png)
 
 A configuration window **"Pass Through Device"**  appears.
+- You can enter a custom subject name that will be displayed on the Traffic tab in API Gateway Manager
 - Keep the default value and click **"OK"**
 
 ![frontend_inbound_security_passthrough_panel.png](./imgs/frontend_inbound_security_passthrough_panel.png)
