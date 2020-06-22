@@ -10,7 +10,7 @@ This is the policy that you are going to implement:
 
 ### New **"Authentication"** policy
 We are going to isolate the identification part in an independent Policy. At the same time you will test the reuse of policies.
-We are therefore going to create a new policy: **"Authentication". This policy will authenticate the user using basic authentication (use of an identifier / password pair) when logging in.
+We are therefore going to create a new policy: **"Authentication"**. This policy will authenticate the user using basic authentication (use of an identifier / password pair) when logging in.
 - Return to the **"Policy Studio"** interface (bottom menu)
 
 - Right click on the **"TechLabs"** container in the Axway Policy Studio explorer, on the left-hand section of the interface.
@@ -39,10 +39,10 @@ In the **"Configure 'http Basic'"** window,
   **Credential Format**: User Name
   **Repository Name**: Local User Store
 - Leave the **"Allow client challenge"** option activated
-- Click **"Finish"**
+- Click **"Finish"**.
 ![http_basic_panel](./imgs/http_basic_panel.png)
 
-- To define the start of the Policy, right-click on the **"HTTP Basic"** filter and select **"Set as Start".
+- To define the start of the Policy, right-click on the **"HTTP Basic"** filter and select **"Set as Start"**.
 ![set_as_start](./imgs/set_as_start.png)
 
 So our authentication policy is only one filter!
@@ -70,9 +70,10 @@ We are now going to define the **"Call 'Authentication'"** filter as a new start
 - Click on the **"Call 'Authentication'"** filter to position the start of the arrow, then click on the **"Set message OK"** filter to indicate the end of the arrow.
 ![shortcut_green_arrow](./imgs/shortcut_green_arrow.png)
 - In the right-hand column, select the red **"Failure Path"** arrow
-- Connect the **"Call 'Authentication'"** filter to the **"Throttling"** filter in the same way
+- Connect the **"Call 'Authentication'"** filter to the **"Throttling"** filter in the same way.
 ![shortcut_red_arrow](./imgs/shortcut_red_arrow.png)
-The final diagram should look similar to the following picture:
+
+The final diagram should look similar to the following picture.
 ![shortcut_linked](./imgs/shortcut_linked.png)
  
 ###	Deployment
@@ -90,6 +91,7 @@ In the **"Authentication Required"** window,
 - For the **"User Name"** field, enter **"user1"**
 - For the **"Password"** field, enter **"axway"**
 - Click **"OK"**
+
 ![http_basic_prompt](./imgs/http_basic_prompt.png)
 
 - Click several times on the web browser refresh button to simulate successive requests.

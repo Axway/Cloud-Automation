@@ -6,7 +6,7 @@ We need:
 - A shell, with kubectl working
 - Access to Kubetnetes dashboard
 
-Please refer to your [environment](../Environment) to have it working.
+Please refer to your [environment](../../Environment) to have it working.
 
 
 

@@ -11,7 +11,14 @@ When you test:
 ### Implementation of the **"Quota System"** policy
 
 In the tree view on the left of the screen,
-- Expand **"Policies"**, and right-click on the **"TechLabs"** container (if it doesn’t exists Add Container **"TechLabs"** before adding the policy). Select **"Add Policy"**
+- Expand **"Policies"**
+- If **TechLabs** container doesn't exist, right click on **"Policies"** and click **"Add Container"**
+![add_techlabs_container](./imgs/add_techlabs_container.png)
+
+- Write "TechLabs" then click OK
+![add_techlabs_container_validation](./imgs/add_techlabs_container_validation.png)
+
+- Right-click on the **"TechLabs"** container and select **"Add Policy"**
 
 ![add_policy](./imgs/add_policy.png)
 
@@ -41,7 +48,7 @@ We will configure the filter to accept the processing of one message every 5 sec
 ![set_as_start](./imgs/set_as_start.png)
 
 
-You have the following:
+You should have the following:
 
 ![throttling_step](./imgs/throttling_step.png)
  
@@ -72,8 +79,12 @@ Access to service authorized
 
 ![set_message_1_panel](./imgs/set_message_1_panel.png)
 
+- Create a success path between Throttling and Set Message filtes.
+Select **Success Path** into Filers panel then, in the Policy, click on **Throttling** first and next on **Set message OK**.
+![add_success_path](./imgs/add_success_path.png)
+
 - Start entering **"Reflect Message"** in the search zone in the top-right.
-Select the **"Reflect Message"** filter 
+Select the **"Reflect Message"** filter.
 - Drag and drop this filter to the **"Set Message OK"** filter.
 
 ![reflect_1_dad](./imgs/reflect_1_dad.png)
@@ -85,6 +96,7 @@ In the **"Configure a new 'Reflect Message' filter"** window,
 
 ![reflect_1_panel](./imgs/reflect_1_panel.png)
 
+- Select **Success Path** filter to link **"Set Message OK"** to **"Reflect Message 200"**.
 
 We will now put in place the processing of an error message informing that the quota has been reached.
 - Start entering **"Set Message"** in the search zone in the top-right.
@@ -109,8 +121,13 @@ Access to service denied
 
 ![set_message_2_panel](./imgs/set_message_2_panel.png)
 
+- Create a failure path between Throttling and Set Message KO filtes.
+Select **Failure Path** into Filers panel then, in the Policy, click on **Throttling** first and next on **Set message KO**.
+![add_failure_path](./imgs/add_failure_path.png)
+
+
 - Start entering **"Reflect Message"** in the search zone in the top-right.
-Select the **"Reflect Message"** filter
+Select the **"Reflect Message"** filter.
 
 ![reflect_2_dad](./imgs/reflect_2_dad.png)
 
@@ -124,6 +141,7 @@ Drag and drop this filter on top of the **"Set Message KO"** filter.
 
 ![reflect_2_panel](./imgs/reflect_2_panel.png)
 
+- Select **Success Path** filter to link **"Set Message KO"** to **"Reflect Message 500"**.
 
 The **"Set Response Status"** filter is used to explicitly add a message in the Monitoring displays. 
 If this policy proceeds correctly, it will by default be considered positive (whether or not the quota is reached).

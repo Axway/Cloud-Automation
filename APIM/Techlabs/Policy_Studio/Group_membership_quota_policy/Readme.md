@@ -4,17 +4,17 @@ The objective is to develop the policy to take into account three levels of auth
 - "Silver" level: Access limited to 5 requests every 5 seconds;
 - "Bronze" level: 1 request every 5 seconds, default right for an unrecognized user.
 
-Let's go to the "Policy Studio", to the "Quota System" policy.
-Here are the new elements of the policy (on the light background) that you are going to implement:
+Let's go to the **"Policy Studio"** and open the **"Quota System"** policy.
+Here are the new elements of the policy (*on the light background*) that you are going to implement:
  
 ![policy_change_overview](./imgs/policy_change_overview.png)
 
 
 ### Modification of the "Quota System" policy
-Following authentication, once the user is identified, their group must be determined. The "Check Group Membership" filter is used to check whether a user belongs to a certain group.
-- In the search zone, located at the top of the right-hand column, enter "check".
-- Click on the "Check Group Membership" filter
-- Then click on the green arrow connecting the "Call 'Authentication'" filter to the "Set Message OK" filter
+Following authentication, once the user is identified, their group must be determined. The **"Check Group Membership"** filter is used to check whether a user belongs to a certain group.
+- In the search zone, located at the top of the right-hand column, enter **"check"**.
+- Click on the **"Check Group Membership"** filter
+- Then click on the green arrow connecting the **"Call 'Authentication'"** filter to the **"Set Message OK"** filter
 - The "Check Group Membership" filter will then be inserted on the selected arrow.
 ![check_group_membership_dad](./imgs/check_group_membership_dad.png)
  
@@ -23,11 +23,12 @@ In the "Configure a new 'Check Group Membership' filter" window,
 - For the "User" field, leave the pre-configured value.
 - For the "Group" field, enter "Gold"
 - Click "Finish"
+
 ![check_group_membership_panel](./imgs/check_group_membership_panel.png)
 
 
-- Select the "Check Group Membership" filter
-Drag and drop this filter to the "Check Group Membership Gold" filter created previously. This will create an error management branch (red arrow).
+- Select the **"Check Group Membership"** filter.
+- Drag and drop this filter to the "Check Group Membership Gold" filter created previously. This will create an error management branch (red arrow).
 ![check_group_membership_silver_dad](./imgs/check_group_membership_silver_dad.png)
  
 In the "Configure a new 'Check Group Membership' filter" window, 
@@ -35,12 +36,14 @@ In the "Configure a new 'Check Group Membership' filter" window,
 - For the "User" field, leave the pre-configured value.
 - For the "Group" field, enter "Silver"
 - Click "Finish"
+
 ![check_group_membership_sliver_panel](./imgs/check_group_membership_sliver_panel.png)
 
 
-- In the search zone, located at the top of the right-hand column, enter "set".
-Select the "Set Attribute Filter" filter
-Drag and drop this filter to the "Check Group Membership Silver" filter.
+In the search zone, located at the top of the right-hand column, enter "set".
+- Select the "Set Attribute Filter" filter.
+- Drag and drop this filter to the "Check Group Membership Silver" filter.
+
 ![set_attribute_dad](./imgs/set_attribute_dad.png)
  
 The "Set Attribute Filter" filter is used to assign a value to a variable. Here we will allocate the value corresponding to the maximum number of transactions authorized per unit of time. In the "Configure a new 'Set Attribute Filter' filter" window:
@@ -48,10 +51,12 @@ The "Set Attribute Filter" filter is used to assign a value to a variable. Here 
 - For the "Attribute Name" field, enter "Limit" (be sure to respect upper/lower case)
 - For the "Attribute Value" field, enter "5"
 - Click on "Finish"
+
 ![set_attribute_panel](./imgs/set_attribute_panel.png)
 
 - Select the "Set Attribute Filter" filter
-Drag and drop this filter to the "Check Group Membership Silver" filter. This will create an error management branch (red arrow). If the requester identified does not belong to the Silver group, they form part of the Bronze group and are entitled to one request every 5 seconds.
+- Drag and drop this filter to the "Check Group Membership Silver" filter. This will create an error management branch (red arrow). If the requester identified does not belong to the Silver group, they form part of the Bronze group and are entitled to one request every 5 seconds.
+
 ![set_attribute_1_dad](./imgs/set_attribute_1_dad.png)
  
 
@@ -59,30 +64,36 @@ In the "Configure a new 'Set Attribute Filter' filter" window,
 - For the "Name" field, enter "Set Attribute Limit (1)"
 - For the "Attribute Name" field, enter "Limit" (be sure to respect upper/lower case)
 - For the "Attribute Value" field, enter "1"
-- Click "Finish"
+- Click "Finish".
+
 ![set_attribute_1_panel](./imgs/set_attribute_1_panel.png)
 
 
 - Select the green "Success Path" arrow.
-Connect the "Set Attribute Filter (1)" filter to the "Throttling" filter
+- Connect the "Set Attribute Filter (1)" filter to the "Throttling" filter.
+
 ![success_path_1](./imgs/success_path_1.png)
  
 - Select the green "Success Path" arrow.
-Connect the "Set Attribute Filter Limit (5)" filter to the "Throttling" filter
+- Connect the "Set Attribute Filter Limit (5)" filter to the "Throttling" filter.
+
 ![success_path_2](./imgs/success_path_2.png)
  
 - Click at the top of the right-hand column on "Select" to be able to select filters on the main frame.
 - Double-click on the "Throttling" filter to open its properties window.
 - In the "Configure "Throttling"" window, change the value of the "Allow" field to "${Limit}" (be sure to respect upper/lower case).
-- Click on "Finish"
+- Click on "Finish".
+
 ![throttling_panel](./imgs/throttling_panel.png)
  
-You will move the red "Failure Path" arrow, which starts from the "Call 'Authentication'" filter, to connect it to the "Set Attribute Filter (1)" filter
+You will move the red **"Failure Path"** arrow, which starts from the **"Call 'Authentication'"** filter, to connect it to the **"Set Attribute Filter (1)"** filter.
+
 To do this:
 - Click on the red arrow connecting "Call 'Authentication'" and "Throttling".
 - Its two ends show small black squares.
 - Select the end with the arrow, and move it to the "Set Attribute Limit (1)" filter
 - Your policy should look like this:
+
 ![policy_final](./imgs/policy_final.png)
 
  
@@ -93,17 +104,21 @@ The policy is now ready to be deployed.
 
 
 ### Tests
-We want to test the policy with different users, belonging to different groups. Setup was already done in this environment. You can talk a look of it here;
+We want to test the policy with different users, belonging to different groups. Setup was already done in the reference environment. You can take a look of it here :
 - The list of users:
+
 ![user_list](./imgs/user_list.png)
 
 - The list of groups:
+
 ![group_list](./imgs/group_list.png)
 
 - The following users are part of the "Gold" group:
+
 ![gold_group](./imgs/gold_group.png)
 
 - The following users are part of the "Silver" group:
+
 ![silver_group](./imgs/silver_group.png)
  
 Let's test with different user. Web browser can remind identity you put, so do not easy to open a new private tab or close and reopne the browser.
