@@ -1,24 +1,26 @@
 ## 5. Create Cloud2Cloud flow
 
-- In Integration Builder, select the Flows tab and click **"Build New Flow Template"**
-- Click **"Build New Flow"**
+- In Integration Builder, select the Flows tab and click **"Build New Flow"**
+- A list is displayed, click **"Build New Flow"**
 - Type the following flow name **"Salesforce to Slack exercise"** and click **"Create"**
 ![Create_flow1.png](./imgs/Create_flow1.png)
 
-- Click **"Add Event"** on Event tile
+- Click **"Add Event"** on Event panel
 - Type **${config.source}** on the field **"connector instance variable"**.
-- Click **"Save"**. A flow diagram is displayed with “trigger”
+- Click **"Save"**. A flow diagram is displayed with “trigger” selection
 
 
 ![Create_flow2.png](./imgs/Create_flow2.png)
 
-Click on **"Variables"**, and define three variables like the following table, and click on **"Cancel"** to validate the creation : 
+- Click on **"Manage"**, then on **"Manage variables"**.
+- Define three variables like the following table.
+- Finally click on **"Save"** to validate the creation.
 
 
 ![Create_flow3.png](./imgs/Create_flow3.png)
 
 - Click **"+"** below the «trigger» step
-- Click **"Create New"** and select **"Connector API Request"**
+- Click **"ADD STEP"** and select **"Connector API Request"**
 - Complete the following fields and click **"Save"**:
     - Name: **getSalesforceLeadInfo**
     - Connector Instance Variable: select the source variable : **${config.source}**
@@ -29,7 +31,8 @@ Click on **"Variables"**, and define three variables like the following table, a
 ![Create_flow4.png](./imgs/Create_flow4.png)
 
 - Click on **"getSalesforceLeadInfo"** step, and select **"ADD ONSUCCESS"**
-- Click on **"JS Script"**
+- Click on **ADD STEP** button 
+- Select on **"JS Script"**
 - Type the following name **createSlackMessageBody**
 - Put the following JSON code, and click **"Save"**:
 
@@ -51,7 +54,8 @@ Click on **"Variables"**, and define three variables like the following table, a
 ![Create_flow5.png](./imgs/Create_flow5.png)
 
 - Click on **"createSlackMessageBody"** step, and select **"ADD ONSUCCESS"**
-- Click on **"Connector API Request"**
+- Click on **ADD STEP** button 
+- Select on **"Connector API Request"**
 - Type the following values and click **"Save"**:
     - Name: **sendSlackMessage**
     - Connector Instance Variable: select the messaging variable **${config.messaging}**
