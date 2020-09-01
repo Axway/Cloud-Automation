@@ -147,7 +147,6 @@
             "apiVersion": "2019-09-01",
             "name": "[concat(parameters('vnetName'), '/', parameters('snetAksName'))]",
             "dependsOn": [
-                "NSG",
                 "[parameters('vnetId')]"
             ],
             "properties": {
@@ -183,7 +182,6 @@
             "apiVersion": "2019-09-01",
             "name": "[concat(parameters('vnetName'), '/', parameters('snetDataName'))]",
             "dependsOn": [
-                "NSG",
                 "[parameters('vnetId')]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'),parameters('snetBastionName'))]"
 
@@ -209,7 +207,6 @@
             "apiVersion": "2019-09-01",
             "name": "[concat(parameters('vnetName'), '/', parameters('snetBastionName'))]",
             "dependsOn": [
-                "NSG",
                 "[parameters('vnetId')]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'),parameters('snetAksName'))]"
             ],

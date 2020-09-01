@@ -253,7 +253,7 @@
         "properties": {
           "mode": "Incremental",
           "templateLink": {
-            "uri":"[variables('uriNsgTemplate')]"
+            "uri":"[variables('uriNSGTemplate')]"
           },
           "parameters": {
             "nsgAksName":{"value": "[variables('nsgAksName')]"},
