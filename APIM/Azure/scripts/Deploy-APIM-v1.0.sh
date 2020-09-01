@@ -469,7 +469,7 @@ function f_Setup_AKS ()
 
     log "[INFO]  Set Public IP for Ingress."
     rgAKSName=$(az aks show --resource-group $resourceGroupName --name $aksClusterName --query nodeResourceGroup -o tsv)
-    aksPublicIP=$(az network public-ip create --resource-group $rgAKSName --sku Standard --name $ipAKSName --allocation-method static --query publicIp.ipAddress -o tsv --allocation-method static --zone 3)
+    aksPublicIP=$(az network public-ip create --resource-group $rgAKSName --sku Standard --name $ipAKSName --allocation-method static --query publicIp.ipAddress -o tsv --allocation-method static --zone 1)
     log "[INFO]  Public static IP generated for AKS ingress : $aksPublicIP."
     log "[INFO]  End configuration of AKS."
 }
@@ -605,7 +605,7 @@ f_build_helm () {
     helmPackageFullName="${helmPackageName}-${helmChartVersion}.tgz"
     helm package $helmFolder/$helmPackageName -d $helmFolder
     az acr helm push --name $containerRegistryName $helmFolder/$helmPackageFullName
-    log "Push Helm $helmPackageFullName on regsitry $containerRegistryURL"
+    log "Push Helm $helmPackageFullName on registry $containerRegistryURL"
 }
 
 ###############
