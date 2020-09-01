@@ -181,6 +181,13 @@
       "snetBastionName":"bastion-snet",
       "snetBastionId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('snetBastionName'))]",
 
+      "nsgAksName": "[toLower(concat(parameters('projectName'),'-',parameters('environment'),'-aks-nsg'))]",
+      "nsgBastionName": "[toLower(concat(parameters('projectName'),'-',parameters('environment'),'-bastion-nsg'))]",
+      "nsgDataName": "[toLower(concat(parameters('projectName'),'-',parameters('environment'),'-data-nsg'))]",
+      "nsgBastionId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgBastionName'))]",
+      "nsgAksId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgAksName'))]",
+      "nsgDataId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgDataName'))]",
+
       "containerRegistryName": "[toLower(concat(parameters('projectName'),parameters('environment'), 'acr'))]",
       "baseURL": "https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Azure",
       "nestedTemplateURL": "[concat(variables('baseURL'),'/nestedtemplates/')]",
@@ -200,7 +207,7 @@
       "aksNodeNamePrefix": "[toLower(concat(parameters('projectName'),parameters('environment')))]",
       "aksClusterName": "[toLower(concat(parameters('projectName'),parameters('environment')))]",
       "aksDnsPrefix": "[toLower(concat(parameters('projectName'), '-dns'))]",
-      "aksVersion": "1.15.10",
+      "aksVersion": "1.17.9",
   
       "scriptFileName": "Deploy-APIM-v1.0.sh",
       "vmExtensionName": "[concat(variables('bastionVMName'),'-scriptextension')]",
@@ -242,9 +249,30 @@
       }
     },
     {
+      "name": "NetworkSecurityGroup",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri":"[variables('uriNsgTemplate')]"
+          },
+          "parameters": {
+            "aksNsgName":{"value": "[variables('nsgAksName')]"},
+            "bastionNsgName":{"value": "[variables('nsgBastionName')]"},
+            "dataNsgName":{"value": "[variables('nsgDataName')]"}
+
+          }
+        }
+    },
+    {
         "name": "Network",
         "type": "Microsoft.Resources/deployments",
         "apiVersion": "2019-08-01",
+        "dependsOn": [
+          "NetworkSecurityGroup"
+        ],
         "properties": {
             "mode": "Incremental",
             "templateLink": {
@@ -263,7 +291,9 @@
                 "snetDataPrefix":{"value": "[parameters('snetDataPrefix')]"},
                 "snetBastionName":{"value": "[variables('snetBastionName')]"},
                 "snetBastionPrefix":{"value": "[parameters('snetBastionPrefix')]"},
-                "uriNsgTemplate":{"value": "[variables('uriNSGTemplate')]"}
+                "nsgBastionId":{"value": "[variables('nsgBastionId')]"},
+                "nsgAksId":{"value": "[variables('nsgAksId')]"},
+                "nsgDataId":{"value": "[variables('nsgDataId')]"}
             }
         }
     },
