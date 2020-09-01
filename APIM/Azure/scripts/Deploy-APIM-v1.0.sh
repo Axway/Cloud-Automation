@@ -693,6 +693,9 @@ fi
 helmPackageName="amplify-apim-${apimVersion%%-*}"
 helmDeployName="$projectName-$helmPackageName-$environment"
 
+#to be removed 
+mysqlHost=""
+
 timestamp=$(date +%s)
 aksStorageFileShareEvents="gw-events"
 aksStorageFileShareLogs="apim-logs"
