@@ -34,7 +34,7 @@
       "imagePublisher": "OpenLogic",
       "imageOffer": "CentOS",
       "imageSKU": "7.5",
-      "vmSize" : "Standard_D2_v2"
+      "vmSize" : "Standard_D1_v2"
     },
     "resources": [
       {
