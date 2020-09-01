@@ -29,35 +29,22 @@
         "snetDataPrefix": {
             "type": "string"
         },
-        "uriNsgTemplate": {
+        "nsgAksName": {
+            "type": "string"
+        },
+        "nsgDataName": {
+            "type": "string"
+        },
+        "nsgBastionName": {
             "type": "string"
         }
     },
     "variables": {
-        "nsgBastionName": "bastion-nsg",
-        "nsgBastionId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgBastionName'))]",
-        "nsgAksName": "aks-nsg",
-        "nsgAksId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgAksName'))]",
-        "nsgDataName": "data-nsg",
-        "nsgDataId" : "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgDataName'))]"
+        "nsgBastionId" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgBastionName'))]",
+        "nsgAksId" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgAksName'))]",
+        "nsgDataId" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgDataName'))]"
     },
     "resources": [
-        {
-            "name": "NSG",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri":"[parameters('uriNsgTemplate')]"
-                },
-                "parameters": {
-                    "aksNsgName":{"value": "[variables('nsgAksName')]"},
-                    "dataNsgName":{"value": "[variables('nsgDataName')]"},
-                    "bastionNsgName":{"value": "[variables('nsgBastionName')]"}
-                }
-            }
-        },
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2018-12-01",

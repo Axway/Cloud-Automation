@@ -2,13 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "dataNsgName": {
+        "nsgDataName": {
             "type": "string"
         },
-        "bastionNsgName": {
+        "nsgBastionName": {
             "type": "string"
         },
-        "aksNsgName": {
+        "nsgAksName": {
             "type": "string"
         }
     },
@@ -17,7 +17,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2018-12-01",
-            "name": "[parameters('aksNsgName')]",
+            "name": "[parameters('nsgAksName')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "securityRules": [
@@ -154,7 +154,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2018-12-01",
-            "name": "[parameters('dataNsgName')]",
+            "name": "[parameters('nsgDataName')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "securityRules": [
@@ -291,7 +291,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2018-12-01",
-            "name": "[parameters('bastionNsgName')]",
+            "name": "[parameters('nsgBastionName')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "securityRules": [
