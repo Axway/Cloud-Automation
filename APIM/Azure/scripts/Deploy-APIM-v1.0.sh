@@ -443,10 +443,10 @@ function f_Setup_AKS ()
     kubectl create namespace $apimNamespace
 
     log "[INFO]  Configure secret in Kubernetes."
-    #Grant the kube-system user with admin-permission
-    kubectl create clusterrolebinding kubernetes-dashboard -n kube-system \
-                    --clusterrole=cluster-admin \
-                    --serviceaccount=kube-system:kubernetes-dashboard
+    #Grant the kube-system user with admin-permission - to be deleted because already provided by MS
+#    kubectl create clusterrolebinding kubernetes-dashboard -n kube-system \
+#                    --clusterrole=cluster-admin \
+#                    --serviceaccount=kube-system:kubernetes-dashboard
 
     #Add secret for pull images from ACR
     kubectl create secret docker-registry $aksSecretDockerName \
