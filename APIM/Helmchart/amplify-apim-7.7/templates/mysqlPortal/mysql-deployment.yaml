@@ -16,6 +16,7 @@ spec:
       labels:
         app: {{ .Values.mysqlPortal.name }}
     spec:
+    {{- if eq .Values.global.nodeAffinity.enabled true }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -24,7 +25,8 @@ spec:
               - key: agentpool
                 operator: In
                 values:
-                - podpool
+                - {{ .Values.global.nodeAffinity.name }}
+      {{- end }}
       containers:
       - image: {{ .Values.mysqlPortal.imageName }}:{{ .Values.mysqlPortal.buildTag }}
         name: {{ .Values.mysqlPortal.name }}

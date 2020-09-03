@@ -17,6 +17,7 @@ spec:
       labels:
         app: {{ .Values.cassandra.name }}
     spec:
+      {{- if eq .Values.global.nodeAffinity.enabled true }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -25,7 +26,8 @@ spec:
               - key: agentpool
                 operator: In
                 values:
-                - podpool
+                - {{ .Values.global.nodeAffinity.name }}
+      {{- end }}
       terminationGracePeriodSeconds: 1800
       containers:
       - name: {{ .Values.cassandra.name }}

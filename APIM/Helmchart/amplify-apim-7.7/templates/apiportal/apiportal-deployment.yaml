@@ -18,6 +18,7 @@ spec:
         app: {{ .Values.apiportal.name | quote }}
     spec:
       affinity:
+        {{- if eq .Values.global.nodeAffinity.enabled true }}
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
@@ -25,7 +26,8 @@ spec:
               - key: agentpool
                 operator: In
                 values: 
-                - podpool
+                - {{ .Values.global.nodeAffinity.name }}
+        {{- end }}
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 100

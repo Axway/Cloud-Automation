@@ -20,6 +20,7 @@ spec:
       labels:
         app: {{ .Values.anm.name | quote }}
     spec:
+      {{- if eq .Values.global.nodeAffinity.enabled true }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -28,7 +29,8 @@ spec:
               - key: agentpool
                 operator: In
                 values: 
-                - apimpool
+                - {{ .Values.global.nodeAffinity.name }}
+      {{- end }}
       containers:
       - name: {{ .Values.anm.name | quote }}
         image: {{ .Values.global.dockerRegistries.apimName }}/{{ .Values.anm.imageName }}:{{ .Values.anm.buildTag }}
