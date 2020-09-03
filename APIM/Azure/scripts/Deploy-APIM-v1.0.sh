@@ -608,7 +608,7 @@ f_build_helm () {
     helmPackageFullName="${helmPackageName}-${helmChartVersion}.tgz"
 
     helm chart save $helmFolder/$helmPackageName $containerRegistryURL/$helmPackageName
-    echo $servicePrincipalPwd | helm registry login $containerRegistryURL \
+    echo $_servicePrincipalPwd | helm registry login $containerRegistryURL \
             --username $servicePrincipalId \
             --password-stdin
 
