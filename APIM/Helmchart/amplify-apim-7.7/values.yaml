@@ -20,6 +20,7 @@ global:
       secret: azure-file
       name: apimlogs
       quota: 5
+   nodeAffinity: disable
 
 anm:
    name: anm

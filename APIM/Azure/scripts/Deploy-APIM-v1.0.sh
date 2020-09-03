@@ -601,10 +601,22 @@ f_build_gw () {
 }
 
 f_build_helm () {
+    #Enable OCI support in helm 3 client.
+    export HELM_EXPERIMENTAL_OCI=1
+
     helmChartVersion=$(grep version $helmFolder/$helmPackageName/Chart.yaml | sed -n -e 's/^.*version: //p')
     helmPackageFullName="${helmPackageName}-${helmChartVersion}.tgz"
-    helm package $helmFolder/$helmPackageName -d $helmFolder
-    az acr helm push --name $containerRegistryName $helmFolder/$helmPackageFullName
+
+    helm chart save $helmFolder/$helmPackageName $containerRegistryURL/$helmPackageName
+    echo $servicePrincipalPwd | helm registry login $containerRegistryURL \
+            --username $servicePrincipalId \
+            --password-stdin
+
+    helm chart push $helmFolder/$helmPackageName -d $helmFolder
+    helm chart remove $containerRegistryName/$helmPackageName
+     helm registry logout $containerRegistryURL
+#    helm package $helmFolder/$helmPackageName -d $helmFolder
+#    az acr helm push --name $containerRegistryName $helmFolder/$helmPackageFullName
     log "Push Helm $helmPackageFullName on registry $containerRegistryURL"
 }
 
@@ -786,11 +798,12 @@ f_build_helm
 
 ((stepNb++))
 logTitle="Step $stepNb: Deploy Packages HELM"
-az acr helm repo add --name $containerRegistryName
-helm repo update
-echo "helm install $helmDeployName $containerRegistryName/$helmPackageName --namespace=$apimNamespace --set platform=AZURE,managedIngress=true,global.apimVersion=$apimVersion,global.namespace=$apimNamespace,global.dockerRegistries.apimName=$containerRegistryURL,global.dockerRegistries.apimSecret=$aksSecretDockerName,anm.buildTag=$buildTag,anm.ingressName=$dnsIngressAnm,apimgr.buildTag=$buildTag,apimgr.ingressName=$dnsIngressManager,apitraffic.buildTag=$buildTag,apitraffic.ingressName=$dnsIngressTraffic,apitraffic.share.secret=$aksSecretFileName,apitraffic.share.name=$aksStorageFileShareEvents,mysqlAnalytics.enabled=true,mysqlAnalytics.external=true,mysqlAnalytics.host=$mysqlHost,cassandra.external=false,cassandra.keyspace=${projectName}_${environment}_1,apiportal.enabled=$apiportal,apiportal.buildTag=$buildTag,apiportal.ingressName=$dnsIngressPortal,apiportal.share.secret=$aksSecretFileName,apiportal.share.name=$aksStorageFilePortalContent,oauth.enabled=false"
-helm install $helmDeployName $containerRegistryName/$helmPackageName --namespace=$apimNamespace --set platform=ESX,managedIngress=false,global.apimVersion=$apimVersion,global.namespace=$apimNamespace,global.dockerRegistries.apimName=$containerRegistryURL,global.dockerRegistries.apimSecret=$aksSecretDockerName,anm.buildTag=$buildTag,anm.ingressName=$dnsIngressAnm,apimgr.buildTag=$buildTag,apimgr.ingressName=$dnsIngressManager,apitraffic.buildTag=$buildTag,apitraffic.ingressName=$dnsIngressTraffic,apitraffic.share.secret=$aksSecretFileName,apitraffic.share.name=$aksStorageFileShareEvents,mysqlAnalytics.enabled=true,mysqlAnalytics.external=false,mysqlAnalytics.host=$mysqlHost,cassandra.external=false,cassandra.keyspace=${projectName}_${environment}_1,apiportal.enabled=$apiportal,apiportal.buildTag=$buildTag,apiportal.ingressName=$dnsIngressPortal,apiportal.share.secret=$aksSecretFileName,apiportal.share.name=$aksStorageFilePortalContent,oauth.enabled=false
 
+#az acr helm repo add --name $containerRegistryName
+#helm repo update
+#helm chart pull $containerRegistryName/$helmPackageName
+echo "helm install $helmDeployName $helmFolder/$helmPackageName --namespace=$apimNamespace --set platform=AZURE,managedIngress=true,global.apimVersion=$apimVersion,global.namespace=$apimNamespace,global.dockerRegistries.apimName=$containerRegistryURL,global.dockerRegistries.apimSecret=$aksSecretDockerName,anm.buildTag=$buildTag,anm.ingressName=$dnsIngressAnm,apimgr.buildTag=$buildTag,apimgr.ingressName=$dnsIngressManager,apitraffic.buildTag=$buildTag,apitraffic.ingressName=$dnsIngressTraffic,apitraffic.share.secret=$aksSecretFileName,apitraffic.share.name=$aksStorageFileShareEvents,mysqlAnalytics.enabled=true,mysqlAnalytics.external=true,mysqlAnalytics.host=$mysqlHost,cassandra.external=false,cassandra.keyspace=${projectName}_${environment}_1,apiportal.enabled=$apiportal,apiportal.buildTag=$buildTag,apiportal.ingressName=$dnsIngressPortal,apiportal.share.secret=$aksSecretFileName,apiportal.share.name=$aksStorageFilePortalContent,oauth.enabled=false"
+helm install $helmDeployName $helmFolder/$helmPackageName --namespace=$apimNamespace --set platform=ESX,managedIngress=false,global.apimVersion=$apimVersion,global.namespace=$apimNamespace,global.dockerRegistries.apimName=$containerRegistryURL,global.dockerRegistries.apimSecret=$aksSecretDockerName,anm.buildTag=$buildTag,anm.ingressName=$dnsIngressAnm,apimgr.buildTag=$buildTag,apimgr.ingressName=$dnsIngressManager,apitraffic.buildTag=$buildTag,apitraffic.ingressName=$dnsIngressTraffic,apitraffic.share.secret=$aksSecretFileName,apitraffic.share.name=$aksStorageFileShareEvents,mysqlAnalytics.enabled=true,mysqlAnalytics.external=false,mysqlAnalytics.host=$mysqlHost,cassandra.external=false,cassandra.keyspace=${projectName}_${environment}_1,apiportal.enabled=$apiportal,apiportal.buildTag=$buildTag,apiportal.ingressName=$dnsIngressPortal,apiportal.share.secret=$aksSecretFileName,apiportal.share.name=$aksStorageFilePortalContent,oauth.enabled=false
 log "Step $stepNb: End Packages HELM deployement"
 f_sendLog
 
