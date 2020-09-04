@@ -611,8 +611,8 @@ f_build_helm () {
     echo $_servicePrincipalPwd | helm registry login $containerRegistryURL \
             --username $servicePrincipalId \
             --password-stdin
-
-    helm chart push $helmFolder/$helmPackageName
+    helmChartRef=$(helm chart list | grep amplify | cut -f1)
+    helm chart push $helmChartRef
     helm chart remove $containerRegistryName/$helmPackageName
      helm registry logout $containerRegistryURL
 #    helm package $helmFolder/$helmPackageName -d $helmFolder
