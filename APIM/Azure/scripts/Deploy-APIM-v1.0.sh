@@ -612,7 +612,7 @@ f_build_helm () {
             --username $servicePrincipalId \
             --password-stdin
 
-    helm chart push $helmFolder/$helmPackageName -d $helmFolder
+    helm chart push $helmFolder/$helmPackageName
     helm chart remove $containerRegistryName/$helmPackageName
      helm registry logout $containerRegistryURL
 #    helm package $helmFolder/$helmPackageName -d $helmFolder
