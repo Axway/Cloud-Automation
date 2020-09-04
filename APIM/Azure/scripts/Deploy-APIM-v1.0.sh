@@ -631,6 +631,7 @@ messConcat=""
 # Set if customers files are presents
 #todo : test file is present
 anmFedLocation="no"
+aksStorageFilePortalContent=""
 
 while getopts "$options" arg; do
         case "${arg}" in
