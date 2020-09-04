@@ -613,7 +613,7 @@ f_build_helm () {
             --password-stdin
     helmChartRef=$(helm chart list | grep amplify | cut -f1)
     helm chart push $helmChartRef
-    helm chart remove $containerRegistryName/$helmPackageName
+    helm chart remove $helmChartRef
      helm registry logout $containerRegistryURL
 #    helm package $helmFolder/$helmPackageName -d $helmFolder
 #    az acr helm push --name $containerRegistryName $helmFolder/$helmPackageFullName
