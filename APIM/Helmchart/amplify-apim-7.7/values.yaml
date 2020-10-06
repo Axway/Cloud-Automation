@@ -21,14 +21,15 @@ global:
       name: apimlogs
       quota: 5
    nodeAffinity:
-      enabled: "false"
+      enabled: false
       name: apimpool
+   dynamicLicense: false
 
 anm:
    name: anm
    buildTag: "7.7-20200130"
    imageName: "apim-anm"
-   ingressName: "ANM-DNS-NAME-VALUE"
+   ingressName: "anm-dns-name"
    replicaCount: 1
    pvcQuota: 1
    trafficPort: 8090
@@ -43,7 +44,7 @@ apimgr:
    name: apimgr
    buildTag: "7.7-20200130"
    imageName: "apim-mgr"
-   ingressName: "APIMGR-DNS-NAME-VALUE"
+   ingressName: "api-manager-dns-name"
    replicaCount: 1
    trafficPort: 8075
    logTraceToFile: "true"
@@ -56,7 +57,7 @@ apitraffic:
    name: traffic
    buildTag: "7.7-20200130"
    imageName: "apim-mgr"
-   ingressName: "TRAFFIC-DNS-NAME-VALUE"
+   ingressName: "apitraffic-dns-name"
    portManager: 8065
    portGateway: 8080
    portGatewaySSL: 8081
@@ -72,8 +73,8 @@ apitraffic:
    emt_heap_size_mb: "1512"
    test_import: false
    share:
-      secret: "TRAFFIC-SHARE-SECRET-NAME-VALUE"
-      name: "TRAFFIC-SHARE-NAME-VALUE"
+      secret: "apim-event-volume-rwm-secret-name"
+      name: "apim-event-volume-rwm-name"
       path: "/opt/Axway/apigateway/events"
       quota: 1
 
@@ -82,12 +83,12 @@ apiportal:
    name: "api-portal"
    buildTag: "7.7-20200130"
    imageName: "apim-ptl"
-   ingressName: "APIPORTAL-DNS-NAME-VALUE"
+   ingressName: "apiportal-dns-name"
    trafficPort: 443
    replicaCount: 1
    share:
-      secret: "APIPORTAL-SHARE-SECRET-NAME-VALUE"
-      name: "APIPORTAL-SHARE-NAME-VALUE"
+      secret: "apiportal-volume-rwm-secret-name"
+      name: "apiportal-volume-rwm-name"
 
 mysqlAnalytics:
    enabled: true
@@ -135,5 +136,5 @@ mysqlPortal:
 oauth:
    enabled: false
    name: "oauth"
-   ingressName: "OAUTH-DNS-NAME-VALUE"
+   ingressName: "oauth-dns-name"
    trafficPort: 8089

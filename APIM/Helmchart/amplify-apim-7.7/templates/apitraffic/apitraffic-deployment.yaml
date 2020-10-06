@@ -86,6 +86,11 @@ spec:
         volumeMounts:
         - mountPath: {{ .Values.apitraffic.share.path | quote }}
           name: events
+        {{- if eq .Values.global.dynamicLicense true }}
+        - name: config-license
+          mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
+          subPath: license
+        {{- end }}
         ports:
         - containerPort: {{ .Values.apitraffic.portManager }}
           protocol: TCP
@@ -153,6 +158,11 @@ spec:
           secretName: {{ .Values.apitraffic.share.secret | quote }}
           shareName: {{ .Values.apitraffic.share.name | quote }}
           readOnly: false
+      {{- if eq .Values.global.dynamicLicense true }}
+      - name: config-license
+        configMap:
+          name: apim-config
+      {{- end }}
       terminationGracePeriodSeconds: 100
   strategy:
     type: {{ .Values.global.updateStrategy }}

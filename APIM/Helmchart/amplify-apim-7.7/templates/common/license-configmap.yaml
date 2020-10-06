@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+   name: licence
+   namespace: {{ .Values.global.namespace | quote }}
+data:
+   license: |
+    FIPS=1
+    SalesForce Connector=1
+    ServiceNow Connector=1
+    analytics=1
+    api_visual_mapper=1
+    apiportal=1
+    company=Axway
+    deployment_type=docker
+    expires=Wed, 30 Sep 2020 21:14:48 GMT
+    license_id=TEMP
+    mcafee=1
+    name=Axway
+    sdkgenerator=1
+    unrestricted=1
+    version=7.7
+    # SIGNATURE: 09ea7607345436af0e33d7d58a6a67cd6fb6a6c56eb205afd6f654154979a197
+    # SIGNATURE: dd0462ec1eb2a5c98e0ac416de5ae9f8f9806fffbad21b0c5d3082118ae8ce07
+    # SIGNATURE: c81968ee22d62fb60d1ff69adedd4a15a7bff48db87cf33013820207624834be
+    # SIGNATURE: d4b8b0283c4be0a6a81391e99692abe5f0a3e560de47727a8b7e19be67be3ac6
+    # SIGNATURE: df31de91c1cb15e872ae7bf7611ed77501673d24141a72bf502aa98bfcc6ac13
+    # SIGNATURE: 1dd568d02381993db4044d006b58cf95216d3997f73f93adef06b9c8988828c3
+    # SIGNATURE: e3506286c225ef7480685febfb72795e2291b931aa793a633b7495c5326063d5
+    # SIGNATURE: 90751327590578a57010e54e7cfbe7776563b9147e73ef9668fb11feea6e1887
