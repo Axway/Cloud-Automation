@@ -1,4 +1,4 @@
-{{- if eq .Values.apiportal.enabled true }}
+{{- if eq .Values.apiportal.enable true }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,7 +16,7 @@ spec:
       labels:
         app: {{ .Values.mysqlPortal.name }}
     spec:
-    {{- if eq .Values.global.nodeAffinity.enabled true }}
+    {{- if eq .Values.global.nodeAffinity.enable true }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -25,7 +25,7 @@ spec:
               - key: agentpool
                 operator: In
                 values:
-                - {{ .Values.global.nodeAffinity.name }}
+                - {{ .Values.global.nodeAffinity.dbName }}
       {{- end }}
       containers:
       - image: {{ .Values.mysqlPortal.imageName }}:{{ .Values.mysqlPortal.buildTag }}

@@ -1,4 +1,4 @@
-{{- if eq .Values.mysqlAnalytics.enabled true }}
+{{- if eq .Values.mysqlAnalytics.enable true }}
 {{- if eq .Values.mysqlAnalytics.external false }}
 apiVersion: apps/v1
 kind: Deployment
@@ -17,7 +17,7 @@ spec:
       labels:
         app: {{ .Values.mysqlAnalytics.name }}
     spec:
-      {{- if eq .Values.global.nodeAffinity.enabled true }}
+      {{- if eq .Values.global.nodeAffinity.enable true }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -26,7 +26,7 @@ spec:
               - key: agentpool
                 operator: In
                 values: 
-                - {{ .Values.global.nodeAffinity.name }}
+                - {{ .Values.global.nodeAffinity.dbName }}
       {{- end }}
       containers:
       - image: {{ .Values.mysqlAnalytics.imageName }}:{{ .Values.mysqlAnalytics.buildTag }}

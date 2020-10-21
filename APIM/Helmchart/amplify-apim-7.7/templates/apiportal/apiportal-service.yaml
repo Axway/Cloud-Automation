@@ -1,4 +1,4 @@
-{{- if eq .Values.apiportal.enabled true }}
+{{- if eq .Values.apiportal.enable true }}
 apiVersion: v1
 kind: Service
 metadata:

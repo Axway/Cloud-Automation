@@ -1,4 +1,4 @@
-{{- if eq .Values.apiportal.enabled true }}
+{{- if eq .Values.apiportal.enable true }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:

@@ -1,0 +1,26 @@
+{{- if eq .Values.apitraffic.oauth.enabled true }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: oauth
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/backend-protocol: https
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
+    cert-manager.io/cluster-issuer: azure-dns-issuer
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.oauth.ingressName }}
+    secretName: apioauth-ingress-cert
+  rules:
+  - host: {{ .Values.oauth.ingressName }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Values.oauth.name }}
+          servicePort: {{ .Values.oauth.trafficPort }}
+        path: /
+{{- end }}

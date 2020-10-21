@@ -23,7 +23,7 @@ spec:
   tls:
   - hosts:
     - {{ .Values.apitraffic.ingressName }}
-    secretName: tls-secret-traffic
+    secretName: apitraffic-ingress-cert
   rules:
   - host: {{ .Values.apitraffic.ingressName }}
     http:

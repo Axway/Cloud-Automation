@@ -2,8 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# minikube, AWS, esx, AZURE
-platform: "AZURE"
+# ESX, AZURE
+platform: "ESX"
 managedIngress: true
 
 global:
@@ -11,52 +11,55 @@ global:
    initImageTag: "busybox:1.30"
    updateStrategy: "RollingUpdate"
    editor: "Axway"
-   apimVersion: "7.7-20200130"
-   namespace: "APIM-NAMESPACE-VALUE"
-   dockerRegistries:
-      apimName: DOCKER-REGISTRY-USER-NAME-VALUE
-      apimSecret: DOCKER-REGISTRY-USER-PWD-VALUE
+   apimVersion: "7.7-20200930"
+   namespace: "default"
+   dockerRegistry:
+      url: "your-url"
+      secret: "registry-secret"
+      token: "yourapimtoken"
    share:
       secret: azure-file
       name: apimlogs
       quota: 5
    nodeAffinity:
-      enabled: false
-      name: apimpool
-   dynamicLicense: false
+      enable: false
+      dbName: apimpool
+      apimName: apimpool
+   enableDynamicLicense: false
 
 anm:
    name: anm
-   buildTag: "7.7-20200130"
-   imageName: "apim-anm"
+   buildTag: "20200930"
+   imageName: "apim-anm-7.7"
    ingressName: "anm-dns-name"
    replicaCount: 1
    pvcQuota: 1
    trafficPort: 8090
    trafficPortUI: 8091
    logTraceToFile: "true"
-   logTraceJSONtoSTDOUT: "true"
+   logTraceJSONtoSTDOUT: "false"
    emt_heap_size_mb: "1024"
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
 
 apimgr:
    name: apimgr
-   buildTag: "7.7-20200130"
-   imageName: "apim-mgr"
+   buildTag: "20200930"
+   imageName: "apim-mgr-7.7"
    ingressName: "api-manager-dns-name"
    replicaCount: 1
    trafficPort: 8075
    logTraceToFile: "true"
-   logTraceJSONtoSTDOUT: "true"
+   logTraceJSONtoSTDOUT: "false"
    logOpenTrafficOutput: "stdout"
-   emt_trace_level: "INFO"
    emt_heap_size_mb: "1024"
+   emt_topology_ttl: 10
+   emt_trace_level: "INFO"
 
 apitraffic:
    name: traffic
-   buildTag: "7.7-20200130"
-   imageName: "apim-mgr"
+   buildTag: "20200930"
+   imageName: "apim-mgr-7.7"
    ingressName: "apitraffic-dns-name"
    portManager: 8065
    portGateway: 8080
@@ -67,11 +70,10 @@ apitraffic:
       maxReplicas: 6
       averageUtilization: 70
    logTraceToFile: "true"
-   logTraceJSONtoSTDOUT: "true"
+   logTraceJSONtoSTDOUT: "false"
    logOpenTrafficOutput: "stdout"
    emt_trace_level: "INFO"
    emt_heap_size_mb: "1512"
-   test_import: false
    share:
       secret: "apim-event-volume-rwm-secret-name"
       name: "apim-event-volume-rwm-name"
@@ -79,7 +81,7 @@ apitraffic:
       quota: 1
 
 apiportal:
-   enabled: false
+   enable: false
    name: "api-portal"
    buildTag: "7.7-20200130"
    imageName: "apim-ptl"
@@ -91,38 +93,39 @@ apiportal:
       name: "apiportal-volume-rwm-name"
 
 mysqlAnalytics:
-   enabled: true
+   enable: true
    external: false
    host: "externalUri"
    name: mysql-aga
-   ssl: true
+   ssl: false
    imageName: "mysql"
    buildTag: "5.7.26"
    replicaCount: 1
    dbName: "analytics"
-   adminUser: report
+   adminUser: "report"
+   adminPasswd: "changeme"
    quotaStorage: 10
    port: 3306
 
 cassandra:
-   enabled: true
    external: false
    name: "cassandra"
+   adminPasswd: "changeme"
    portCql: 9042
    portJmx: 7199
    portIntraNode: 7000
    portTlsIntraNode: 7001
-   buildTag: v13
-   registry: "gcr.io/google-samples/cassandra"
-   replicaCount: 3
-   clusterName: "APIM"
+   buildTag: "3.11.6"
+   registry: "bitnami/cassandra"
+   replicaCount: 1
+   clusterName: "cassandra"
    keyspace: "apim_demo_1"
    host1: "ip_host1"
    host2: "ip_host2"
    host3: "ip_host3"
 
 mysqlPortal:
-   enabled: false
+   enable: false
    external: true
    name: "mysql-portal"
    imageName: "mysql"
@@ -130,11 +133,12 @@ mysqlPortal:
    replicaCount: 1
    dbName: "portal"
    adminUser: "portal"
+   adminPasswd: "changeme"
    quotaStorage: 10
    port: 3306
 
 oauth:
-   enabled: false
+   enable: false
    name: "oauth"
    ingressName: "oauth-dns-name"
    trafficPort: 8089

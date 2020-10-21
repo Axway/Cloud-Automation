@@ -17,7 +17,7 @@ spec:
       labels:
         app: {{ .Values.apimgr.name | quote }}
     spec:
-      {{- if eq .Values.global.nodeAffinity.enabled true }}
+      {{- if eq .Values.global.nodeAffinity.enable true }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -26,7 +26,7 @@ spec:
               - key: agentpool
                 operator: In
                 values: 
-                - {{ .Values.global.nodeAffinity.name }}
+                - {{ .Values.global.nodeAffinity.apimName }}
       {{- end }}
       containers:
       - args:
@@ -47,7 +47,7 @@ spec:
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
         - name: EMT_TOPOLOGY_TTL
-          value: "10"
+          value: {{ .Values.apimgr.emt_topology_ttl }}
         - name: EMT_HEAP_SIZE_MB
           value: "{{ .Values.apimgr.emt_heap_size_mb }}"
         - name: EMT_TRACE_LEVEL
@@ -69,7 +69,7 @@ spec:
               key: dbmysqlanalytics
         - name: EMT_DEPLOYMENT_ENABLED
           value: "true"
-        image: {{ .Values.global.dockerRegistries.apimName }}/{{ .Values.apimgr.imageName }}:{{ .Values.apimgr.buildTag }}
+        image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.apimgr.imageName }}:{{ .Values.apimgr.buildTag }}
         imagePullPolicy: {{ .Values.global.pullPolicy | quote }}
         name: {{ .Values.apimgr.name | quote }}
         ports:
@@ -103,7 +103,7 @@ spec:
         volumeMounts:
         - mountPath: {{ .Values.apitraffic.share.path | quote }}
           name: events
-        {{- if eq .Values.global.dynamicLicense true }}
+        {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
           subPath: license
@@ -123,7 +123,7 @@ spec:
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v anm 8090; do echo waiting for anm; sleep 2; done;']
       imagePullSecrets:
-      - name: {{ .Values.global.dockerRegistries.apimSecret }}      
+      - name: {{ .Values.global.dockerRegistry.secret }}      
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext:
@@ -136,7 +136,7 @@ spec:
           secretName: {{ .Values.apitraffic.share.secret | quote }}
           shareName: {{ .Values.apitraffic.share.name | quote }}
           readOnly: false
-      {{- if eq .Values.global.dynamicLicense true }}
+      {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:
           name: apim-config

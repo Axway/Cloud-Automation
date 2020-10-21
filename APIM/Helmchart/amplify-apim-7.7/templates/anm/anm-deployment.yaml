@@ -20,7 +20,7 @@ spec:
       labels:
         app: {{ .Values.anm.name | quote }}
     spec:
-      {{- if eq .Values.global.nodeAffinity.enabled true }}
+      {{- if eq .Values.global.nodeAffinity.enable true }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -29,11 +29,11 @@ spec:
               - key: agentpool
                 operator: In
                 values: 
-                - {{ .Values.global.nodeAffinity.name }}
+                - {{ .Values.global.nodeAffinity.apimName }}
       {{- end }}
       containers:
       - name: {{ .Values.anm.name | quote }}
-        image: {{ .Values.global.dockerRegistries.apimName }}/{{ .Values.anm.imageName }}:{{ .Values.anm.buildTag }}
+        image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.anm.imageName }}:{{ .Values.anm.buildTag }}
         imagePullPolicy: {{ .Values.global.pullPolicy }}
         env:
         - name: GW_DIR
@@ -106,7 +106,7 @@ spec:
         terminationMessagePolicy: File
         resources: {}
       imagePullSecrets:
-      - name: {{ .Values.global.dockerRegistries.apimSecret }}
+      - name: {{ .Values.global.dockerRegistry.secret }}
       initContainers:
       - name: init-mysql
         image: {{ .Values.global.initImageTag }}

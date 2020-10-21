@@ -1,4 +1,4 @@
-{{- if eq .Values.mysqlAnalytics.enabled true }}
+{{- if eq .Values.mysqlAnalytics.enable true }}
 {{- if eq .Values.mysqlAnalytics.external false }}
 apiVersion: v1
 kind: PersistentVolumeClaim

@@ -1,4 +1,4 @@
-{{- if eq .Values.apiportal.enabled true }}
+{{- if eq .Values.apiportal.enable true }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,7 +18,7 @@ spec:
         app: {{ .Values.apiportal.name | quote }}
     spec:
       affinity:
-        {{- if eq .Values.global.nodeAffinity.enabled true }}
+        {{- if eq .Values.global.nodeAffinity.enable true }}
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
@@ -26,7 +26,7 @@ spec:
               - key: agentpool
                 operator: In
                 values: 
-                - {{ .Values.global.nodeAffinity.name }}
+                - {{ .Values.global.nodeAffinity.apimName }}
         {{- end }}
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -40,7 +40,7 @@ spec:
                     - {{ .Values.apiportal.name | quote }}
               topologyKey: kubernetes.io/hostname
       imagePullSecrets:
-        - name: {{ .Values.global.dockerRegistries.apimSecret }}
+        - name: {{ .Values.global.dockerRegistry.secret }}
       containers:
       - env:
         - name: MYSQL_HOST
@@ -68,7 +68,7 @@ spec:
         - name: APIMANAGER_PUBLIC_NAME
           value: {{ .Values.apimgr.name }}
         name: {{ .Values.apiportal.name }}
-        image: {{ .Values.global.dockerRegistries.apimName }}/{{ .Values.apiportal.imageName }}:{{ .Values.apiportal.buildTag }}
+        image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.apiportal.imageName }}:{{ .Values.apiportal.buildTag }}
         imagePullPolicy: {{ .Values.global.pullPolicy }}
         readinessProbe:
           httpGet:

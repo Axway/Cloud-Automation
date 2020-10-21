@@ -29,7 +29,7 @@ spec:
   tls:
   - hosts:
     - {{ .Values.anm.ingressName }}
-    secretName: tls-secret-anm
+    secretName: apioauth-ingress-cert
   rules:
   - host: {{ .Values.anm.ingressName }}
     http:

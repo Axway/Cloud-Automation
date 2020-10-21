@@ -29,7 +29,7 @@ spec:
   tls:
   - hosts:
     - {{ .Values.apimgr.ingressName }}
-    secretName: tls-secret-manager
+    secretName: apimanager-ingress-cert
   rules:
   - host: {{ .Values.apimgr.ingressName }}
     http:

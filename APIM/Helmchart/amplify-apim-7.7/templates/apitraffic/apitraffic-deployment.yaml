@@ -16,7 +16,7 @@ spec:
         app: {{ .Values.apitraffic.name }}
     spec:
       affinity:
-        {{- if eq .Values.global.nodeAffinity.enabled true }}
+        {{- if eq .Values.global.nodeAffinity.enable true }}
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
@@ -24,7 +24,7 @@ spec:
               - key: agentpool
                 operator: In
                 values:
-                - {{ .Values.global.nodeAffinity.name }}
+                - {{ .Values.global.nodeAffinity.apimName }}
         {{- end }}
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -38,7 +38,7 @@ spec:
                     - {{ .Values.apitraffic.name }}
               topologyKey: kubernetes.io/hostname
       imagePullSecrets:
-      - name: {{ .Values.global.dockerRegistries.apimSecret }}
+      - name: {{ .Values.global.dockerRegistry.secret }}
       containers:
       - args:
         - /opt/Axway/apigateway/posix/bin/start-emt-instance
@@ -80,13 +80,13 @@ spec:
             secretKeyRef:
               name: apim-password
               key: dbmysqlanalytics
-        image: {{ .Values.global.dockerRegistries.apimName }}/{{ .Values.apitraffic.imageName }}:{{ .Values.apitraffic.buildTag }} 
+        image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.apitraffic.imageName }}:{{ .Values.apitraffic.buildTag }} 
         imagePullPolicy: {{ .Values.global.pullPolicy }} 
         name: {{ .Values.apitraffic.name }}
         volumeMounts:
         - mountPath: {{ .Values.apitraffic.share.path | quote }}
           name: events
-        {{- if eq .Values.global.dynamicLicense true }}
+        {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
           subPath: license
@@ -98,6 +98,10 @@ spec:
           protocol: TCP
         - containerPort: {{ .Values.apitraffic.portGatewaySSL }}
           protocol: TCP
+        {{- if eq .Values.oauth.enable true }}
+        - containerPort: {{ .Values.oauth.trafficPort }}
+          protocol: TCP
+        {{- end }}
         resources:
           limits:
             memory: "2Gi"
@@ -158,7 +162,7 @@ spec:
           secretName: {{ .Values.apitraffic.share.secret | quote }}
           shareName: {{ .Values.apitraffic.share.name | quote }}
           readOnly: false
-      {{- if eq .Values.global.dynamicLicense true }}
+      {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:
           name: apim-config
