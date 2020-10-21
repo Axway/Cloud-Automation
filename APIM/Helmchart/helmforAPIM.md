@@ -16,12 +16,12 @@ This helmchart requires the following capabilities on the Kubernetes cluster:
 - A storage class with in RWO.
 - An automatic certificates creator for ingress like cert-manager and Let's Encrypt.
 - A total resources of 6vcpu and 8Go memory spread on 2 nodes.
+- A container registry with APIM images
 
 The following tables lists the mandatory parameters of the AMPLIFY API Management Helm chart.
 | Parameter     | Description                           | Default       |
 |:------------- |:------------------------------------- |:------------- |
 | global.dockerRegistry.url | The apim's container registry url | - |
-| global.dockerRegistry.secret | The Kubernetes secret name | registry-secret |
 | global.dockerRegistry.token | - |
 | anm.buildTag | Docker image tag of Admin Node Manager component | - |
 | anm.imageName | Docker image name of Admin Node Manager component | |
@@ -67,65 +67,36 @@ The following tables lists the optional parameters of the AMPLIFY API Management
 |:------------- |:------------------------------------- |:------------ |
 | global.namespace | Set the targeted namespace | default |
 | global.apimVersion | Release of the product for label | 7.7 |
+| global.dockerRegistry.secret | The Kubernetes secret name | registry-secret |
 | global.platform | Set standard storage class for of the platform. Value can be ESX or AZURE | ESX |
 | global.nodeAffinity.enable | Enable component deployment on specific node pool | false |
 | global.nodeAffinity.apimName | Set the node pool name for apim | apimpool |
 | global.nodeAffinity.dbName | Set the node pool name for databases | apimpool |
 | global.enableDynamicLicense | Enable capability to load your license key with a configMap | false |
 
-## Optional features
-### Affinity nodes
 
-A Kubernetes node pool is a group of hosts with similar capabilities. Kubernetes allows to manage different node pools. Use an affinity node It's usefull for large cluster to secure resources. Affinity node is disable by default and the node pool name by default is apimpool.
+## Helm command examples
 
-Define an affinity node require theses options:
+### Minimal installation
+The followinf command deploys components Admin Node Manager, API Manager and API Gateway in the default namespace on Kubernetes. 
+
 ```
-   nodeAffinity.enabled=true,nodeAffinity.name=<nodePoolName>
+Helm install <release-name> amplify-apim-<version> --set global.dockerRegistry.url=<container registry url>, global.dockerRegistry.token=<your token>, anm.buildTag=<anm tag>,
 ```
+anm.buildTag 
+anm.imageName
+anm.ingressName
+apimgr.buildTag
+apimgr.imageName
+apimgr.ingressName
+apitraffic.buildTag
+apitraffic.imageName
+apitraffic.ingressName
+cassandra.adminPasswd
+mysqlAnalytics.adminPasswd
 
-
-
-
-
-### dynamic License
-
-API-Manager and API-Traffic pods require a license file to start. It's not the case of the API Gateway Manager.
-
-The license file is embedded during generation of the docker image and EMT scripts verify the validity of the license. But change a new license mustn't be a trigger to generate a new image.
-
-To add a dynamic license key:
-- Past a new license in license-configmap.yaml
-- Add the following option in install/upgrade command: 
-```
-dynamicLicense=true
-```
-
-
-## Helm commands example
-
-### Minimal install
-Minimal install require these values
-```
-Helm install AMPLIFY-APIM-demo amplify-apim-<version> --set 
-```
-
-### Nginx installation 
+### Upgrade deployment with a new license
 *Add dynamic license*
 ```
-dynamicLicense=true
+helm upgrade --reuse-values dynamicLicense=true
 ```
-
-### Upgrade with automatic rollback
-
-
-
-### Manual rollback
-
-
-
-
-
-
-## Debugging
-
-Manual rollback if helm rollback fails
