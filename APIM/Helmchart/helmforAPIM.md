@@ -81,22 +81,11 @@ The following tables lists the optional parameters of the AMPLIFY API Management
 The followinf command deploys components Admin Node Manager, API Manager and API Gateway in the default namespace on Kubernetes. 
 
 ```
-Helm install <release-name> amplify-apim-<version> --set global.dockerRegistry.url=<container registry url>, global.dockerRegistry.token=<your token>, anm.buildTag=<anm tag>,
+Helm install *<release-name>* amplify-apim-*<version>* --set global.dockerRegistry.url=*<container registry url>*,global.dockerRegistry.token=*<your token>*,anm.buildTag=*<anm tag>*,anm.imageName=*<anm image name>*,anm.ingressName=*<anm ingress url>*,apimgr.buildTag=*<API Manager tag>*,apimgr.imageName=*<API Manager image name>*,apimgr.ingressName=*<API Manager ingress url>*,apitraffic.buildTag=*<API Gateway tag>*,apitraffic.imageName=*<API Gateway image name>*,apitraffic.ingressName=*<API Gateway ingress url>*,cassandra.adminPasswd=*<your password>*,mysqlAnalytics.adminPasswd=*<your password>*
 ```
-anm.buildTag 
-anm.imageName
-anm.ingressName
-apimgr.buildTag
-apimgr.imageName
-apimgr.ingressName
-apitraffic.buildTag
-apitraffic.imageName
-apitraffic.ingressName
-cassandra.adminPasswd
-mysqlAnalytics.adminPasswd
 
 ### Upgrade deployment with a new license
-*Add dynamic license*
+Before deploy this command, please edit the file license-configmap.yaml and past your license in the data section. 
 ```
-helm upgrade --reuse-values dynamicLicense=true
+helm upgrade *<release-name>* amplify-apim-*<version>* --reuse-values --set dynamicLicense=true
 ```
