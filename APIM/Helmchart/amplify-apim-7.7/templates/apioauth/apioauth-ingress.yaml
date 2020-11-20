@@ -1,4 +1,4 @@
-{{- if eq .Values.apitraffic.oauth.enabled true }}
+{{- if eq .Values.oauth.enable true }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -13,10 +13,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.oauth.ingressName }}
+    - {{ .Values.oauth.ingressName }}.{{ .Values.global.domainName }}
     secretName: apioauth-ingress-cert
   rules:
-  - host: {{ .Values.oauth.ingressName }}
+  - host: {{ .Values.oauth.ingressName }}.{{ .Values.global.domainName }}
     http:
       paths:
       - backend:

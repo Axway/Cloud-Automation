@@ -17,8 +17,8 @@ spec:
       labels:
         app: {{ .Values.cassandra.name }}
     spec:
-      {{- if eq .Values.global.nodeAffinity.enable true }}
       affinity:
+        {{- if eq .Values.global.nodeAffinity.enable true }}
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
@@ -27,7 +27,7 @@ spec:
                 operator: In
                 values:
                 - {{ .Values.global.nodeAffinity.dbName }}
-      {{- end }}
+        {{- end }}
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 100
@@ -87,7 +87,7 @@ spec:
           - name: CASSANDRA_ENDPOINT_SNITCH
             value: GossipingPropertyFileSnitch
           - name: CASSANDRA_USER
-            value: {{ .Values.cassandra.username }}
+            value: {{ .Values.cassandra.adminName }}
           - name: CASSANDRA_PASSWORD_SEEDER
             value: "yes"
           - name: CASSANDRA_PASSWORD

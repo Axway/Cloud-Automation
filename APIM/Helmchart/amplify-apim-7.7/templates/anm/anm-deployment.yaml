@@ -12,7 +12,7 @@ spec:
   replicas: {{ .Values.anm.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.anm.name | quote }}  
+      app: {{ .Values.anm.name | quote }}
   strategy:
     type: {{ .Values.global.updateStrategy }}
   template:
@@ -28,7 +28,7 @@ spec:
             - matchExpressions:
               - key: agentpool
                 operator: In
-                values: 
+                values:
                 - {{ .Values.global.nodeAffinity.apimName }}
       {{- end }}
       containers:
@@ -104,12 +104,11 @@ spec:
           mountPath: {{ .Values.apitraffic.share.path | quote }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-        resources: {}
       imagePullSecrets:
       - name: {{ .Values.global.dockerRegistry.secret }}
       initContainers:
       - name: init-mysql
-        image: {{ .Values.global.initImageTag }}
+        image: {{ .Values.global.initImageTag | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysqlAnalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
       dnsPolicy: ClusterFirst
       restartPolicy: Always

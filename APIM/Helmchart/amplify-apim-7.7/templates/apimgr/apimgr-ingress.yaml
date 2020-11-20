@@ -28,10 +28,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.apimgr.ingressName }}
+    - {{ .Values.apimgr.ingressName }}.{{ .Values.global.domainName }}
     secretName: apimanager-ingress-cert
   rules:
-  - host: {{ .Values.apimgr.ingressName }}
+  - host: {{ .Values.apimgr.ingressName }}.{{ .Values.global.domainName }}
     http:
       paths:
       - backend:

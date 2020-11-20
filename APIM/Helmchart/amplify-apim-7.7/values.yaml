@@ -13,25 +13,27 @@ global:
    editor: "Axway"
    apimVersion: "7.7-20200930"
    namespace: "default"
+   domainName: ""
    dockerRegistry:
-      url: "your-url"
       secret: "registry-secret"
-      token: "yourapimtoken"
+      url: ""
+      username: ""
+      token: ""
    share:
       secret: azure-file
       name: apimlogs
       quota: 5
    nodeAffinity:
       enable: false
-      dbName: apimpool
-      apimName: apimpool
+      dbName: "apimpool"
+      apimName: "apimpool"
    enableDynamicLicense: false
 
 anm:
    name: anm
    buildTag: "20200930"
    imageName: "apim-anm-7.7"
-   ingressName: "anm-dns-name"
+   ingressName: "anm"
    replicaCount: 1
    pvcQuota: 1
    trafficPort: 8090
@@ -46,7 +48,7 @@ apimgr:
    name: apimgr
    buildTag: "20200930"
    imageName: "apim-mgr-7.7"
-   ingressName: "api-manager-dns-name"
+   ingressName: "api-mgr"
    replicaCount: 1
    trafficPort: 8075
    logTraceToFile: "true"
@@ -60,7 +62,7 @@ apitraffic:
    name: traffic
    buildTag: "20200930"
    imageName: "apim-mgr-7.7"
-   ingressName: "apitraffic-dns-name"
+   ingressName: "api"
    portManager: 8065
    portGateway: 8080
    portGatewaySSL: 8081
@@ -75,8 +77,8 @@ apitraffic:
    emt_trace_level: "INFO"
    emt_heap_size_mb: "1512"
    share:
-      secret: "apim-event-volume-rwm-secret-name"
-      name: "apim-event-volume-rwm-name"
+      secret: "event-secret-name"
+      name: "event-name"
       path: "/opt/Axway/apigateway/events"
       quota: 1
 
@@ -85,11 +87,11 @@ apiportal:
    name: "api-portal"
    buildTag: "7.7-20200130"
    imageName: "apim-ptl"
-   ingressName: "apiportal-dns-name"
+   ingressName: "portal"
    trafficPort: 443
    replicaCount: 1
    share:
-      secret: "apiportal-volume-rwm-secret-name"
+      secret: "apiportal-secret-name"
       name: "apiportal-volume-rwm-name"
 
 mysqlAnalytics:
@@ -104,12 +106,14 @@ mysqlAnalytics:
    dbName: "analytics"
    adminUser: "report"
    adminPasswd: "changeme"
+   rootPasswd: "changeme"
    quotaStorage: 10
    port: 3306
 
 cassandra:
    external: false
    name: "cassandra"
+   adminName: "cassandra"
    adminPasswd: "changeme"
    portCql: 9042
    portJmx: 7199
@@ -140,5 +144,5 @@ mysqlPortal:
 oauth:
    enable: false
    name: "oauth"
-   ingressName: "oauth-dns-name"
+   ingressName: "oauth"
    trafficPort: 8089

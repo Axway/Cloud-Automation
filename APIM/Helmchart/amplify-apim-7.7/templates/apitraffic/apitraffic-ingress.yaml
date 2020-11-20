@@ -22,10 +22,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.apitraffic.ingressName }}
+    - {{ .Values.apitraffic.ingressName }}.{{ .Values.global.domainName }}
     secretName: apitraffic-ingress-cert
   rules:
-  - host: {{ .Values.apitraffic.ingressName }}
+  - host: {{ .Values.apitraffic.ingressName }}.{{ .Values.global.domainName }}
     http:
       paths:
       - backend:

@@ -47,7 +47,7 @@ spec:
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
         - name: EMT_TOPOLOGY_TTL
-          value: {{ .Values.apimgr.emt_topology_ttl }}
+          value: "{{ .Values.apimgr.emt_topology_ttl }}"
         - name: EMT_HEAP_SIZE_MB
           value: "{{ .Values.apimgr.emt_heap_size_mb }}"
         - name: EMT_TRACE_LEVEL

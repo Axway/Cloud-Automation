@@ -28,10 +28,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.anm.ingressName }}
+    - {{ .Values.anm.ingressName }}.{{ .Values.global.domainName }}
     secretName: apioauth-ingress-cert
   rules:
-  - host: {{ .Values.anm.ingressName }}
+  - host: {{ .Values.anm.ingressName }}.{{ .Values.global.domainName }}
     http:
       paths:
       - backend:

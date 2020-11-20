@@ -26,10 +26,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.apiportal.ingressName }}
+    - {{ .Values.apiportal.ingressName }}.{{ .Values.global.domainName }}
     secretName: tls-secret-portal
   rules:
-  - host: {{ .Values.apiportal.ingressName }}
+  - host: {{ .Values.apiportal.ingressName }}.{{ .Values.global.domainName }}
     http:
       paths:
       - backend:
