@@ -23,8 +23,9 @@ The goal of this technical lab is to create and configure step by step an APIM E
     - Create secrets into K8S
 - [2. Configure an Ingress controller](./Configure_an_ingress_controller)
     - Create a public IP address for Ressource Group cluster
-    - Create DNS zones
+    - Create DNS records
     - Create and configure NGINX ingress
+    - Create and configure a certmanager
 - [3. APIM Docker image creation](./APIM_Docker_image_creation)
     - Create docker images
         - APIM Base

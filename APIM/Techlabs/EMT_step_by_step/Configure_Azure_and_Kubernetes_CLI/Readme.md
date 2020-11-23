@@ -20,8 +20,7 @@ The goal of this scenario is to create and configure step by step Azure CLI and 
 
 - Login with your account in Azure CLI called az ([documentation](https://docs.microsoft.com/fr-fr/cli/azure/create-an-azure-service-principal-azure-cli))
     ``` Bash
-    az login --service-principal -u "<<SERVICE_PRINCIPAL_ID>>" 
-    --password "<<SERVICE_PRINCIPAL_PASSWORD>>" --tenant "<<TENANT_ID>>"
+    az login --service-principal -u "<<SERVICE_PRINCIPAL_ID>>" --password "<<SERVICE_PRINCIPAL_PASSWORD>>" --tenant "<<TENANT_ID>>"
     ```
     
     Expected output command
@@ -29,15 +28,15 @@ The goal of this scenario is to create and configure step by step Azure CLI and 
     [
       {
         "cloudName": "AzureCloud",
-        "homeTenantId": "300f59df-78e6-436f-9b27-b64973e34f7d",
-        "id": "f0202431-2a18-4bea-8ae0-f3b4c723bbdb",
+        "homeTenantId": "...",
+        "id": "...",
         "isDefault": true,
         "managedByTenants": [],
-        "name": "DSS - EMEA",
+        "name": "...",
         "state": "Enabled",
-        "tenantId": "300f59df-78e6-436f-9b27-b64973e34f7d",
+        "tenantId": "...",
         "user": {
-          "name": "cff69af8-e0e6-4074-8ca2-d12821e4fa79",
+          "name": "...",
           "type": "servicePrincipal"
         }
       }
@@ -61,10 +60,10 @@ The goal of this scenario is to create and configure step by step Azure CLI and 
     ```
     Expected output command
     ``` Bash
-    Kubernetes master is running at https://apim2-demo7-aks-dns-4b30cfeb.hcp.francecentral.azmk8s.io:443
-    healthmodel-replicaset-service is running at https://apim2-demo7-aks-dns-4b30cfeb.hcp.francecentral.azmk8s.io:443/api/v1/namespaces/kube-system/services/healthmodel-replicaset-service/proxy
-    CoreDNS is running at https://apim2-demo7-aks-dns-4b30cfeb.hcp.francecentral.azmk8s.io:443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
-    Metrics-server is running at https://apim2-demo7-aks-dns-4b30cfeb.hcp.francecentral.azmk8s.io:443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy
+    Kubernetes master is running at https://...
+    healthmodel-replicaset-service is running at https:...
+    CoreDNS is running at https://...
+    Metrics-server is running at https://...
     
     To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
     ```

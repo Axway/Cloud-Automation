@@ -56,11 +56,11 @@ The extracted package includes the following:
 Used to communication between API components (ANM image and Gtw image)
 *gen_domain_cert.py with "--default-cert option" will generate selfsigned certificat with changeme as default passphrass*
 ``` Bash
-TODO: cd $HOME/binaries/ 
+cd $HOME/binaries/apigw-emt-scripts-2.1.0-SNAPSHOT
 python2 gen_domain_cert.py --help
 python2 gen_domain_cert.py --default-cert
 ```
-Command output 
+Expected Command output 
 ``` Bash
 *Generating private key...*
 *Generating CSR...*
@@ -98,6 +98,13 @@ systemctl start docker
 ``` Bash
 python2 build_base_image.py --installer=<<path_to_binary>>/APIGateway_7.7.20200330_Install_linux-x86-64_BN3.run --os="centos7" --out-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:7.7-<<BUILD>>
 ```
+Expected Command output 
+``` Bash
+Step 1/14
+...
+Step 14/14
+```
+
 *Your Docker image is now created into Docker local repository.*
 
 You can see it with the following command :
