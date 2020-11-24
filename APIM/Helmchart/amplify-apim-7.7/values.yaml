@@ -28,6 +28,7 @@ global:
       dbName: "apimpool"
       apimName: "apimpool"
    enableDynamicLicense: false
+   createSecrets: true
 
 anm:
    name: anm
@@ -77,8 +78,8 @@ apitraffic:
    emt_trace_level: "INFO"
    emt_heap_size_mb: "1512"
    share:
-      secret: "event-secret-name"
-      name: "event-name"
+      secret: "azure-file"
+      name: "gw-events"
       path: "/opt/Axway/apigateway/events"
       quota: 1
 
