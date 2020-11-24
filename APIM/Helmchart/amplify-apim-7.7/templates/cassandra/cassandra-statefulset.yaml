@@ -95,8 +95,6 @@ spec:
               secretKeyRef:
                 name: apim-password
                 key: dbcass
-          initialDelaySeconds: 15
-          timeoutSeconds: 5
         volumeMounts:
         - name: cassandra-data
           mountPath: /cassandra_data
