@@ -56,7 +56,7 @@ spec:
         - name: CASS_TKEYSPACE
           value: t_{{ .Values.cassandra.keyspace }}
         - name: CASS_USERNAME
-          value: {{ .Values.cassandra.username }}
+          value: {{ .Values.cassandra.adminName }}
         - name: CASS_PASS
           valueFrom:
             secretKeyRef:
