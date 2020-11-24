@@ -55,6 +55,13 @@ spec:
           value: {{ .Values.cassandra.keyspace }}
         - name: CASS_TKEYSPACE
           value: t_{{ .Values.cassandra.keyspace }}
+        - name: CASS_USERNAME
+          value: {{ .Values.cassandra.username }}
+        - name: CASS_PASS
+          valueFrom:
+            secretKeyRef:
+              name: apim-password
+              key: dbcass
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
         - name: EMT_TOPOLOGY_TTL
