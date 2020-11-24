@@ -95,12 +95,6 @@ spec:
               secretKeyRef:
                 name: apim-password
                 key: dbcass
-        readinessProbe:
-          exec:
-            command:
-            - /bin/bash
-            - -c
-            - /ready-probe.sh
           initialDelaySeconds: 15
           timeoutSeconds: 5
         volumeMounts:
