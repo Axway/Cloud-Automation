@@ -12,10 +12,11 @@
 3. **APIM_BUILD**                 *(APIM build of your binary)*
 4. **YOUR_HELM_PACKAGE_NAME**     *(Your HELM package name)*
 5. **YOUR_HELM_PACKAGE_VERSION**  *(Your HELM package version)*
+
 *********************
 
 ## What we are going to do
-- Setup HELM client
+- Setup HELM client in order to connect into ACR and pull/push HELM package
 - Pull HELM project from GIT
 - Configure and create an HELM package
 - Publish HELM package into ACR
@@ -120,3 +121,5 @@
     ...Successfully got an update from the "<<ACR_NAME>>" chart repository
     Update Complete. ⎈Happy Helming!⎈
     ```
+
+helm search repo apim

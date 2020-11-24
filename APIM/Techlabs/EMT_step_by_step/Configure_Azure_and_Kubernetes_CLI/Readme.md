@@ -101,7 +101,7 @@ The goal of this scenario is to create and configure step by step Azure CLI and 
     - Secret for Azure Container Registry access
         We are going to store ACR credentials using Service Principal name and secret into Kubernetes secret 
         ``` Bash
-        kubectl create secret docker-registry azure-container-registry --namespace <<K8S_NAMESPACE_NAME>> --docker-server <<ACR_URL>> --docker-username "<<SERVICE_PRINCIPAL_NAME>>" --docker-password "<<SERVICE_PRINCIPAL_PASSWORD>>"
+        kubectl create secret docker-registry registry-secret --namespace <<K8S_NAMESPACE_NAME>> --docker-server <<ACR_URL>> --docker-username "<<SERVICE_PRINCIPAL_NAME>>" --docker-password "<<SERVICE_PRINCIPAL_PASSWORD>>"
         ```
         Expected output command
         ``` Bash

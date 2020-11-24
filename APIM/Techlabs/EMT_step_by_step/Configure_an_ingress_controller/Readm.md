@@ -1,27 +1,39 @@
 # Configure an Ingress Controller
 
-What we are going to do
-- 
+## What we are going to do
+- Install and configure an Ingress Controler with NGINX
+It will allow us to access our APIM cluster in Kubernetes from outside
+- Install and configure a certificat manager with Lets Encrypt
+It will allow automatic generation of certificat using Lets Encrypt
 
 TODO -> SCHEMA Here
 
-RG_NAME_NETWORK=
-PUBLIC_IP_NAME=
-RG_NAME_DNS
-YOUR_DNS_ALIAS
-YOUR_PUBLIC_IP
+*********************
+
+## Information you need before you start
+1. RG_NAME_NETWORK
+2. RG_NAME_DNS
+3. PUBLIC_IP_ADDRESS_NAME (eg. apim-emt-ip-<<your-trigram>>)
+4. YOUR_DNS_ALIAS (eg. <<your-trigram>>)
+
+*********************
+
+## Information you will get from this step
+1. PUBLIC_IP_ADDRESS
+
+*********************
 
 - Create a public IP into AKS Ressource Group
     First, we need to create a public address to join AKS
 
     Execute the following command to create a public IP [documentation](https://docs.microsoft.com/en-us/cli/azure/network/public-ip?view=azure-cli-latest#az_network_public_ip_create)
     ``` Bash
-    az network public-ip create --resource-group <<RG_NAME_NETWORK>> --sku Standard --name <<PUBLIC_IP_NAME>> --allocation-method static --query publicIp.ipAddress -o tsv --allocation-method static
+    az network public-ip create --resource-group <<RG_NAME_NETWORK>> --sku Standard --name <<PUBLIC_IP_ADDRESS_NAME>> --allocation-method static --query publicIp.ipAddress -o tsv --allocation-method static
     ```
 
     Output command
     ``` Bash
-    <<YOUR_PUBLIC_IP>>
+    <<PUBLIC_IP_ADDRESS>>
     ```
 
 - Create DNS zone
@@ -30,14 +42,14 @@ Then we need DNS records in order to be able to connect to AKS and to APIM UIs (
         ``` Bash
         az aks show --resource-group <<AKS_RESSOURCE_GROUP>> --name <<AKS_NAME>> --query nodeResourceGroup -o tsv
 
-        az network dns record-set a add-record -g <<RG_NAME_DNS>> -z azure.demoaxway.com -n <<YOUR_DNS_ALIAS>> -a <<YOUR_PUBLIC_IP>>
+        az network dns record-set a add-record -g <<RG_NAME_DNS>> -z azure.demoaxway.com -n <<YOUR_DNS_ALIAS>> -a <<PUBLIC_IP_ADDRESS>>
         ```
         Output command
         ``` Bash
         {
           "arecords": [
             {
-              "ipv4Address": "<<YOUR_PUBLIC_IP>>"
+              "ipv4Address": "<<PUBLIC_IP_ADDRESS>>"
             }
           ],
           "etag": "7101c679-aca0-494c-975b-5cfb87bfb886",
@@ -161,9 +173,14 @@ To do so, we are using NGINX offcial HELM who will deploy NGINX as Ingress Contr
         ```
 TODO: check this command with NCO
     - Deploying NGINX
+        
+        ``` Bash
+        kubectl create namespace ingress-controller
+        ```
+
         Then we can deploy by launching an HELM install :
         ``` Bash
-        helm install nginx-ingress nginx-stable/nginx-ingress --namespace <<K8S_NAMESPACE_NAME>> --set controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.service.externalTrafficPolicy=Local,controller.service.loadBalancerIP="<<YOUR_PUBLIC_IP>>",rbac.create=true --set-string controller.config.use-http2=false,controller.ssl_procotols=TLSv1.2        
+        helm install nginx-ingress nginx-stable/nginx-ingress --namespace "ingress-controller" --set controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.service.externalTrafficPolicy=Local,controller.service.loadBalancerIP="<<PUBLIC_IP_ADDRESS>>",rbac.create=true --set-string controller.config.use-http2=false,controller.ssl_procotols=TLSv1.2        
         ```
 
     Output command
@@ -177,4 +194,53 @@ TODO: check this command with NCO
     NOTES:
     The NGINX Ingress Controller has been installed.
     ```
-- Install a certmanager
+
+- Install a certificat manager
+    First, we are going to create a dedicated namespace : 
+    ``` Bash
+    kubectl create namespace cert-manager
+    ```
+
+    Than give a mandatory label name to cert-manager namespace (TODO:documentation)
+    ``` Bash
+    kubectl label namespace cert-manager cert-manager.io/disable-validation=true
+    ```
+    
+    Add jetstack to HELM repository
+    ``` Bash
+    helm repo add jetstack https://charts.jetstack.io
+    ```
+    
+    Update HELM repository
+    ``` Bash
+    helm repo update
+    ```
+    
+    Install the certificat manager
+    ``` Bash
+    helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v0.14.1 --set webhook.enabled=false
+    ```
+    
+    Create a file called "gen-cert.yml" and insert the following yaml instruction :
+    ``` Bash
+    apiVersion: cert-manager.io/v1alpha2
+    kind: ClusterIssuer
+    metadata:
+      name: letsencrypt-dev
+      namespace: "ingress-controller"
+    spec:
+      acme:
+        server: https://acme-staging-v02.api.letsencrypt.org/directory
+        email: youremail@yourdomain.com
+        privateKeySecretRef:
+          name: letsencrypt-dev
+        solvers:
+        - http01:
+            ingress:
+              class: nginx
+    ```
+    
+    Deploy your file
+    ``` Bash
+    kubectl apply -F yourfile.yml
+    ```

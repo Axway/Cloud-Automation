@@ -36,5 +36,5 @@ The goal of this technical lab is to create and configure step by step an APIM E
     - Get HELM from GIT
     - Customize HELM
     - Create a package and push into ACR
-- Deploy APIM EMT with HELM
+- [5. Deploy APIM EMT with HELM](./Deploy_APIM_EMT_with_HELM)
 
