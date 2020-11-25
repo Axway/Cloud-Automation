@@ -14,41 +14,73 @@ Information you need before you start :
 10. IMAGE_ANM_NAME              *(name of your anm image name)*
 11. IMAGE_GTW_NAME              *(name of your gtw image name)*
 12. YOUR_DOMAIN_NAME            *(name of your domain)*
+13. HELM_PACKAGE_NAME           *(name of Helm package to deploy)*
 
 Information you need to set :
 1. YOUR_HELM_RELEASE_NAME        *(a name for your Helm release)*
-2. YOUR_HELM_PACKAGE_NAME        *(name of your Helm package to deploy)*
+
 
 *********************
 
 ## What we are going to do
-The goal of this step is to deploy APIM EMT into Azure Kubernetes Service by using an HELM package.
+The goal of this step is to get Helm package from Azure Container Registry and deploy APIM EMT into Azure Kubernetes Service by using this Helm package.
 
 *********************
 
+### Fetch APIM EMT Helm package
+
+1. Adding ACR repository into HELM client
+    ``` Bash
+    az acr helm repo add --name <<ACR_NAME>>
+    ```
+    Expected Output command
+     ``` Bash
+    This command is implicitly deprecated because command group 'acr helm' is deprecated and will be removed in a future release. Use 'helm v3' instead.
+    "<<ACR_NAME>>" has been added to your repositories
+     ```
+    
+2. Updating HELM local repository
+
+     ``` Bash
+    helm repo update
+    ```
+
+    Expected Output command
+     ``` Bash
+    Hang tight while we grab the latest from your chart repositories...
+    ...Successfully got an update from the "<<ACR_NAME>>" chart repository
+    Update Complete. ⎈Happy Helming!⎈
+     ```
+
+
+3. Pulling HELM charts package from ACR
+
+    ``` Bash
+    helm search repo apim
+    ```
+    Expected Command output 
+    ``` Bash
+    NAME                                            CHART VERSION   APP VERSION     DESCRIPTION
+    axwayapimdemo7/techlab-emt-apim-77              1.0.0           7.7-20200330    Package for demo ...
+    ```
+
+    ``` Bash
+    cd $HOME/helm-package
+
+    helm pull axwayapimdemo7/techlab-emt-apim-77
+    ```
+
+    ``` Bash
+    tar -xvf techlab-emt-apim-77-1.0.0.tgz
+    ```
+    
+### Perform Helm package installation
 - Execute HELM install [documentation](https://helm.sh/docs/helm/helm_install/)
     The following command will install your HELM package.
     **It can takes several minutes before your Kubernetes cluster is up and running.**
 
     ``` Bash
-    helm install <<YOUR_HELM_RELEASE_NAME>> <<YOUR_HELM_PACKAGE_NAME>> 
-    --namespace=<<K8S_NAMESPACE_NAME>> 
-    --set global.domainName=<<YOUR_DNS_ALIAS>>.<<YOUR_DOMAIN_NAME>>,
-    global.apimVersion=<<APIM_VERSION>>,
-    global.namespace=<<K8S_NAMESPACE_NAME>>,
-    global.dockerRegistry.url=<<ACR_URL>>,
-    global.dockerRegistry.username=<<SERVICE_PRINCIPAL_NAME>>,
-    global.dockerRegistry.token=<<SERVICE_PRINCIPAL_PASSWORD>>,
-    global.createSecrets=false,
-    anm.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,
-    anm.imageName=<<IMAGE_ANM_NAME>>,
-    apimgr.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,
-    apimgr.imageName=<<IMAGE_GTW_NAME>>,
-    apitraffic.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,
-    apitraffic.imageName=<<IMAGE_GTW_NAME>>,
-    apitraffic.share.secret=azure-file,
-    apitraffic.share.name=<<STORAGE_SHARED_NAME>> 
-    --atomic --wait --timeout 10m0s
+    helm install <<YOUR_HELM_RELEASE_NAME>> <<YOUR_HELM_PACKAGE_NAME>> --namespace=<<K8S_NAMESPACE_NAME>> --set global.domainName=<<YOUR_DNS_ALIAS>>.<<YOUR_DOMAIN_NAME>>,global.apimVersion=<<APIM_VERSION>>,global.namespace=<<K8S_NAMESPACE_NAME>>,global.dockerRegistry.url=<<ACR_URL>>,global.dockerRegistry.username=<<SERVICE_PRINCIPAL_NAME>>,global.dockerRegistry.token=<<SERVICE_PRINCIPAL_PASSWORD>>,global.createSecrets=false,anm.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,anm.imageName=<<IMAGE_ANM_NAME>>,apimgr.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,apimgr.imageName=<<IMAGE_GTW_NAME>>,apitraffic.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,apitraffic.imageName=<<IMAGE_GTW_NAME>>,apitraffic.share.secret=azure-file,apitraffic.share.name=<<STORAGE_SHARED_NAME>> --atomic --wait --timeout 10m0s
     ```
 
     Expected output command example
@@ -110,8 +142,3 @@ The goal of this step is to deploy APIM EMT into Azure Kubernetes Service by usi
     ``` Bash
     helm delete <<YOUR_HELM_RELEASE_NAME>> --namespace=<<K8S_NAMESPACE_NAME>>
     ```
-
-helm list -A
-NAME            NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
-cert-manager    cert-manager    1               2020-11-09 22:07:15.85852 +0100 CET     deployed        cert-manager-v0.14.1    v0.14.1
-nginx-ingress   nco-ns          1               2020-11-09 22:23:20.4600221 +0100 CET   deployed        nginx-ingress-0.7.0     1.9.0
