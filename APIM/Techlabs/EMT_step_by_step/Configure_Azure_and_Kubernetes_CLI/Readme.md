@@ -7,7 +7,7 @@
 
 *********************
 
-Information you need before you start : 
+Information you need before to start : 
 1. TENANT_ID                    *(ID of your Azure tenant)*
 2. SERVICE_PRINCIPAL_ID         *(ID of your Service Principal)*
 3. SERVICE_PRINCIPAL_PASSWORD   *(Password of your Service Principal)*
