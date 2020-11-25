@@ -34,7 +34,7 @@ Information you will get from this step :
 
     Execute the following command to find the appropriate resource group and then create a public IP [documentation](https://docs.microsoft.com/en-us/cli/azure/network/public-ip?view=azure-cli-latest#az_network_public_ip_create)
     ``` Bash
-    rgAKSName=$(az aks show --resource-group <<RG_RESOURCE_GROUP>> --name $aksClusterName --query nodeResourceGroup -o tsv)
+    rgAKSName=$(az aks show --resource-group <<AKS_RESOURCE_GROUP>> --name $aksClusterName --query nodeResourceGroup -o tsv)
     
     az network public-ip create --resource-group $rgAKSName --sku Standard --name <<PUBLIC_IP_ADDRESS_NAME>> --location francecentral --zone 1 --allocation-method static --query publicIp.ipAddress -o tsv --allocation-method static
     ```
