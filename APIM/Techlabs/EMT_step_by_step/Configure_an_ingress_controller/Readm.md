@@ -5,8 +5,9 @@
 *********************
 
 Information you need before you start :
-1. RG_NAME_DNS             *(name of your Ressouce Group where network objects belongs)*
+1. RG_NAME_DNS             *(name of your Resouce Group where network objects belongs)*
 2. YOUR_DOMAIN_NAME        *(name of your domain)*
+3. AKS_RESOURCE_GROUP     *(name of the AKS Resource group)        
 
 Information you need to set :
 1. PUBLIC_IP_ADDRESS_NAME  *(name of your Azure Public Address)*
@@ -33,9 +34,9 @@ Information you will get from this step :
 
     Execute the following command to find the appropriate resource group and then create a public IP [documentation](https://docs.microsoft.com/en-us/cli/azure/network/public-ip?view=azure-cli-latest#az_network_public_ip_create)
     ``` Bash
-    rgAKSName=$(az aks show --resource-group $resourceGroupName --name $aksClusterName --query nodeResourceGroup -o tsv)
+    rgAKSName=$(az aks show --resource-group <<RG_RESOURCE_GROUP>> --name $aksClusterName --query nodeResourceGroup -o tsv)
     
-    az network public-ip create --resource-group $rgAKSName --sku Standard --name <<PUBLIC_IP_ADDRESS_NAME>> --allocation-method static --query publicIp.ipAddress -o tsv --allocation-method static
+    az network public-ip create --resource-group $rgAKSName --sku Standard --name <<PUBLIC_IP_ADDRESS_NAME>> --location francecentral --zone 1 --allocation-method static --query publicIp.ipAddress -o tsv --allocation-method static
     ```
 
     Output command
@@ -225,7 +226,9 @@ Information you will get from this step :
     
     Install the certificat manager
     ``` Bash
-    helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v0.16.1 --set webhook.enabled=false
+    #helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v0.16.1 --set webhook.enabled=false
+    helm 
+    install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.1.0 --set installCRDs=true
     ```
     
     Create a file called "gen-cert.yml" and insert the following yaml instruction :
