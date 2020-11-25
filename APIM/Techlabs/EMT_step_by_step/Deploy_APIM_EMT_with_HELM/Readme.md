@@ -72,12 +72,12 @@ The goal of this step is to deploy APIM EMT into Azure Kubernetes Service by usi
         Expected output command example
         ``` Bash
         NAME                        HOSTS                                                 ADDRESS           PORTS     AGE
-        apimanager                  api-mgr.<<YOUR_DNS_ALIAS >>.azure.demoaxway.com   xxx.xxx.xxx.xxx   80, 443   6m48s
-        cm-acme-http-solver-4sdcm   anm.<<YOUR_DNS_ALIAS >>.azure.demoaxway.com                         80        6m44s
-        cm-acme-http-solver-7cvzj   api-mgr.<<YOUR_DNS_ALIAS >>.azure.demoaxway.com                     80        6m45s
-        cm-acme-http-solver-nk2f6   api.<<YOUR_DNS_ALIAS >>.azure.demoaxway.com                         80        6m45s
-        gatewaymanager              anm.<<YOUR_DNS_ALIAS >>.azure.demoaxway.com       xxx.xxx.xxx.xxx   80, 443   6m48s
-        traffic                     api.<<YOUR_DNS_ALIAS >>.azure.demoaxway.com       xxx.xxx.xxx.xxx   80, 443   6m48s
+        apimanager                  api-mgr.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>   xxx.xxx.xxx.xxx   80, 443   6m48s
+        cm-acme-http-solver-4sdcm   anm.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>                        80        6m44s
+        cm-acme-http-solver-7cvzj   api-mgr.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>                     80        6m45s
+        cm-acme-http-solver-nk2f6   api.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>                         80        6m45s
+        gatewaymanager              anm.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>       xxx.xxx.xxx.xxx   80, 443   6m48s
+        traffic                     api.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>       xxx.xxx.xxx.xxx   80, 443   6m48s
         ```
         
         - Get a list of your pods
