@@ -2,16 +2,22 @@
 *********************
 
 Information you need before you start : 
-1. TENANT_ID
-2. SERVICE_PRINCIPAL_ID
-3. SERVICE_PRINCIPAL_PASSWORD
-5. SERVICE_PRINCIPAL_NAME
-6. K8S_NAMESPACE_NAME
-7. AKS_NAME
-8. AKS_RESSOURCE_GROUP
-9. ACR_URL
-10. STORAGE_ACCOUNT
-11. STORAGE_SHARED_NAME
+
+1. SERVICE_PRINCIPAL_PASSWORD
+2. SERVICE_PRINCIPAL_NAME
+3. K8S_NAMESPACE_NAME
+4. ACR_NAME
+5. ACR_URL
+1. STORAGE_ACCOUNT
+1. STORAGE_SHARED_NAME
+1. YOUR_HELM_RELEASE_NAME
+1. YOUR_HELM_PACKAGE_NAME
+1. YOUR_DNS_ALIAS
+1. APIM_VERSION
+1. APIM_BUILD
+1. IMAGE_ANM_NAME
+1. IMAGE_GTW_NAME
+1. STORAGE_SHARED_NAME
 
 *********************
 
@@ -21,4 +27,32 @@ cert-manager    cert-manager    1               2020-11-09 22:07:15.85852 +0100 
 nginx-ingress   nco-ns          1               2020-11-09 22:23:20.4600221 +0100 CET   deployed        nginx-ingress-0.7.0     1.9.0
 
 
-helm install demo7-amplify-apim-7.7-test (nom de l’installation) demo7testacr/amplify-apim-7.7 --namespace=demo7-test --set platform=ESX,managedIngress=true,global.apimVersion=7.7,global.namespace=demo7-test,global.dockerRegistries.apimName=demo7testacr.azurecr.io,global.dockerRegistries.apimSecret=azure-container-registry,anm.buildTag=7.7.1586357966,anm.ingressName=anm.demo7.test.azure.demoaxway.com,apimgr.buildTag=7.7.1586357966,apimgr.ingressName=api-manager.demo7.test.azure.demoaxway.com,apitraffic.buildTag=7.7.1586357966,apitraffic.ingressName=api.demo7.test.azure.demoaxway.com,apitraffic.share.secret=azure-file,apitraffic.share.name=gw-events,mysqlAnalytics.enabled=true,mysqlAnalytics.external=false,mysqlAnalytics.host=,cassandra.external=false,cassandra.keyspace=demo7_test_1,apiportal.enabled=false,apiportal.buildTag=7.7.1586357966,apiportal.ingressName=none,apiportal.share.secret=azure-file,apiportal.share.name="",oauth.enabled=false
+- Execute HELM install [documentation](https://helm.sh/docs/helm/helm_install/)
+
+helm install <<YOUR_HELM_RELEASE_NAME>> <<ACR_NAME>>/<<YOUR_HELM_PACKAGE_NAME>> 
+--namespace=<<K8S_NAMESPACE_NAME>> 
+--set global.domainName=<<YOUR_DNS_ALIAS>>.azure.demoaxway.com,
+global.apimVersion=<<APIM_VERSION>>,
+global.namespace=<<K8S_NAMESPACE_NAME>>,
+global.dockerRegistry.url=<<ACR_URL>>,
+global.dockerRegistry.username=<<SERVICE_PRINCIPAL_NAME>>,
+global.dockerRegistry.token=<<SERVICE_PRINCIPAL_PASSWORD>>,
+global.createSecrets=false,
+anm.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,
+anm.imageName=<<IMAGE_ANM_NAME>>,
+apimgr.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,
+apimgr.imageName=<<IMAGE_GTW_NAME>>,
+apitraffic.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,
+apitraffic.imageName=<<IMAGE_GTW_NAME>>,
+apitraffic.share.secret=azure-file,
+apitraffic.share.name=<<STORAGE_SHARED_NAME>> 
+--atomic --wait --timeout 10m0s
+
+
+While your APIM EMT Cluster is starting, you can check pod logs with the following command :
+kubectl logs <<POD_NAME>> --follow -n <<K8S_NAMESPACE_NAME>> 
+
+Check your 3 ingress have been created :
+kubectl get ingress -n <<K8S_NAMESPACE_NAME>> 
+
+helm delete <<YOUR_HELM_RELEASE_NAME>> --namespace=<<K8S_NAMESPACE_NAME>>
