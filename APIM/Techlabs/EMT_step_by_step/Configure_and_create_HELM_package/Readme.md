@@ -49,10 +49,19 @@
     Update Complete. ⎈Happy Helming!⎈
      ```
 
+
+
 3. Pulling HELM charts from GIT
 
+helm search repo apim
+
     ``` Bash
-    TODO: mettre la commande pull git sur la bonne branche
+    cd $HOME/helm-package
+
+    helm pull axwayapimdemo7/techlab-emt-apim-77
+
+    tar -xvf techlab-emt-apim-77-1.0.0.tgz
+
     ```
 
 4. Modifying HELM charts
@@ -91,14 +100,14 @@
 
     Expected Output command
      ``` Bash
-    Successfully packaged chart and saved it to: <<$HOME>>/Cloud-Automation/APIM/Helmchart/<<YOUR_HELM_PACKAGE_NAME>>-<<YOUR_HELM_PACKAG_VERSION>>.tgz
+    Successfully packaged chart and saved it to: <<$HOME>>/Cloud-Automation/APIM/Helmchart/<<YOUR_HELM_PACKAGE_NAME>>-<<YOUR_HELM_PACKAG_VERSION>>/<<YOUR_HELM_PACKAGE_NAME>>-<<YOUR_HELM_PACKAG_VERSION>>.tgz
     ```
 
 6. Push HELM packge into ACR
 
     Then push your HELM package to Azure Container Repository
     ``` Bash
-    az acr helm push --name <<ACR_NAME>> <<$HOME>>/Cloud-Automation/APIM/Helmchart/<<YOUR_HELM_PACKAGE_NAME>>-<<YOUR_HELM_PACKAG_VERSION>>.tgz
+    az acr helm push --name <<ACR_NAME>> <<$HOME>>/Cloud-Automation/APIM/Helmchart/<<YOUR_HELM_PACKAGE_NAME>>-<<YOUR_HELM_PACKAG_VERSION>>/<<YOUR_HELM_PACKAGE_NAME>>-<<YOUR_HELM_PACKAG_VERSION>>.tgz
     ```
 
     Expected Output command
