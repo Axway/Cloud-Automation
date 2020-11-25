@@ -1,35 +1,38 @@
 # Configure an Ingress Controller
 
-## What we are going to do
-- Install and configure an Ingress Controler with NGINX
-It will allow us to access our APIM cluster in Kubernetes from outside
-- Install and configure a certificat manager with Lets Encrypt
-It will allow automatic generation of certificat using Lets Encrypt
-
-TODO -> SCHEMA Here
-
+## What do you need to start
 
 *********************
 
-## Information you need before you start
-1. RG_NAME_DNS
-2. PUBLIC_IP_ADDRESS_NAME (eg. apim-emt-ip-<<your-trigram>>)
-3. YOUR_DNS_ALIAS (eg. <<your-trigram>>)
-4. YOUR_DOMAIN_NAME
+- Information you need before you start :
+1. RG_NAME_DNS             *(name of your Ressouce Group where network objects belongs)*
+2. PUBLIC_IP_ADDRESS_NAME  *(name of your Azure Public Address)*
+3. YOUR_DNS_ALIAS          *(name of your DNS Alias)*
+4. YOUR_DOMAIN_NAME        *(name of your domain)*
 
 *********************
 
-## Information you will get from this step
+- Information you will get from this step :
 1. PUBLIC_IP_ADDRESS
 
 *********************
 
+## What we are going to do
+- Create a public IP address
+- Create DNS Recodrs for anm, api manager and api traffic access
+- Install and configure an Ingress Controler with NGINX *(it will allow us to access our APIM cluster in Kubernetes from outside)*
+- Install and configure a certificat manager with Lets Encrypt *(it will allow automatic generation of certificat using Lets Encrypt)*
+
+*********************
+
+### Public IP address and DNS Record creation
 - Create a public IP into AKS Ressource Group
-    First, we need to create a public address to join AKS. This IP must be in the AKS resource group managed by Azure.
+    First, we need to create a public address to join AKS. **This IP must be in the AKS resource group managed by Azure.**
 
     Execute the following command to find the appropriate resource group and then create a public IP [documentation](https://docs.microsoft.com/en-us/cli/azure/network/public-ip?view=azure-cli-latest#az_network_public_ip_create)
     ``` Bash
     rgAKSName=$(az aks show --resource-group $resourceGroupName --name $aksClusterName --query nodeResourceGroup -o tsv)
+    
     az network public-ip create --resource-group $rgAKSName --sku Standard --name <<PUBLIC_IP_ADDRESS_NAME>> --allocation-method static --query publicIp.ipAddress -o tsv --allocation-method static
     ```
 
@@ -39,7 +42,7 @@ TODO -> SCHEMA Here
     ```
 
 - Create DNS zone
-Then we need DNS records in order to be able to connect to AKS and to APIM UIs (manager, manageent)
+    Then we need DNS records in order to be able to connect to AKS and to APIM UIs (manager, manageent)
     - Record creation of A type [information](https://pressable.com/2019/10/11/what-are-dns-records-types-explained-2/)
         ``` Bash
         az network dns record-set a add-record -g <<RG_NAME_DNS>> -z <<YOUR_DOMAIN_NAME>> -n <<YOUR_DNS_ALIAS>> -a <<PUBLIC_IP_ADDRESS>>
@@ -123,7 +126,7 @@ Then we need DNS records in order to be able to connect to AKS and to APIM UIs (
 
         - DNS record to join API Manager web UI
         ``` Bash
-        az network dns record-set cname set-record -g <<RG_NAME_DNS>> -z <<YOUR_DOMAIN_NAME>> -n api-manager.<<YOUR_DNS_ALIAS>> -c <<YOUR_DNS_ALIAS>>.<<YOUR_DOMAIN_NAME>>
+        az network dns record-set cname set-record -g <<RG_NAME_DNS>> -z <<YOUR_DOMAIN_NAME>> -n api-mgr.<<YOUR_DNS_ALIAS>> -c <<YOUR_DNS_ALIAS>>.<<YOUR_DOMAIN_NAME>>
         ```
 
         Output command
@@ -147,61 +150,63 @@ Then we need DNS records in order to be able to connect to AKS and to APIM UIs (
         }
         ```
 
+### Ingress Controller installation and configuration
 - Install NGINX
-Now we need to install an ingress controller.
-To do so, we are using NGINX offcial HELM who will deploy NGINX as Ingress Controller into our AKS
+    Now we need to install an ingress controller.
+    To do so, we are using NGINX offcial HELM who will deploy NGINX as Ingress Controller into our AKS.
+    
+        - Adding NGINX repository into HELM
+            First we need to add NGINX repository into HELM repo :
+            ``` Bash
+            helm repo add nginx-stable https://helm.nginx.com/stable
+            ```
+            Expected Output command
+            ``` Bash
+            "nginx-stable" has been added to your repositories
+            ```
+    
+        - Updating HELM repository
+            ``` Bash
+            helm repo update
+            ```
+            Expected Output command
+            ``` Bash  
+            Hang tight while we grab the latest from your chart repositories...
+            ...Successfully got an update from the "nginx-stable" chart repository
+            Update Complete. ⎈Happy Helming!⎈
+            ```
+    
+        - Deploying NGINX
+            
+            ``` Bash
+            kubectl create namespace ingress-controller
+            ```
+    
+            Then we can deploy by launching an HELM install :
+            ``` Bash
+            helm install nginx-ingress nginx-stable/nginx-ingress --namespace "ingress-controller" --set controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.service.externalTrafficPolicy=Local,controller.service.loadBalancerIP="<<PUBLIC_IP_ADDRESS>>",rbac.create=true --set-string controller.config.use-http2=false,controller.ssl_procotols=TLSv1.2        
+            ```
+    
+            Output command
+            ``` Bash
+            NAME: nginx-ingress
+            LAST DEPLOYED: ...
+            NAMESPACE: ingress-controller
+            STATUS: deployed
+            REVISION: 1
+            TEST SUITE: None
+            NOTES:
+            The NGINX Ingress Controller has been installed.
+            ```
 
-    - Adding NGINX repository into HELM
-        First we need to add NGINX repository into HELM repo :
-        ``` Bash
-        helm repo add nginx-stable https://helm.nginx.com/stable
-        ```
-        Expected Output command
-        ``` Bash
-        "nginx-stable" has been added to your repositories
-        ```
-
-    - Updating HELM repository
-        ``` Bash
-        helm repo update
-        ```
-        Expected Output command
-        ``` Bash  
-        Hang tight while we grab the latest from your chart repositories...
-        ...Successfully got an update from the "nginx-stable" chart repository
-        Update Complete. ⎈Happy Helming!⎈
-        ```
-
-    - Deploying NGINX
-        
-        ``` Bash
-        kubectl create namespace ingress-controller
-        ```
-
-        Then we can deploy by launching an HELM install :
-        ``` Bash
-        helm install nginx-ingress nginx-stable/nginx-ingress --namespace "ingress-controller" --set controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.service.externalTrafficPolicy=Local,controller.service.loadBalancerIP="<<PUBLIC_IP_ADDRESS>>",rbac.create=true --set-string controller.config.use-http2=false,controller.ssl_procotols=TLSv1.2        
-        ```
-
-    Output command
-    ``` Bash
-    NAME: nginx-ingress
-    LAST DEPLOYED: ...
-    NAMESPACE: ingress-controller
-    STATUS: deployed
-    REVISION: 1
-    TEST SUITE: None
-    NOTES:
-    The NGINX Ingress Controller has been installed.
-    ```
-
+### Certificat manager installation and configuration
 - Install a certificat manager
     First, we are going to create a dedicated namespace : 
     ``` Bash
     kubectl create namespace cert-manager
     ```
 
-    Than give a mandatory label name to cert-manager namespace (TODO:documentation)
+    Than give a mandatory label name to cert-manager namespace [documentation](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
     ``` Bash
     kubectl label namespace cert-manager cert-manager.io/disable-validation=true
     ```
@@ -242,5 +247,5 @@ To do so, we are using NGINX offcial HELM who will deploy NGINX as Ingress Contr
     
     Deploy your file
     ``` Bash
-    kubectl apply -F yourfile.yml
+    kubectl apply -F gen-cert.yml.yml
     ```
