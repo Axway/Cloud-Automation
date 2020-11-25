@@ -13,6 +13,9 @@ Information you need before you start :
 9. ACR_URL
 10. STORAGE_ACCOUNT
 11. STORAGE_SHARED_NAME
+12. CASSANDRA_ROOT_PASSWORD
+13. MYSQL_ROOT_PASSWORD
+14. ANALYTIC_USER_PASSWORD
 
 *********************
 
@@ -139,7 +142,7 @@ The goal of this scenario is to create and configure step by step Azure CLI and 
     - Secrets for mySQL password
         We are going to store mySQL password into Kubernetes secret 
         ``` Bash
-        kubectl create secret generic apim-password --namespace <<K8S_NAMESPACE_NAME>> --from-literal=dbmysqlanalytics=<<ANALYTIC_USER_PASSWORD>> --from-literal=dbmysqlroot=<<MYSQL_ROOT_PASSWORD>>
+        kubectl create secret generic apim-password --namespace <<K8S_NAMESPACE_NAME>> --from-literal=dbmysqlanalytics=<<ANALYTIC_USER_PASSWORD>> --from-literal=dbmysqlroot=<<MYSQL_ROOT_PASSWORD>> --from-literal=dbcass=<<CASSANDRA_ROOT_PASSWORD>>
         ```
     
         Expected output command
