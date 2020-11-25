@@ -17,25 +17,29 @@
 Information you need before you start : 
 1. **ACR_URL**                        *(url of Azure Container Registry)*
 2. **ACR_NAME**                       *(name of Azure Container Registry)*
-3. **IMAGE_BASE_NAME**                *(a name for your base image name)*
-4. **IMAGE_ANM_NAME**                 *(a name for your anm image name)*
-5. **IMAGE_GTW_NAME**                 *(a name for your gateway image name)*
-6. **APIM_VERSION**                   *(APIM version of your binary)*
-7. **APIM_BUILD**                     *(APIM build of your binary)*
-8. **BINARIES_PATH**                  *(eg. $HOME/binaries)*
-9. **FULL_PATH_TO_YOUR_LICENCE**      *(eg. $HOME/licence/my_licence.lic)*
-10. **MERGE_PATH_APIGATEWAY**         *(eg. $HOME/merge-directory/apigateway)*
-11. **FULL_PATH_TO_YOUR_ANM_FED**     *(eg. $HOME/fed/my_anm_fed.fed)*
-12. **FULL_PATH_TO_YOUR_GTW_FED**     *(eg. $HOME/fed/my_gtw_fed.fed)*
+
+Information you need to set :
+1. **IMAGE_BASE_NAME**                *(a name for your base image name)*
+2. **IMAGE_ANM_NAME**                 *(a name for your anm image name)*
+3. **IMAGE_GTW_NAME**                 *(a name for your gateway image name)*
+4. **APIM_VERSION**                   *(APIM version of your binary)*
+5. **APIM_BUILD**                     *(APIM build of your binary)*
+6. **BINARIES_PATH**                  *(eg. $HOME/binaries)*
+7. **FULL_PATH_TO_YOUR_LICENCE**      *(eg. $HOME/licence/my_licence.lic)*
+8. **MERGE_PATH_APIGATEWAY**          *(eg. $HOME/merge-directory/apigateway)*
+9. **FULL_PATH_TO_YOUR_ANM_FED**      *(eg. $HOME/fed/my_anm_fed.fed)*
+10. **FULL_PATH_TO_YOUR_GTW_FED**     *(eg. $HOME/fed/my_gtw_fed.fed)*
 
 *********************
 
 ## What we are going to do
 - Prepare environement to generate APIM Docker images
+    - Certificate generation and password creation
+    - Binaries, FEDs, dependancies and license upload
 - Generate Docker images
     - apim-base
-    - apim-gtw
-    - apim-anm
+    - apim-gtw *(used for API Manager, API Manager UI and API Gateway component)*
+    - apim-anm *(used for API Admin Node Manager component)*
 - Push Docker images into Azure Container Repository (ACR)
 
 *********************
