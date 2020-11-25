@@ -1,0 +1,16 @@
+{{- if eq .Values.platform "OPENSHIFT" }}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: gatewaymanager
+spec:
+  to:
+    kind: Service
+    name: {{ .Values.anm.name }}
+  port:
+    targetPort: {{ .Values.anm.trafficPort }}
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+{{- end }}
