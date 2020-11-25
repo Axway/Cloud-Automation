@@ -13,7 +13,7 @@ Information you need before to start :
 3. SERVICE_PRINCIPAL_PASSWORD   *(Password of your Service Principal)*
 5. SERVICE_PRINCIPAL_NAME       *(Name of your Service Principal)*
 6. AKS_NAME                     *(Name of your Azure Kubernetes Service)*
-7. AKS_RESSOURCE_GROUP          *(Name of your AKS Resource Group)*
+7. AKS_RESOURCE_GROUP           *(Name of your AKS Resource Group)*
 8. ACR_URL                      *(URL of your Azure Container Registry)*
 9. STORAGE_ACCOUNT_NAME         *(Name of your Azure Storage Account)*
 
@@ -66,7 +66,7 @@ The goal of this step is to create and configure Azure CLI and Kubernetes CLI in
     Execute the following commands to connect with AKS
 
     ``` Bash
-    az aks get-credentials --resource-group <<AKS_RESSOURCE_GROUP>> --name <<AKS_NAME>>
+    az aks get-credentials --resource-group <<AKS_RESOURCE_GROUP>> --name <<AKS_NAME>>
     ```
     Expected output command
     ``` Bash
@@ -130,7 +130,7 @@ The goal of this step is to create and configure Azure CLI and Kubernetes CLI in
     - Secret for Azure File Prenium access
         - First, we are going to create storage account in Azure
             ``` Bash
-            aksConnectionString=`az storage account show-connection-string -n <<STORAGE_ACCOUNT_NAME>> -g <<AKS_RESSOURCE_GROUP>> -o tsv`
+            aksConnectionString=`az storage account show-connection-string -n <<STORAGE_ACCOUNT_NAME>> -g <<AKS_RESOURCE_GROUP>> -o tsv`
     
             az storage share create -n <<STORAGE_SHARED_NAME>> --connection-string $aksConnectionString --quota 100
             ```
@@ -143,7 +143,7 @@ The goal of this step is to create and configure Azure CLI and Kubernetes CLI in
 
         - Then we are going to get and store in a local variable a shared key :
             ``` Bash
-            _aksStorageFileSharedKey=$(az storage account keys list --resource-group <<AKS_RESSOURCE_GROUP>> --account-name <<STORAGE_ACCOUNT_NAME>> --query "[0].value" -o tsv)
+            _aksStorageFileSharedKey=$(az storage account keys list --resource-group <<AKS_RESOURCE_GROUP>> --account-name <<STORAGE_ACCOUNT_NAME>> --query "[0].value" -o tsv)
             ```
         
         - Finally we are creating secret

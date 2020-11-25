@@ -32,9 +32,7 @@ The goal of this technical lab is to create and configure step by step an APIM E
         - APIM ANM
         - APIM Gateway
     - Push images into Azure Container Repository (ACR)
-- [4. Configure HELM and create a package](./Configure_and_create_HELM_package)
-    - Get HELM from GIT
-    - Customize HELM
-    - Create a package and push into ACR
-- [5. Deploy APIM EMT with HELM](./Deploy_APIM_EMT_with_HELM)
-
+- [4. Deploy APIM EMT with HELM](./Deploy_APIM_EMT_with_HELM)
+    - Configure HELM CLI to use an ACR
+    - Get HELM charts from ACR
+    - Deploy EMT APIM solution using Helm
