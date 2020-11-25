@@ -1,25 +1,41 @@
 # Configure Azure and Kubernetes CLI
 
+## What do you need to start
+- Access to a Linux server
+- Azure CLI installed
+- Kubectl installed
+
 *********************
 
 Information you need before you start : 
-1. TENANT_ID
-2. SERVICE_PRINCIPAL_ID
-3. SERVICE_PRINCIPAL_PASSWORD
-5. SERVICE_PRINCIPAL_NAME
-6. K8S_NAMESPACE_NAME
-7. AKS_NAME
-8. AKS_RESSOURCE_GROUP
-9. ACR_URL
-10. STORAGE_ACCOUNT
-11. STORAGE_SHARED_NAME
-12. CASSANDRA_ROOT_PASSWORD
-13. MYSQL_ROOT_PASSWORD
-14. ANALYTIC_USER_PASSWORD
+1. TENANT_ID                    *(ID of your Azure tenant)*
+2. SERVICE_PRINCIPAL_ID         *(ID of your Service Principal)*
+3. SERVICE_PRINCIPAL_PASSWORD   *(Password of your Service Principal)*
+5. SERVICE_PRINCIPAL_NAME       *(Name of your Service Principal)*
+6. AKS_NAME                     *(Name of your Azure Kubernetes Service)*
+7. AKS_RESSOURCE_GROUP          *(Name of your AKS Resource Group)*
+8. ACR_URL                      *(URL of your Azure Container Registry)*
+9. STORAGE_ACCOUNT_NAME         *(Name of your Azure Storage Account)*
+
+
+Information you need to set
+1. K8S_NAMESPACE_NAME           *(Name of you want to give yo your K8S namespace)*
+2. STORAGE_SHARED_NAME          *(Name of you want to give yo your shared storage)*
+3. CASSANDRA_ROOT_PASSWORD      *(Root password of you want to set for Cassandra)*
+4. MYSQL_ROOT_PASSWORD          *(Root password of you want to set for MySQL)*
+5. ANALYTIC_USER_PASSWORD       *(Root password of you want to set for Analytic)*
 
 *********************
 
-The goal of this scenario is to create and configure step by step Azure CLI and Kubernetes CLI in order to access an AKS instance.
+## What we are going to do
+The goal of this step is to create and configure Azure CLI and Kubernetes CLI in order to access an AKS instance. But also to prepare Kubernetes environement for your deployment.
+
+- Azure CLI login with Service Principal
+- Connection with AKS
+- Namespace creation in AKS
+- Secrets creation in AKS
+
+*********************
 
 - Login with your account in Azure CLI called az ([documentation](https://docs.microsoft.com/fr-fr/cli/azure/create-an-azure-service-principal-azure-cli))
     ``` Bash
