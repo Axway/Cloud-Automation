@@ -15,8 +15,8 @@
 *********************
 
 Information you need before you start : 
-1. **ACR_URL**                        *(url of Azure Container Registry)*
-2. **ACR_NAME**                       *(name of Azure Container Registry)*
+1. **ACR_URL**                        *(url of your Azure Container Registry)*
+2. **ACR_NAME**                       *(name of your Azure Container Registry)*
 
 Information you need to set :
 1. **IMAGE_BASE_NAME**                *(a name for your base image name)*

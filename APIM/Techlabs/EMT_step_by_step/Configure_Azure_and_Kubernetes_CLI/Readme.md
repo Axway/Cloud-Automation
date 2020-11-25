@@ -18,12 +18,12 @@ Information you need before to start :
 9. STORAGE_ACCOUNT_NAME         *(Name of your Azure Storage Account)*
 
 
-Information you need to set
-1. K8S_NAMESPACE_NAME           *(Name of you want to give yo your K8S namespace)*
-2. STORAGE_SHARED_NAME          *(Name of you want to give yo your shared storage)*
-3. CASSANDRA_ROOT_PASSWORD      *(Root password of you want to set for Cassandra)*
-4. MYSQL_ROOT_PASSWORD          *(Root password of you want to set for MySQL)*
-5. ANALYTIC_USER_PASSWORD       *(Root password of you want to set for Analytic)*
+Information you need to set :
+1. K8S_NAMESPACE_NAME           *(Name you want to give to your K8S namespace)*
+2. STORAGE_SHARED_NAME          *(Name you want to give to your shared storage)*
+3. CASSANDRA_ROOT_PASSWORD      *(Root password you want to set for Cassandra)*
+4. MYSQL_ROOT_PASSWORD          *(Root password you want to set for MySQL)*
+5. ANALYTIC_USER_PASSWORD       *(Root password you want to set for Analytic)*
 
 *********************
 
