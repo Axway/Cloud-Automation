@@ -180,3 +180,7 @@ The goal of this step is to create and configure Azure CLI and Kubernetes CLI in
     azure-file                 Opaque                                2   
     default-token-vjkbh        kubernetes.io/service-account-token   3  
     ```
+
+*********************
+## Next step
+[2. Configure an Ingress controller](../Configure_an_ingress_controller)
