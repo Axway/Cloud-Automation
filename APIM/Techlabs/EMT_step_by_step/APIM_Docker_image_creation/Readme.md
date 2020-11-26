@@ -248,3 +248,7 @@ Information you need to set :
       "ddi-apim-gtw"
     ]
     ```
+
+*********************
+## Next step
+[4. Deploy APIM EMT with HELM](../Deploy_APIM_EMT_with_HELM)
