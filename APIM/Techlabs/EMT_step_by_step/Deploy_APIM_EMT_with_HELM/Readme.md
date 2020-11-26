@@ -15,6 +15,7 @@ Information you need before you start :
 11. IMAGE_GTW_NAME              *(name of your gtw image name)*
 12. YOUR_DOMAIN_NAME            *(name of your domain)*
 13. HELM_PACKAGE_NAME           *(name of Helm package to deploy)*
+14. HELM_PACKAGE_VERSION        *(version of Helm package to deploy)*
 
 Information you need to set :
 1. YOUR_HELM_RELEASE_NAME        *(a name for your Helm release)*
@@ -60,20 +61,20 @@ The goal of this step is to get Helm package from Azure Container Registry and d
     ```
     Expected Command output 
     ``` Bash
-    NAME                                            CHART VERSION   APP VERSION     DESCRIPTION
-    <<ACR_NAME>>/techlab-emt-apim-77              1.0.0           7.7-20200330    Package for demo ...
+    NAME                                            CHART VERSION   APP VERSION                 DESCRIPTION
+    <<ACR_NAME>>/<<HELM_PACKAGE_NAME>>                  x.y.z       <<HELM_PACKAGE_VERSION>>          Package for ...
     ```
     
     Then go on a specific folder and pull our Helm charts package
     ``` Bash
     cd $HOME/helm-package
 
-    helm pull <<ACR_NAME>>/techlab-emt-apim-77
+    helm pull <<ACR_NAME>>/<<HELM_PACKAGE_NAME>>
     ```
 
     When it is done, untar Helm package
     ``` Bash
-    tar -xvf techlab-emt-apim-77-1.0.0.tgz
+    tar -xvf <<HELM_PACKAGE_NAME>>-<<HELM_PACKAGE_VERSION>>.tgz
     ```
     
 ### Perform Helm package installation
@@ -82,7 +83,7 @@ The goal of this step is to get Helm package from Azure Container Registry and d
     **It can takes several minutes before your Kubernetes cluster is up and running.**
 
     ``` Bash
-    helm install <<YOUR_HELM_RELEASE_NAME>> <<YOUR_HELM_PACKAGE_NAME>> --namespace=<<K8S_NAMESPACE_NAME>> --set global.domainName=<<YOUR_DNS_ALIAS>>.<<YOUR_DOMAIN_NAME>>,global.apimVersion=<<APIM_VERSION>>,global.namespace=<<K8S_NAMESPACE_NAME>>,global.dockerRegistry.url=<<ACR_URL>>,global.dockerRegistry.username=<<SERVICE_PRINCIPAL_NAME>>,global.dockerRegistry.token=<<SERVICE_PRINCIPAL_PASSWORD>>,global.createSecrets=false,anm.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,anm.imageName=<<IMAGE_ANM_NAME>>,apimgr.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,apimgr.imageName=<<IMAGE_GTW_NAME>>,apitraffic.buildTag=<<APIM_VERSION>>-<<APIM_BUILD>>,apitraffic.imageName=<<IMAGE_GTW_NAME>>,apitraffic.share.secret=azure-file,apitraffic.share.name=<<STORAGE_SHARED_NAME>> --atomic --wait --timeout 10m0s
+   helm install <<YOUR_HELM_RELEASE_NAME>> <<YOUR_HELM_PACKAGE_NAME>> --namespace=<<K8S_NAMESPACE_NAME>> --set global.domainName=<<YOUR_DNS_ALIAS>>.<<YOUR_DOMAIN_NAME>>,global.apimVersion=<<APIM_VERSION>>.<<APIM_BUILD>>,global.namespace=<<K8S_NAMESPACE_NAME>>,global.createSecrets=false,global.dockerRegistry.url=<<ACR_URL>>,anm.buildTag=<<APIM_VERSION>>.<<APIM_BUILD>,anm.imageName=<<IMAGE_ANM_NAME>>,apimgr.buildTag=<<APIM_VERSION>>.<<APIM_BUILD>>,apimgr.imageName=<<IMAGE_GTW_NAME>>,apitraffic.buildTag=<<APIM_VERSION>>.<<APIM_BUILD>>,apitraffic.imageName=<<IMAGE_GTW_NAME>>,apitraffic.share.name=<<STORAGE_SHARED_NAME>> --atomic --wait --timeout 15m0s
     ```
 
     Expected output command example
