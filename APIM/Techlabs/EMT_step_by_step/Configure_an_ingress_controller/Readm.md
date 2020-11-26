@@ -161,11 +161,11 @@ Information you will get from this step :
         - Adding NGINX repository into HELM
             First we need to add NGINX repository into HELM repo :
             ``` Bash
-            helm repo add nginx-stable https://helm.nginx.com/stable
+            helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
             ```
             Expected Output command
             ``` Bash
-            "nginx-stable" has been added to your repositories
+            "ingress-nginx" has been added to your repositories
             ```
     
         - Updating HELM repository
@@ -187,9 +187,9 @@ Information you will get from this step :
     
             Then we can deploy by launching an HELM install :
             ``` Bash
-            helm install nginx-ingress nginx-stable/nginx-ingress --namespace "ingress-controller" --set controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.service.externalTrafficPolicy=Local,controller.service.loadBalancerIP="<<PUBLIC_IP_ADDRESS>>",rbac.create=true --set-string controller.config.use-http2=false,controller.ssl_procotols=TLSv1.2        
+            helm install nginx-ingress ingress-nginx/ingress-nginx --namespace "ingress-controller" --set controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.service.loadBalancerIP="<<PUBLIC_IP_ADDRESS>>",rbac.create=true --set-string controller.config.use-http2=false,controller.ssl_procotols=TLSv1.2        
             ```
-    
+ 
             Output command
             ``` Bash
             NAME: nginx-ingress
@@ -226,11 +226,9 @@ Information you will get from this step :
     
     Install the certificat manager
     ``` Bash
-    #helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v0.16.1 --set webhook.enabled=false
-    helm 
-    install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.1.0 --set installCRDs=true
+    helm install cert-manager --namespace cert-manager --version v0.16.1 --set installCRDs=true,nodeSelector."beta\.kubernetes\.io/os"=linux jetstack/cert-manager
     ```
-    
+
     Create a file called "gen-cert.yml" and insert the following yaml instruction :
     ``` Bash
     apiVersion: cert-manager.io/v1alpha2

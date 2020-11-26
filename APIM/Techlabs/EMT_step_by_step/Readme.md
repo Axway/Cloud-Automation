@@ -2,6 +2,9 @@
 
 The goal of this technical lab is to create and configure step by step an APIM EMT environment on Azure Kubernetes Server (AKS).
 
+![global view](./imgs/demo-architecture-Infra.png)
+
+
 ## Prerequisites
 **Thoses prerequisites are not covered in this lab and must be created and accessible**
 - Create and configure an Azure Kubernetes Server (AKS)

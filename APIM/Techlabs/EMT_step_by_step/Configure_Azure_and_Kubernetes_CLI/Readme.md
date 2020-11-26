@@ -100,7 +100,7 @@ The goal of this step is to create and configure Azure CLI and Kubernetes CLI in
 
 - List cluster namespace 
 
-    Execute a comand to list every namepsaces in AKS and verify yours is created :
+    Execute the following comand to list all namespaces in AKS. Verify that yours is created :
     ``` Bash
     kubectl get namespace
     ```
@@ -118,7 +118,7 @@ The goal of this step is to create and configure Azure CLI and Kubernetes CLI in
 - Secret creation ([documentation](https://kubernetes.io/fr/docs/concepts/configuration/secret/))
 
     - Secret for Azure Container Registry access
-        We are going to store ACR credentials using Service Principal name and secret into Kubernetes secret 
+        We are going to store ACR credentials using Service Principal name and token into a Kubernetes secret 
         ``` Bash
         kubectl create secret docker-registry registry-secret --namespace <<K8S_NAMESPACE_NAME>> --docker-server <<ACR_URL>> --docker-username "<<SERVICE_PRINCIPAL_NAME>>" --docker-password "<<SERVICE_PRINCIPAL_PASSWORD>>"
         ```
@@ -128,7 +128,7 @@ The goal of this step is to create and configure Azure CLI and Kubernetes CLI in
         ```
 
     - Secret for Azure File Prenium access
-        - First, we are going to create storage account in Azure
+        - First, we are going to create storage account in Azure. This storage will be used for the event logs. It can be replaced by a Persistant Volume Claim now.
             ``` Bash
             aksConnectionString=`az storage account show-connection-string -n <<STORAGE_ACCOUNT_NAME>> -g <<AKS_RESOURCE_GROUP>> -o tsv`
     
@@ -141,7 +141,7 @@ The goal of this step is to create and configure Azure CLI and Kubernetes CLI in
             }
             ```
 
-        - Then we are going to get and store in a local variable a shared key :
+        - Then we are going to get a shared key to store it in a local variable :
             ``` Bash
             _aksStorageFileSharedKey=$(az storage account keys list --resource-group <<AKS_RESOURCE_GROUP>> --account-name <<STORAGE_ACCOUNT_NAME>> --query "[0].value" -o tsv)
             ```

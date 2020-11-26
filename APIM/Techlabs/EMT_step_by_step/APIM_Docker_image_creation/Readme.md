@@ -7,8 +7,8 @@
 - APIGateway DockerScripts (latest)
     - https://support.axway.com/fr/search/index/type/Downloads/sort/created%7Cdesc/ipp/10/product/324/version/3034/subtype/47
 - A valid license file
-- A FED for the ANM component
-- A FED for the API Manager component
+- A FED for the ANM component. It must contains the appropriate certificate on the listener 8091.
+- A FED for the API Manager component. All environment variable for cassandra, mysql must be set. A healthcheck must be created for Kubernetes probes.
 - Dependencies
     - mysql-connector-java-5.1.46.jar
 
@@ -41,6 +41,7 @@ Information you need to set :
     - apim-gtw *(used for API Manager, API Manager UI and API Gateway components)*
     - apim-anm *(used for API Admin Node Manager component)*
 - Push Docker images into Azure Container Repository (ACR)
+
 
 *********************
 
