@@ -132,6 +132,11 @@ The goal of this step is to get Helm package from Azure Container Registry and d
         traffic-75ffc776b6-sq8lw                                          1/1     Running     0          4m41s
         ```
 
+        Try the ingress and login with default passwords (except if you change them in the previous step). Test of components can be done by a test from a web browser on the following url:
+         - https://api.<<YOUR_DNS_ALIAS>>/healthcheck
+         - https://anm.<<YOU_DNS_ALIAS>>
+         - https://api-mgr.<<YOUR_DNS_ALIAS>>
+
         - Access a log for a specific pod
         ``` Bash
         kubectl logs <<POD_NAME>> --follow -n <<K8S_NAMESPACE_NAME>> 
