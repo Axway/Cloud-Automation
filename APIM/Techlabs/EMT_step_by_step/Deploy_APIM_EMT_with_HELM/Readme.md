@@ -61,14 +61,14 @@ The goal of this step is to get Helm package from Azure Container Registry and d
     Expected Command output 
     ``` Bash
     NAME                                            CHART VERSION   APP VERSION     DESCRIPTION
-    axwayapimdemo7/techlab-emt-apim-77              1.0.0           7.7-20200330    Package for demo ...
+    <<ACR_NAME>>/techlab-emt-apim-77              1.0.0           7.7-20200330    Package for demo ...
     ```
     
     Then go on a specific folder and pull our Helm charts package
     ``` Bash
     cd $HOME/helm-package
 
-    helm pull axwayapimdemo7/techlab-emt-apim-77
+    helm pull <<ACR_NAME>>/techlab-emt-apim-77
     ```
 
     When it is done, untar Helm package
