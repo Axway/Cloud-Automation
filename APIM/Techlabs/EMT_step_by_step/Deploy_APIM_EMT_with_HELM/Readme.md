@@ -107,10 +107,7 @@ The goal of this step is to get Helm package from Azure Container Registry and d
         Expected output command example
         ``` Bash
         NAME                        HOSTS                                                 ADDRESS           PORTS     AGE
-        apimanager                  api-mgr.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>   xxx.xxx.xxx.xxx   80, 443   6m48s
-        cm-acme-http-solver-4sdcm   anm.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>                        80        6m44s
-        cm-acme-http-solver-7cvzj   api-mgr.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>                     80        6m45s
-        cm-acme-http-solver-nk2f6   api.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>                         80        6m45s
+        apimanager                  api-mgr.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>                     80        6m45s
         gatewaymanager              anm.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>       xxx.xxx.xxx.xxx   80, 443   6m48s
         traffic                     api.<<YOUR_DNS_ALIAS >>.<<YOUR_DOMAIN_NAME>>       xxx.xxx.xxx.xxx   80, 443   6m48s
         ```
@@ -140,7 +137,7 @@ The goal of this step is to get Helm package from Azure Container Registry and d
         kubectl logs <<POD_NAME>> --follow -n <<K8S_NAMESPACE_NAME>> 
         ```
     
-- Delete your cluster
+- Delete your apim deployment
     If you need to delete your cluster, you can run the following command
     ``` Bash
     helm delete <<YOUR_HELM_RELEASE_NAME>> --namespace=<<K8S_NAMESPACE_NAME>>
