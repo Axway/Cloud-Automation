@@ -252,3 +252,7 @@ Information you will get from this step :
     ``` Bash
     kubectl apply -F gen-cert.yml.yml
     ```
+
+*********************
+## Next step
+[3. APIM Docker image creation](../APIM_Docker_image_creation)

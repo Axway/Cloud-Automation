@@ -64,17 +64,30 @@ Information you need to set :
     
     *You will have now an apigw-emt-scripts-x.y.z-SNAPSHOT directory*
 
-3. Generate certificates
+3. Dos2Unix and chmod commands
+    If dos2unix is not installed, launch the following comand :
+    ``` Bash
+    sudo dnf install dos2unix 
+    ```
+
+    ``` Bash
+    cd $HOME/binaries/apigw-emt-scripts-x.y.z-SNAPSHOT
+
+    dos2unix Dockerfiles/*/scripts/*
+
+    chmod 755 Dockerfiles/*/scripts/*
+    ```
+4. Generate certificates
 
     Used for internal flows between API components (ANM image and Gtw images)
     *gen_domain_cert.py with "--default-cert option" will generate selfsigned certificat with changeme as default passphrass*
    
     ``` Bash
     cd $HOME/binaries/apigw-emt-scripts-x.y.z-SNAPSHOT
-    python2 gen_domain_cert.py --help
+
     python2 gen_domain_cert.py --default-cert
-    
     ```
+    
     Expected Command output 
     ``` Bash
     *Generating private key...*
@@ -88,13 +101,13 @@ Information you need to set :
     *Once gen_domain_cert.py is executed, it has generated a directory tree into cert*
 
 
-4. Create a file for storing password used as passphrase by DefaultDomain certificat
+5. Create a file for storing password used as passphrase by DefaultDomain certificat
 
     ``` Bash
     echo changeme > certs/DefaultDomain/pass.txt
     ```
 
-5. Create a file for storing ANM password
+6. Create a file for storing ANM password
     Scripts to build images need to have password into files.
 
     ``` Bash
@@ -113,7 +126,7 @@ Information you need to set :
     ``` Bash
     cd $HOME/binaries/apigw-emt-scripts-x.y.z-SNAPSHOT
     
-    python2 build_base_image.py --installer=<<BINARIES_PATH>>/APIGateway_<<APIM_VERSION>>.<<APIM_BUILD>>_Install_linux-x86-64_BN3.run --os="centos7" --out-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>>
+    python2 build_base_image.py --installer=<<BINARIES_PATH>>/APIGateway_<<APIM_VERSION>>.<<APIM_BUILD>>_Install_linux-x86-64_BN3.run --os="centos7" --out-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>.<<APIM_BUILD>>
     ```
     Expected Command output 
     ``` Bash
@@ -131,7 +144,7 @@ Information you need to set :
     Expected Command output
     ``` Bash
     REPOSITORY                                    TAG                             IMAGE ID            CREATED             SIZE
-    <<ACR_URL>>/<<IMAGE_BASE_NAME>>      <<APIM_VERSION>>-<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        949MB
+    <<ACR_URL>>/<<IMAGE_BASE_NAME>>      <<APIM_VERSION>>.<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        949MB
     centos                                     7                                xxxxxxxxxxxx        x seconds ago        204MB
     ```
 
@@ -141,7 +154,7 @@ Information you need to set :
     - API Admin Node Manager component
 
     ``` Bash
-    python2 build_anm_image.py --out-image=<<ACR_URL>>/<<IMAGE_ANM_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --parent-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --domain-cert certs/DefaultDomain/DefaultDomain-cert.pem --domain-key certs/DefaultDomain/DefaultDomain-key.pem --domain-key-pass-file certs/DefaultDomain/pass.txt --license <<FULL_PATH_TO_YOUR_LICENSE.lic>> --anm-username=admin --anm-pass-file=anmpass.txt --healthcheck --metrics --merge-dir <<MERGE_PATH_APIGATEWAY>> --fed $HOME/fed/<<FULL_PATH_TO_YOUR_ANM_FED>>
+    python2 build_anm_image.py --out-image=<<ACR_URL>>/<<IMAGE_ANM_NAME>>:<<APIM_VERSION>>.<<APIM_BUILD>> --parent-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>.<<APIM_BUILD>> --domain-cert certs/DefaultDomain/DefaultDomain-cert.pem --domain-key certs/DefaultDomain/DefaultDomain-key.pem --domain-key-pass-file certs/DefaultDomain/pass.txt --license <<FULL_PATH_TO_YOUR_LICENSE.lic>> --anm-username=admin --anm-pass-file=anmpass.txt --healthcheck --metrics --merge-dir <<MERGE_PATH_APIGATEWAY>> --fed $HOME/fed/<<FULL_PATH_TO_YOUR_ANM_FED>>
     ```
     Expected Command output 
     ``` Bash
@@ -160,8 +173,8 @@ Information you need to set :
     Expected Command output
     ``` Bash
     REPOSITORY                                       TAG                             IMAGE ID            CREATED             SIZE
-    <<ACR_URL>>/<<IMAGE_ANM_NAME>>           <<APIM_VERSION>>-<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        953MB
-    <<ACR_URL>>/<<IMAGE_BASE_NAME>>          <<APIM_VERSION>>-<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        949MB
+    <<ACR_URL>>/<<IMAGE_ANM_NAME>>           <<APIM_VERSION>>.<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        953MB
+    <<ACR_URL>>/<<IMAGE_BASE_NAME>>          <<APIM_VERSION>>.<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        949MB
     centos                                         7                                xxxxxxxxxxxx        x seconds ago        204MB
     ```
 
@@ -173,7 +186,7 @@ Information you need to set :
     - API Gateway component
     
     ``` Bash
-    python2 build_gw_image.py --out-image=<<ACR_URL>>/<<IMAGE_GTW_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --parent-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --domain-cert certs/DefaultDomain/DefaultDomain-cert.pem --domain-key certs/DefaultDomain/DefaultDomain-key.pem --domain-key-pass-file certs/DefaultDomain/pass.txt --license <<FULL_PATH_TO_YOUR_LICENSE>> --group-id default --merge-dir <<MERGE_PATH_APIGATEWAY>> --fed <<FULL_PATH_TO_YOUR_GTW_FED>>
+    python2 build_gw_image.py --out-image=<<ACR_URL>>/<<IMAGE_GTW_NAME>>:<<APIM_VERSION>>.<<APIM_BUILD>> --parent-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>.<<APIM_BUILD>> --domain-cert certs/DefaultDomain/DefaultDomain-cert.pem --domain-key certs/DefaultDomain/DefaultDomain-key.pem --domain-key-pass-file certs/DefaultDomain/pass.txt --license <<FULL_PATH_TO_YOUR_LICENSE>> --group-id default --merge-dir <<MERGE_PATH_APIGATEWAY>> --fed <<FULL_PATH_TO_YOUR_GTW_FED>>
     ```
 
     Expected Command output 
@@ -193,9 +206,9 @@ Information you need to set :
     Expected Command output
     ``` Bash
     REPOSITORY                                        TAG                             IMAGE ID            CREATED             SIZE
-    <<ACR_URL>>/<<IMAGE_GTW_NAME>>           <<APIM_VERSION>>-<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        957MB
-    <<ACR_URL>>/<<IMAGE_ANM_NAME>>           <<APIM_VERSION>>-<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        953MB
-    <<ACR_URL>>/<<IMAGE_BASE_NAME>>          <<APIM_VERSION>>-<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        949MB
+    <<ACR_URL>>/<<IMAGE_GTW_NAME>>           <<APIM_VERSION>>.<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        957MB
+    <<ACR_URL>>/<<IMAGE_ANM_NAME>>           <<APIM_VERSION>>.<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        953MB
+    <<ACR_URL>>/<<IMAGE_BASE_NAME>>          <<APIM_VERSION>>.<<APIM_BUILD>>        xxxxxxxxxxxx        x seconds ago        949MB
     centos                                         7                                xxxxxxxxxxxx        x seconds ago        204MB
     ```
 
@@ -235,3 +248,7 @@ Information you need to set :
       "ddi-apim-gtw"
     ]
     ```
+
+*********************
+## Next step
+[4. Deploy APIM EMT with HELM](../Deploy_APIM_EMT_with_HELM)
