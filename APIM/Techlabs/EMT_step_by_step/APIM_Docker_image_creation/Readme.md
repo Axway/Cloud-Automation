@@ -6,9 +6,9 @@
     - https://support.axway.com/fr/search/index/type/Downloads/sort/created%7Cdesc/ipp/10/product/324/version/3034/subtype/50
 - APIGateway DockerScripts (latest)
     - https://support.axway.com/fr/search/index/type/Downloads/sort/created%7Cdesc/ipp/10/product/324/version/3034/subtype/47
-- A valide licence file
-- A FED for your ANM
-- A FED for your Gateway
+- A valid license file
+- A FED for the ANM component
+- A FED for the API Manager component
 - Dependencies
     - mysql-connector-java-5.1.46.jar
 
@@ -25,7 +25,7 @@ Information you need to set :
 4. **APIM_VERSION**                   *(APIM version of your binary)*
 5. **APIM_BUILD**                     *(APIM build of your binary)*
 6. **BINARIES_PATH**                  *(eg. $HOME/binaries)*
-7. **FULL_PATH_TO_YOUR_LICENCE**      *(eg. $HOME/licence/my_licence.lic)*
+7. **FULL_PATH_TO_YOUR_LICENSE**      *(eg. $HOME/license/my_license.lic)*
 8. **MERGE_PATH_APIGATEWAY**          *(eg. $HOME/merge-directory/apigateway)*
 9. **FULL_PATH_TO_YOUR_ANM_FED**      *(eg. $HOME/fed/my_anm_fed.fed)*
 10. **FULL_PATH_TO_YOUR_GTW_FED**     *(eg. $HOME/fed/my_gtw_fed.fed)*
@@ -33,23 +33,23 @@ Information you need to set :
 *********************
 
 ## What we are going to do
-- Prepare environement to generate APIM Docker images
+- Prepare environment to generate APIM Docker images
     - Certificate generation and password creation
     - Binaries, FEDs, dependancies and license upload
 - Generate Docker images
     - apim-base
-    - apim-gtw *(used for API Manager, API Manager UI and API Gateway component)*
+    - apim-gtw *(used for API Manager, API Manager UI and API Gateway components)*
     - apim-anm *(used for API Admin Node Manager component)*
 - Push Docker images into Azure Container Repository (ACR)
 
 *********************
 
 ### Prepare environement to generate APIM Docker images
-1. Upload APIGateway installation binary, APIGateway DockerScripts, licence, FED and dependencies into your Linux server
+1. Upload APIGateway installation binary, APIGateway DockerScripts, license, FED and dependencies into your Linux server
     - $HOME/binaries -> APIGateway installation binary and APIGateway DockerScripts
     - $HOME/fed -> your FED for ANM and Gateway
-    - $HOME/licence -> your licence
-    - $HOME/merge-directory/apigateway/ext/lib/ -> your dependencies
+    - $HOME/license -> your license
+    - $HOME/merge-directory/apigateway/ext/lib/ -> your dependencies (the mysql driver)
 
 2. Extract files from the Docker scripts package that you downloaded from Axway Support
     ``` Bash
@@ -63,9 +63,9 @@ Information you need to set :
     
     *You will have now an apigw-emt-scripts-x.y.z-SNAPSHOT directory*
 
-3. Generate certificats
+3. Generate certificates
 
-    Used to communication between API components (ANM image and Gtw image)
+    Used for internal flows between API components (ANM image and Gtw images)
     *gen_domain_cert.py with "--default-cert option" will generate selfsigned certificat with changeme as default passphrass*
    
     ``` Bash
@@ -140,7 +140,7 @@ Information you need to set :
     - API Admin Node Manager component
 
     ``` Bash
-    python2 build_anm_image.py --out-image=<<ACR_URL>>/<<IMAGE_ANM_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --parent-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --domain-cert certs/DefaultDomain/DefaultDomain-cert.pem --domain-key certs/DefaultDomain/DefaultDomain-key.pem --domain-key-pass-file certs/DefaultDomain/pass.txt --license <<FULL_PATH_TO_YOUR_LICENCE.lic>> --anm-username=admin --anm-pass-file=anmpass.txt --healthcheck --metrics --merge-dir <<MERGE_PATH_APIGATEWAY>> --fed $HOME/fed/<<FULL_PATH_TO_YOUR_ANM_FED>>
+    python2 build_anm_image.py --out-image=<<ACR_URL>>/<<IMAGE_ANM_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --parent-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --domain-cert certs/DefaultDomain/DefaultDomain-cert.pem --domain-key certs/DefaultDomain/DefaultDomain-key.pem --domain-key-pass-file certs/DefaultDomain/pass.txt --license <<FULL_PATH_TO_YOUR_LICENSE.lic>> --anm-username=admin --anm-pass-file=anmpass.txt --healthcheck --metrics --merge-dir <<MERGE_PATH_APIGATEWAY>> --fed $HOME/fed/<<FULL_PATH_TO_YOUR_ANM_FED>>
     ```
     Expected Command output 
     ``` Bash
@@ -172,7 +172,7 @@ Information you need to set :
     - API Gateway component
     
     ``` Bash
-    python2 build_gw_image.py --out-image=<<ACR_URL>>/<<IMAGE_GTW_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --parent-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --domain-cert certs/DefaultDomain/DefaultDomain-cert.pem --domain-key certs/DefaultDomain/DefaultDomain-key.pem --domain-key-pass-file certs/DefaultDomain/pass.txt --license <<FULL_PATH_TO_YOUR_LICENCE>> --group-id default --merge-dir <<MERGE_PATH_APIGATEWAY>> --fed <<FULL_PATH_TO_YOUR_GTW_FED>>
+    python2 build_gw_image.py --out-image=<<ACR_URL>>/<<IMAGE_GTW_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --parent-image <<ACR_URL>>/<<IMAGE_BASE_NAME>>:<<APIM_VERSION>>-<<APIM_BUILD>> --domain-cert certs/DefaultDomain/DefaultDomain-cert.pem --domain-key certs/DefaultDomain/DefaultDomain-key.pem --domain-key-pass-file certs/DefaultDomain/pass.txt --license <<FULL_PATH_TO_YOUR_LICENSE>> --group-id default --merge-dir <<MERGE_PATH_APIGATEWAY>> --fed <<FULL_PATH_TO_YOUR_GTW_FED>>
     ```
 
     Expected Command output 
