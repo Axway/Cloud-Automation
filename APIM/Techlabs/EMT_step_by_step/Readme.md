@@ -38,4 +38,4 @@ The goal of this technical lab is to create and configure step by step an APIM E
 - [4. Deploy APIM EMT with HELM](./Deploy_APIM_EMT_with_HELM)
     - Configure HELM CLI to use an ACR
     - Get HELM charts from ACR
-    - Deploy EMT APIM solution using Helm
+    - Deploy EMT APIM solution using HELM
