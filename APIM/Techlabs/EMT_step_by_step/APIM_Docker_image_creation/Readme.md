@@ -64,17 +64,25 @@ Information you need to set :
     
     *You will have now an apigw-emt-scripts-x.y.z-SNAPSHOT directory*
 
-3. Generate certificates
+3. Dos2Unix and chmod commands
+    ``` Bash
+    cd $HOME/binaries/apigw-emt-scripts-x.y.z-SNAPSHOT
+
+    dos2unix Dockerfiles/*/scripts/*
+
+    chmod 755 Dockerfiles/*/scripts/*
+    ```
+4. Generate certificates
 
     Used for internal flows between API components (ANM image and Gtw images)
     *gen_domain_cert.py with "--default-cert option" will generate selfsigned certificat with changeme as default passphrass*
    
     ``` Bash
     cd $HOME/binaries/apigw-emt-scripts-x.y.z-SNAPSHOT
-    python2 gen_domain_cert.py --help
+
     python2 gen_domain_cert.py --default-cert
-    
     ```
+    
     Expected Command output 
     ``` Bash
     *Generating private key...*
@@ -88,13 +96,13 @@ Information you need to set :
     *Once gen_domain_cert.py is executed, it has generated a directory tree into cert*
 
 
-4. Create a file for storing password used as passphrase by DefaultDomain certificat
+5. Create a file for storing password used as passphrase by DefaultDomain certificat
 
     ``` Bash
     echo changeme > certs/DefaultDomain/pass.txt
     ```
 
-5. Create a file for storing ANM password
+6. Create a file for storing ANM password
     Scripts to build images need to have password into files.
 
     ``` Bash
