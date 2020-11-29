@@ -119,8 +119,7 @@ spec:
         fsGroup: 1000
       volumes:
       - name: events
-        azureFile:
-           secretName: {{ .Values.apitraffic.share.secret | quote }}
-           shareName: {{ .Values.apitraffic.share.name | quote }}
-           readOnly: false
+        persistentVolumeClaim:
+          claimName: apigw-events
+      terminationGracePeriodSeconds: 100
 status: {}

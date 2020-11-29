@@ -139,10 +139,9 @@ spec:
       terminationGracePeriodSeconds: 101
       volumes:
       - name: events
-        azureFile:
-          secretName: {{ .Values.apitraffic.share.secret | quote }}
-          shareName: {{ .Values.apitraffic.share.name | quote }}
-          readOnly: false
+        persistentVolumeClaim:
+          claimName: apigw-events
+      terminationGracePeriodSeconds: 100
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:

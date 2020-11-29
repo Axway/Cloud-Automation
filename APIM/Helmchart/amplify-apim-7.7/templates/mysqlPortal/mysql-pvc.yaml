@@ -9,7 +9,9 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
+  {{- if eq .Values.platform "AZURE" }}
   storageClassName: managed-premium
+  {{- end }}
   resources:
     requests:
       storage: {{ .Values.mysqlPortal.quotaStorage }}Gi

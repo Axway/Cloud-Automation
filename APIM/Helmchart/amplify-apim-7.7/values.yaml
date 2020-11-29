@@ -16,13 +16,9 @@ global:
    domainName: ""
    dockerRegistry:
       secret: "registry-secret"
-      url: ""
-      username: ""
-      token: ""
-   share:
-      secret: azure-file
-      name: apimlogs
-      quota: 5
+      url: "axwayproductsdemo.azurecr.io"
+      username: "apim-demo"
+      token: "WXLOkIcYitqJZGiKJ65wqBydlM+klvM8"
    nodeAffinity:
       enable: false
       dbName: "apimpool"
@@ -49,7 +45,7 @@ apimgr:
    name: apimgr
    buildTag: "20200930"
    imageName: "apim-mgr-7.7"
-   ingressName: "api-mgr"
+   ingressName: "api-gtw"
    replicaCount: 1
    trafficPort: 8075
    logTraceToFile: "true"
