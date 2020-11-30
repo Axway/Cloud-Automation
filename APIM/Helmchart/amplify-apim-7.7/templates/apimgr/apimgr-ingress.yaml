@@ -1,3 +1,4 @@
+{{- if not .Values.platform "OPENSHIFT" }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -38,3 +39,4 @@ spec:
           serviceName: {{ .Values.apimgr.name }}
           servicePort: {{ .Values.apimgr.trafficPort }}
         path: /
+{{- end }}

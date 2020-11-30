@@ -1,0 +1,16 @@
+{{- if eq .Values.platform "OPENSHIFT" }}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: apimanager
+spec:
+  to:
+    kind: Service
+    name: {{ .Values.apimgr.name }}
+  port:
+    targetPort: {{ .Values.apimgr.trafficPort }}
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+{{- end }}

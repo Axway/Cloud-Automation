@@ -65,7 +65,6 @@ apitraffic:
    portGatewaySSL: 8081
    replicaCount: 3
    autoscaling:
-      minReplicas: 3
       maxReplicas: 6
       averageUtilization: 70
    logTraceToFile: "true"
