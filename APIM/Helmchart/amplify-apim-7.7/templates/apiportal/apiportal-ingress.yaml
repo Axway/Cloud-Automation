@@ -1,4 +1,5 @@
 {{- if eq .Values.apiportal.enable true }}
+{{- if not .Values.platform "OPENSHIFT" }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -36,4 +37,5 @@ spec:
           serviceName: {{ .Values.apiportal.name }}
           servicePort: {{ .Values.apiportal.trafficPort }}
         path: /
+{{- end }}
 {{- end }}
