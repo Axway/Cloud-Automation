@@ -13,6 +13,9 @@ spec:
   {{- if eq .Values.platform "AZURE" }}
   storageClassName: managed-premium
   {{- end }}
+  {{- if .Values.global.customStorageClass.scrwo }}
+  storageClassName: {{ .Values.global.customStorageClass.scrwo }}
+  {{- end }}
   resources:
     requests:
       storage: {{ .Values.mysqlAnalytics.quotaStorage }}Gi

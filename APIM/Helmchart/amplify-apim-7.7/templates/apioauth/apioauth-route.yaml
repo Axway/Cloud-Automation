@@ -11,7 +11,7 @@ spec:
   port:
     targetPort: {{ .Values.oauth.trafficPort }}
   tls:
-    termination: passthrough
+    termination: reencrypt
     insecureEdgeTerminationPolicy: Redirect
   wildcardPolicy: None
 {{- end }}

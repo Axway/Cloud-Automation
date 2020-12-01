@@ -5,7 +5,7 @@ icon: https://images.app.goo.gl/MbQyRo2M2jzAsed79
 home: https://www.axway.com/en/products/api-management
 keywords:
 - API Management, Axway, AMPLIFY API, Demo, v7.7, Azure
-kubeVersion: '>=1.15.0'
+kubeVersion: '>=1.11.0'
 maintainers:
 - email: ncomandini@axway.com
   name: cloud-automation community

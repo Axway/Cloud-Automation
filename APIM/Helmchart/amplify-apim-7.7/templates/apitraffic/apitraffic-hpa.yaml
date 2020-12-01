@@ -1,4 +1,5 @@
-apiVersion: autoscaling/v2beta2
+#apiVersion: autoscaling/v2beta2
+{{- if .Values.apitraffic.autoscaling.enable }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: hpa-{{ .Values.apitraffic.name }}
@@ -17,3 +18,4 @@ spec:
       target:
         type: Utilization
         averageUtilization: {{ .Values.apitraffic.autoscaling.averageUtilization }}
+{{- end }}

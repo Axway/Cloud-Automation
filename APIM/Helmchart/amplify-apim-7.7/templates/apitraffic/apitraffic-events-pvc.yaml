@@ -9,6 +9,9 @@ spec:
   {{- if eq .Values.platform "AZURE" }}
   storageClassName: azurefile-premium
   {{- end }}
+  {{- if .Values.global.customStorageClass.scrwm }}
+  storageClassName: {{ .Values.global.customStorageClass.scrwm }}
+  {{- end }}
   resources:
     requests:
       storage: {{ .Values.apitraffic.share.quota }}Gi
