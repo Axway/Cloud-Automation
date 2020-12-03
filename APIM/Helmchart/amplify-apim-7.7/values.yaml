@@ -47,8 +47,8 @@ anm:
 apimgr:
    name: apimgr
    buildTag: "20200930"
-   imageName: "apim-mgr-7.7"
-   ingressName: "api-gtw"
+   imageName: "apim-gtw-7.7"
+   ingressName: "api-mgr"
    replicaCount: 1
    trafficPort: 8075
    logTraceToFile: "true"
@@ -61,7 +61,7 @@ apimgr:
 apitraffic:
    name: traffic
    buildTag: "20200930"
-   imageName: "apim-mgr-7.7"
+   imageName: "apim-gtw-7.7"
    ingressName: "api"
    portManager: 8065
    portGateway: 8080
