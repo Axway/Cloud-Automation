@@ -10,7 +10,7 @@ spec:
   port:
     targetPort: {{ .Values.apimgr.trafficPort }}
   tls:
-    termination: reencrypt
+    termination: passthrough
     insecureEdgeTerminationPolicy: Redirect
   wildcardPolicy: None
 {{- end }}

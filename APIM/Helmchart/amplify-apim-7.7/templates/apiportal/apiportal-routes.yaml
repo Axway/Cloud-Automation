@@ -11,7 +11,7 @@ spec:
   port:
     targetPort: {{ .Values.apiportal.trafficPort }}
   tls:
-    termination: reencrypt
+    termination: passthrough
     insecureEdgeTerminationPolicy: Redirect
   wildcardPolicy: None
 {{- end }}
