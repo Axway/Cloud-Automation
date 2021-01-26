@@ -6,7 +6,22 @@ APIM solution has been deployed on minikube 1.16 installed on Windows 10 Enterpr
 
 ## Prerequisites
 - Install HELM V3 -> https://helm.sh/docs/intro/install/
-- Install kubctl  -> https://kubernetes.io/fr/docs/tasks/tools/install-kubectl/
+- Install kubectl  -> https://kubernetes.io/fr/docs/tasks/tools/install-kubectl/
+
+- Only for Windows 10 and HYPER-V
+    1. Open "Hyper-V Manager", go into "Virtual Switch Manager"
+    2. Create a New virtual network switch
+        Name : **InternalSwitch**
+        Connection type : **Internal network**
+    3. Click **Apply** button then **OK**
+
+        ![hyperv](./img/HYPER-V_adapter.JPG)
+
+    4. Open the network adapters panel and share your working internet connection.
+    *In this case, I am going to share my WIFI connection with the virtual switch*
+    - Go on Control Panel > Network and Internet > Network Connections > Wi-Fi > Right Click > Properties > Sharing > 
+    - Check “Allow other network users to connect…” > Select the Virtual Switch you just created from the drop-down menu).
+        ![network_sharing](./img/Network_sharing.JPG)
 
 ## Deployment
 
@@ -52,7 +67,7 @@ APIM solution has been deployed on minikube 1.16 installed on Windows 10 Enterpr
 
     For this example, we are running on Windows 10 so starting Minikube command will be :
     ```bash
-    minikube start --driver=hyperv
+    minikube start --vm-driver hyperv --hyperv-virtual-switch "InternalSwitch"
     ```
 
     Expexted output example
@@ -134,8 +149,8 @@ APIM solution has been deployed on minikube 1.16 installed on Windows 10 Enterpr
     First, execute the following command to add axway repository :
     ```bash
     helm repo add axway 'https://axwaysourcesproducts.blob.core.windows.net/helm/?sv=2019-12-12&ss=b&srt=co&sp=rlx&se=2021-12-31T21:28:20Z&st=2021-01-25T13:28:20Z&spr=https&sig=%2FeVcNlH%2BqU8l4qZefbGNxaMhxSnDysmt4fq3ZGG5dRg%3D'
-
     ```
+    *Note : key access (in the URL) for HELM repository is working until January 2022*
 
     Expected output :
     ```bash
@@ -189,12 +204,42 @@ APIM solution has been deployed on minikube 1.16 installed on Windows 10 Enterpr
     default        mysql-aga-b578b84d8-j5lrg                                         1/1     Running
     default        traffic-78f8c9c9fc-j87k2                                          1/1     Running
     ```
+    
+    You can also check ingress :
+    ```bash
+    kubectl get ingress -A
+    ```
+
+    Expected output example :
+    ```bash
+    NAMESPACE   NAME             CLASS    HOSTS                    ADDRESS           PORTS     AGE
+    default     apimanager       <none>   api-mgr.kube.local.com   xxx.xxx.xxx.xxx   80, 443   11m
+    default     gatewaymanager   <none>   anm.kube.local.com       xxx.xxx.xxx.xxx   80, 443   11m
+    default     traffic          <none>   api.kube.local.com       xxx.xxx.xxx.xxx   80, 443   11m
+    ```
 
 8. Accessing UIs
 
-- Admin node manager UI : https://anm.kube.local.com/
-- API Manager UI : https://apimgr.kube.local.com/
-- API Gateway Manager UI : https://api.kube.local.com/
+    Access APIM UI 
+    - Admin node manager UI : https://anm.kube.local.com/
+    - API Manager UI : https://apimgr.kube.local.com/
+    - API traffic : https://api.kube.local.com/healthcheck
+    
+    **For Windows 10**
+    If you are on a Windows environment you first need to get Minikube IP address :
+    ```bash
+    minikube ip
+    ```
+
+    Expected output 
+    ```bash
+    <MINIKUBE_IP_ADDRESS>
+    ```
+
+    Then modify your **hosts** file located in "C:\Windows\System32\drivers\etc" and add the following line :
+    ```bash
+    <MINIKUBE_IP_ADDRESS> api.kube.local.com anm.kube.local.com api-mgr.kube.local.com
+    ```
 
 9. Uninstall using HELM
 
@@ -294,3 +339,21 @@ Unable to connect to the server: net/http: TLS handshake timeout
 
 **It probably means you didn't allocate enough ressources to Minikube.**
 Please make sure you follow step "2. Configure your minikube ressources."
+
+### Cassandra pod Terminating
+When you launch uninstall HELm command, cassandra pod can remains in Terminating status for a long time.
+
+```bash
+default        cassandra-0                                 1/1     Terminating
+```
+
+You can delete this pod with the following command : 
+```bash
+kubectl delete pods cassandra-0 --grace-period=0 --force
+```
+
+Exepected output :
+```bash
+warning: Immediate deletion does not wait for confirmation that the running resource has been terminated. The resource may continue to run on the cluster indefinitely.
+pod "cassandra-0" force deleted
+```
