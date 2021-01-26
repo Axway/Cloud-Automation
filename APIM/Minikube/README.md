@@ -1,6 +1,6 @@
 # Minikube deployment
 
-APIM solution has been deployed on minikube 1.16 installed on Windows 10 Enterprise using HYPER-V.
+AMPLIFY API-Management solution has been deployed on minikube 1.16 installed on Windows 10 Enterprise using HYPER-V.
 
 **The following instruction are based on this setup.**
 
@@ -34,7 +34,7 @@ APIM solution has been deployed on minikube 1.16 installed on Windows 10 Enterpr
 
     APIM deployment required **4vCPU and 6Go RAM** availability so you need to configure Minikube as such.
     
-    Execute the two following command to set up ressources :
+    Execute the two following commands to set up ressources :
     ```bash
     minikube config set cpus 4
     ```
@@ -102,7 +102,7 @@ APIM solution has been deployed on minikube 1.16 installed on Windows 10 Enterpr
     minikube addons enable ingress
     ```
 
-    Expexted output example
+    Expected output example
     ```bash
     * Verifying ingress addon...
     * The 'ingress' addon is enabled
