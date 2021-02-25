@@ -4,7 +4,7 @@ metadata:
   labels:
     app: {{ .Values.apimgr.name | quote }}
   name: {{ .Values.apimgr.name | quote }}
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
 spec:
   replicas: {{ .Values.apimgr.replicaCount }}
   selector:
@@ -75,7 +75,7 @@ spec:
               name: apim-password
               key: dbmysqlanalytics
         - name: EMT_DEPLOYMENT_ENABLED
-          value: "true"
+          value: "{{ .Values.global.emtDeployment }}"
         image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.apimgr.imageName }}:{{ .Values.apimgr.buildTag }}
         imagePullPolicy: {{ .Values.global.pullPolicy | quote }}
         name: {{ .Values.apimgr.name | quote }}
@@ -133,9 +133,11 @@ spec:
       - name: {{ .Values.global.dockerRegistry.secret }}      
       restartPolicy: Always
       schedulerName: default-scheduler
+      {{- if ne .Values.global.platform "OPENSHIFT" }}
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      {{- end }}
       terminationGracePeriodSeconds: 101
       volumes:
       - name: events

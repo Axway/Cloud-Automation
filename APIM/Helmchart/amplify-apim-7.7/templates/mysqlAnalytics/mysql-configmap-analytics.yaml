@@ -97,6 +97,6 @@ data:
 kind: ConfigMap
 metadata:
   name: analytics
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
 {{- end }}
 {{- end }}

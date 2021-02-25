@@ -5,11 +5,11 @@ metadata:
   labels:
     data: mysql-portal
   name: mysql-portal-pvc
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
 spec:
   accessModes:
   - ReadWriteOnce
-  {{- if eq .Values.platform "AZURE" }}
+  {{- if eq .Values.global.platform "AZURE" }}
   storageClassName: managed-premium
   {{- end }}
   {{- if .Values.global.customStorageClass.scrwo }}

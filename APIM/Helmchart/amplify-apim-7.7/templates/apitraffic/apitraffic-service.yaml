@@ -4,7 +4,7 @@ metadata:
   labels:
     name: {{ .Values.apitraffic.name }}
   name: {{ .Values.apitraffic.name }}
-  namespace: {{ .Values.global.namespace | quote }} 
+  namespace: {{ .Release.Namespace | quote }} 
 spec:
   type: ClusterIP
   clusterIP: None

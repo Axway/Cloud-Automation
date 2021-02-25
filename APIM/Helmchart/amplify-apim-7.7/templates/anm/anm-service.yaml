@@ -4,7 +4,7 @@ metadata:
   labels:
     app: {{ .Values.anm.name | quote }}
   name: {{ .Values.anm.name | quote }}
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
 spec:
   clusterIP: None
   ports:

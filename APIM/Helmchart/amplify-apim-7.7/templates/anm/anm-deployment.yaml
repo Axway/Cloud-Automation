@@ -7,7 +7,7 @@ metadata:
   labels:
     app: {{ .Values.anm.name }}
   name: {{ .Values.anm.name }}
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.anm.replicaCount }}
   selector:
@@ -114,9 +114,11 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 101
+      {{- if ne .Values.global.platform "OPENSHIFT" }}
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      {{- end }}
       volumes:
       - name: events
         persistentVolumeClaim:

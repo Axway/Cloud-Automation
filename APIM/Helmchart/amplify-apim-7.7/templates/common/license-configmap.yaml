@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
    name: licence
-   namespace: {{ .Values.global.namespace | quote }}
+   namespace: {{ .Release.Namespace | quote }}
 data:
    license: |
     FIPS=1

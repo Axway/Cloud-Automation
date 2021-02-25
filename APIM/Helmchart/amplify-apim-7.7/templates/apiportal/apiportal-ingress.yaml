@@ -1,18 +1,19 @@
 {{- if eq .Values.apiportal.enable true }}
-{{- if ne .Values.platform "OPENSHIFT" }}
+{{- if ne .Values.global.platform "OPENSHIFT" }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ .Values.apiportal.name }}
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
-    {{- if and (eq .Values.platform "AZURE") (eq .Values.managedIngress true) }}
+    {{- if .Values.global.managedIngress }}
+    {{- if eq .Values.global.platform "AZURE" }}
     kubernetes.io/ingress.class: azure/application-gateway
     appgw.ingress.kubernetes.io/backend-protocol: https
     cert-manager.io/cluster-issuer: letsencrypt-prod
     cert-manager.io/acme-challenge-type: http01
     {{- end }}
-    {{- if or (eq .Values.platform "ESX") (eq .Values.managedIngress false) }}
+    {{- else }}
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
     cert-manager.io/acme-challenge-type: http01

@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.mysqlPortal.name }}
-  namespace: {{ .Values.global.namespace | quote }} 
+  namespace: {{ .Release.Namespace | quote }} 
 spec:
   replicas: 1
   selector:
