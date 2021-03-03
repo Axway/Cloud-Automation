@@ -5,7 +5,7 @@ metadata:
   labels:
     name: {{ .Values.mysqlAnalytics.name }}
   name: {{ .Values.mysqlAnalytics.name }}
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
 spec:
 {{- if eq .Values.mysqlAnalytics.external true }}
   type: ExternalName

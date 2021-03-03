@@ -2,17 +2,20 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# ESX, AZURE, OPENSHIFT
-platform: "ESX"
-managedIngress: true
 
 global:
+   # AZURE, OPENSHIFT, MINIKUBE
+   platform: ""
+   # Define is managed service must be used for specific cloud provider. Doesn't work for Openshift and minikube.
+   managedIngress: false
+
+   #Annotation
+
    pullPolicy: Always
-   initImageTag: "busybox:1.30"
+   initImageTag: "busybox:1.33"
    updateStrategy: "RollingUpdate"
    editor: "Axway"
-   apimVersion: "7.7-20200930"
-   namespace: "default"
+   apimVersion: "7.7-20210130"
    domainName: ""
    dockerRegistry:
       secret: "registry-secret"
@@ -24,6 +27,7 @@ global:
       dbName: "apimpool"
       apimName: "apimpool"
    enableDynamicLicense: false
+   emtDeployment: "true"
    customStorageClass:
       scrwo:
       scrwm:
@@ -31,7 +35,7 @@ global:
 
 anm:
    name: anm
-   buildTag: "20200930"
+   buildTag: "20210130"
    imageName: "apim-anm-7.7"
    ingressName: "anm"
    replicaCount: 1
@@ -46,7 +50,7 @@ anm:
 
 apimgr:
    name: apimgr
-   buildTag: "20200930"
+   buildTag: "20210130"
    imageName: "apim-gtw-7.7"
    ingressName: "api-mgr"
    replicaCount: 1
@@ -60,16 +64,16 @@ apimgr:
 
 apitraffic:
    name: traffic
-   buildTag: "20200930"
+   buildTag: "20210130"
    imageName: "apim-gtw-7.7"
    ingressName: "api"
    portManager: 8065
    portGateway: 8080
    portGatewaySSL: 8081
-   replicaCount: 3
+   replicaCount: 1
    autoscaling:
       enable: false
-      maxReplicas: 6
+      maxReplicas: 3
       averageUtilization: 70
    logTraceToFile: "true"
    logTraceJSONtoSTDOUT: "false"
@@ -85,7 +89,7 @@ apitraffic:
 apiportal:
    enable: false
    name: "api-portal"
-   buildTag: "7.7-20200130"
+   buildTag: "7.7-20210130"
    imageName: "apim-ptl"
    ingressName: "portal"
    trafficPort: 443

@@ -5,7 +5,7 @@ metadata:
   labels:
     name: {{ .Values.mysqlPortal.name }}
   name: {{ .Values.mysqlPortal.name }}
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
 spec:
   clusterIP: None
   ports:

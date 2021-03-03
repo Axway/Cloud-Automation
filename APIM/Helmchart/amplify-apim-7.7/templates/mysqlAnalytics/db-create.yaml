@@ -4,7 +4,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: db-create-mysql-apigw-{{ uuidv4 }}
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:  
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}

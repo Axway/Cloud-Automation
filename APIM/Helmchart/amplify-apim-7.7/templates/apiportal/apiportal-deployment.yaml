@@ -6,7 +6,7 @@ metadata:
     app: {{ .Values.apiportal.name | quote }}
     version: {{ .Values.apiportal.buildTag }}
   name: {{ .Values.apiportal.name  | quote }}
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
 spec:
   replicas: {{ .Values.apiportal.replicaCount }}
   selector:
@@ -101,6 +101,11 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
+      {{- if ne .Values.global.platform "OPENSHIFT" }}
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      {{- end }}
   strategy:
     type: {{ .Values.global.updateStrategy }}
 status: {}

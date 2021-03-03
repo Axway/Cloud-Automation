@@ -4,7 +4,7 @@ metadata:
   labels:
     app: {{ .Values.apitraffic.name }}
   name: {{ .Values.apitraffic.name }}
-  namespace: {{ .Values.global.namespace | quote }} 
+  namespace: {{ .Release.Namespace | quote }} 
 spec:
   replicas: {{ .Values.apitraffic.replicaCount }}
   selector:
@@ -77,7 +77,7 @@ spec:
         - name: APIGW_LOG_OPENTRAFFIC_OUTPUT
           value: "{{ .Values.apitraffic.logOpenTrafficOutput }}"
         - name: EMT_DEPLOYMENT_ENABLED
-          value: "{{ .Values.apitraffic.enabled }}"
+          value: "{{ .Values.global.emtDeployment }}"
         - name: METRICS_DB_URL
           value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}
         - name: METRICS_DB_USERNAME
@@ -160,9 +160,11 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
+      {{- if ne .Values.global.platform "OPENSHIFT" }}
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      {{- end }}
       volumes:
       - name: events
         persistentVolumeClaim:

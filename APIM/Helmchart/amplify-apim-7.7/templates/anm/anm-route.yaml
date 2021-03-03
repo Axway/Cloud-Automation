@@ -1,4 +1,4 @@
-{{- if eq .Values.platform "OPENSHIFT" }}
+{{- if eq .Values.global.platform "OPENSHIFT" }}
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:

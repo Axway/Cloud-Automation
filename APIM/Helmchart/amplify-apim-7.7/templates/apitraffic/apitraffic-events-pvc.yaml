@@ -2,11 +2,11 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: apigw-events
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
 spec:
   accessModes:
     - ReadWriteMany
-  {{- if eq .Values.platform "AZURE" }}
+  {{- if eq .Values.global.platform "AZURE" }}
   storageClassName: azurefile-premium
   {{- end }}
   {{- if .Values.global.customStorageClass.scrwm }}
@@ -14,4 +14,8 @@ spec:
   {{- end }}
   resources:
     requests:
+      {{- if eq .Values.global.platform "AZURE" }}
+      storage: 100Gi
+      {{- else }}
       storage: {{ .Values.apitraffic.share.quota }}Gi
+      {{- end }}
