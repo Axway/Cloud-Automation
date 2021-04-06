@@ -2,7 +2,7 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: apimanager
+  name: {{ .Values.apimgr.name }}
 spec:
   to:
     kind: Service

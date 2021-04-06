@@ -93,7 +93,8 @@ spec:
                 key: dbcass
         volumeMounts:
         - name: cassandra-data
-          mountPath: /cassandra_data
+          mountPath: /var/lib/cassandra/data
+          # mountPath: /cassandra_data
   volumeClaimTemplates:
   - metadata:
       name: cassandra-data

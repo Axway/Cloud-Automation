@@ -2,7 +2,7 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: gatewaymanager
+  name: {{ .Values.anm.name }}
 spec:
   to:
     kind: Service

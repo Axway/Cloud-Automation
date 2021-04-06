@@ -5,7 +5,7 @@
 
 global:
    # AZURE, OPENSHIFT, MINIKUBE
-   platform: ""
+   platform: "OPENSHIFT"
    # Define is managed service must be used for specific cloud provider. Doesn't work for Openshift and minikube.
    managedIngress: false
 
@@ -97,6 +97,21 @@ apiportal:
    share:
       secret: "apiportal-secret-name"
       name: "apiportal-volume-rwm-name"
+
+apiaga:
+   enable: true
+   name: apiaga
+   buildTag: "20210130"
+   imageName: "apim-aga-7.7"
+   ingressName: "api-aga"
+   replicaCount: 1
+   trafficPort: 8040
+   logTraceToFile: "true"
+   logTraceJSONtoSTDOUT: "false"
+   logOpenTrafficOutput: "stdout"
+   emt_heap_size_mb: "1024"
+   emt_topology_ttl: 10
+   emt_trace_level: "INFO"
 
 mysqlAnalytics:
    enable: true
