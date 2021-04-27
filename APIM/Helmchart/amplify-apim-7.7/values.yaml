@@ -5,7 +5,7 @@
 
 global:
    # AZURE, OPENSHIFT, MINIKUBE
-   platform: "OPENSHIFT"
+   platform: ""
    # Define is managed service must be used for specific cloud provider. Doesn't work for Openshift and minikube.
    managedIngress: false
 
