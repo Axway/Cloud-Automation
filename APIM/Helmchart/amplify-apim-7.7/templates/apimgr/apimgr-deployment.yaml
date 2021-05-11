@@ -53,6 +53,8 @@ spec:
               key: dbcass
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
+        - name: EMT_TOPOLOGY_LOG_ENABLED
+          value: "{{ .Values.apimgr.emt_topology_log_enabled }}"
         - name: EMT_TOPOLOGY_TTL
           value: "{{ .Values.apimgr.emt_topology_ttl }}"
         - name: EMT_HEAP_SIZE_MB
@@ -130,7 +132,7 @@ spec:
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v anm 8090; do echo waiting for anm; sleep 2; done;']
       imagePullSecrets:
-      - name: {{ .Values.global.dockerRegistry.secret }}      
+      - name: {{ .Values.global.dockerRegistry.secret }}
       restartPolicy: Always
       schedulerName: default-scheduler
       {{- if ne .Values.global.platform "OPENSHIFT" }}
@@ -146,5 +148,5 @@ spec:
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:
-          name: apim-config
+          name: licence
       {{- end }}

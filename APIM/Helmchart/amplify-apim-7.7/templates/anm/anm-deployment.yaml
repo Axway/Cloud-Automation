@@ -40,6 +40,8 @@ spec:
           value: /opt/Axway/apigateway
         - name: GW_TRACE_DIR
           value: /opt/Axway/apigateway/trace
+        - name: EMT_TOPOLOGY_LOG_ENABLED
+          value: "{{ .Values.anm.emt_topology_log_enabled }}"
         - name: EMT_TOPOLOGY_TTL
           value: "{{ .Values.anm.emt_topology_ttl }}"
         - name: EMT_HEAP_SIZE_MB

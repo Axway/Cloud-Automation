@@ -64,8 +64,10 @@ spec:
               key: dbcass
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
+        - name: EMT_TOPOLOGY_LOG_ENABLED
+          value: "{{ .Values.apitraffic.emt_topology_log_enabled }}"
         - name: EMT_TOPOLOGY_TTL
-          value: "10"
+          value: "{{ .Values.apitraffic.emt_topology_ttl }}"
         - name: EMT_HEAP_SIZE_MB
           value: "{{ .Values.apitraffic.emt_heap_size_mb }}"
         - name: EMT_TRACE_LEVEL
@@ -172,7 +174,7 @@ spec:
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:
-          name: apim-config
+          name: license
       {{- end }}
       terminationGracePeriodSeconds: 100
   strategy:

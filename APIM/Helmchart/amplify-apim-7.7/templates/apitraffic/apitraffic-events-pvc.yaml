@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
 spec:
   accessModes:
-    - ReadWriteMany
+    - {{ .Values.apitraffic.volumes.accessModes }}
   {{- if eq .Values.global.platform "AZURE" }}
   storageClassName: azurefile-premium
   {{- end }}
