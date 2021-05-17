@@ -150,9 +150,11 @@ spec:
       - name: init-cassandra
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.name }} 9042; do echo waiting for cassandra; sleep 60; done;']
+      {{- if eq .Values.mysqlAnalytics.enable true }}
       - name: init-dbanalytics
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysqlAnalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
+      {{- end }}
       - name: init-anm
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.anm.name }} 8090; do echo waiting for anm; sleep 2; done;']

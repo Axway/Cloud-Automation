@@ -52,6 +52,7 @@ spec:
           value: "{{ .Values.anm.logTraceToFile }}"
         - name: APIGW_LOG_TRACE_JSON_TO_STDOUT
           value: "{{ .Values.anm.logTraceJSONtoSTDOUT }}"
+        {{- if eq .Values.mysqlAnalytics.enable true }}
         - name: METRICS_DB_URL
           value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}
         - name: METRICS_DB_USERNAME
@@ -61,6 +62,7 @@ spec:
             secretKeyRef:
               name: apim-password
               key: dbmysqlanalytics
+        {{- end }}
         args:
           - /opt/Axway/apigateway/posix/bin/start-emt-nodemanager
         ports:
@@ -109,9 +111,11 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.global.dockerRegistry.secret }}
       initContainers:
+      {{- if eq .Values.mysqlAnalytics.enable true }}
       - name: init-mysql
         image: {{ .Values.global.initImageTag | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysqlAnalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
+      {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
