@@ -15,7 +15,7 @@ global:
    initImageTag: "busybox:1.33"
    updateStrategy: "RollingUpdate"
    editor: "Axway"
-   apimVersion: "7.7-20210330"
+   apimVersion: "7.7-20210130"
    domainName: ""
    dockerRegistry:
       secret: "registry-secret"
