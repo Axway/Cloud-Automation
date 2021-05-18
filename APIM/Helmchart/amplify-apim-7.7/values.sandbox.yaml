@@ -17,5 +17,5 @@ cassandra:
    host2: "cassandra"
    host3: "cassandra"
 
-mysqlPortal:
+mysqlAnalytics:
    enable: false
