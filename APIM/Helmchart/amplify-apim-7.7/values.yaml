@@ -45,6 +45,7 @@ anm:
    logTraceToFile: "true"
    logTraceJSONtoSTDOUT: "false"
    emt_heap_size_mb: "1024"
+   emt_topology_log_enabled: "true"
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
 
@@ -59,6 +60,7 @@ apimgr:
    logTraceJSONtoSTDOUT: "false"
    logOpenTrafficOutput: "stdout"
    emt_heap_size_mb: "1024"
+   emt_topology_log_enabled: "true"
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
 
@@ -80,11 +82,15 @@ apitraffic:
    logOpenTrafficOutput: "stdout"
    emt_trace_level: "INFO"
    emt_heap_size_mb: "1512"
+   emt_topology_log_enabled: "true"
+   emt_topology_ttl: 10
    share:
       secret: "azure-file"
       name: "gw-events"
       path: "/opt/Axway/apigateway/events"
       quota: 1
+   volumes:
+      accessModes: ReadWriteOnce
 
 apiportal:
    enable: false
