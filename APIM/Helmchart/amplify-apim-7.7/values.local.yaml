@@ -1,0 +1,29 @@
+# Values for sandbox environment.
+
+global:
+   # AZURE, OPENSHIFT, MINIKUBE
+   # MINIKUBE is the one more in-line for local tests.
+   platform: "MINIKUBE"
+
+   #Annotation
+
+   # That is just a dummy domain.
+   domainName: "local.io"
+   # To have the local-path storage class, remember to run:
+   # kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+   customStorageClass:
+      scrwo: local-path
+      scrwm: local-path
+
+cassandra:
+   external: true
+   # Change this IP to the Cassandra's cluster IPs.
+   host1: "10.42.12.227"
+   host2: "10.42.12.227"
+   host3: "10.42.12.227"
+   # That is the default domain for Cassandra on the default namespace.
+   # Change it to your specific case if necessary.
+   domain: ".default.svc.cluster.local"
+
+mysqlAnalytics:
+   enable: false
