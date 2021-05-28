@@ -1,0 +1,115 @@
+{{- if eq .Values.apiaga.enable true }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.apiaga.name | quote }}
+  name: {{ .Values.apiaga.name | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  replicas: {{ .Values.apiaga.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.apiaga.name | quote }}
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.apiaga.name | quote }}
+    spec:
+      {{- if eq .Values.global.nodeAffinity.enable true }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values: 
+                - {{ .Values.global.nodeAffinity.apimName }}
+      {{- end }}
+      containers:
+      - args:
+        - /opt/Axway/analytics/posix/bin/start-emt-analytics
+        env:
+        - name: EMT_ANM_HOSTS
+          value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
+        - name: EMT_TOPOLOGY_TTL
+          value: "{{ .Values.apiaga.emt_topology_ttl }}"
+        - name: EMT_HEAP_SIZE_MB
+          value: "{{ .Values.apiaga.emt_heap_size_mb }}"
+        - name: EMT_TRACE_LEVEL
+          value: {{ .Values.apiaga.emt_trace_level }}
+        - name: METRICS_DB_URL
+          value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}
+        - name: METRICS_DB_USERNAME
+          value: {{ .Values.mysqlAnalytics.adminUser }}
+        - name: METRICS_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: apim-password
+              key: dbmysqlanalytics
+        - name: EMT_DEPLOYMENT_ENABLED
+          value: "{{ .Values.global.emtDeployment }}"
+        image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.apiaga.imageName }}:{{ .Values.apiaga.buildTag }}
+        imagePullPolicy: {{ .Values.global.pullPolicy | quote }}
+        name: {{ .Values.apiaga.name | quote }}
+        ports:
+        - containerPort: {{ .Values.apiaga.trafficPort }}
+          protocol: TCP
+        resources: {}
+        readinessProbe:
+          httpGet:
+            httpHeaders:
+            - name: k8sprobe
+              value: readiness.{{ .Values.apiaga.name }}
+            path: /healthcheck
+            port: {{ .Values.apiaga.trafficPort }}
+            scheme: HTTPS
+          initialDelaySeconds: 50
+          periodSeconds: 15
+          failureThreshold: 10
+        livenessProbe:
+          httpGet:
+            httpHeaders:
+            - name: k8sprobe
+              value: liveness.{{ .Values.apiaga.name }}
+            path: /healthcheck
+            port: {{ .Values.apiaga.trafficPort }}
+            scheme: HTTPS
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 5
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        {{- if eq .Values.global.enableDynamicLicense true }}
+        - name: config-license
+          mountPath: "/opt/Axway/analytics/conf/licenses/lic.lic"
+          subPath: license
+        {{- end }}
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sleep","90"]
+      initContainers:
+      - name: init-mysql
+        image: {{ .Values.global.initImageTag }}
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysqlAnalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
+      imagePullSecrets:
+      - name: {{ .Values.global.dockerRegistry.secret }}      
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      {{- if ne .Values.global.platform "OPENSHIFT" }}
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      {{- end }}
+      terminationGracePeriodSeconds: 101
+      terminationGracePeriodSeconds: 100
+      {{- if eq .Values.global.enableDynamicLicense true }}
+      - name: config-license
+        configMap:
+          name: apim-config
+      {{- end }}
+{{- end }}
