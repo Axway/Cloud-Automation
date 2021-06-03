@@ -146,6 +146,9 @@ spec:
           preStop:
             exec:
               command: ["/bin/bash", "-c", "sleep 90"]
+      {{- if .Values.extraContainers }}
+{{ tpl .Values.extraContainers . | indent 6 }}
+      {{- end }}
       initContainers:
       - name: init-cassandra
         image: {{ .Values.global.initImageTag }}
@@ -161,6 +164,9 @@ spec:
       - name: init-apimanager
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.apimgr.name }} 8075; do echo waiting for mgmt; sleep 2; done;']
+      {{- if .Values.extraInitContainers }}
+{{ tpl .Values.extraInitContainers . | indent 6 }}
+      {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler

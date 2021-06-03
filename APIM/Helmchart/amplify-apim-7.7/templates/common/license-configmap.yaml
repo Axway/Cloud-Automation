@@ -5,26 +5,3 @@ metadata:
    namespace: {{ .Release.Namespace | quote }}
 data:
    license: |
-    FIPS=1
-    SalesForce Connector=1
-    ServiceNow Connector=1
-    analytics=1
-    api_visual_mapper=1
-    apiportal=1
-    company=Axway
-    deployment_type=docker
-    expires=Wed, 30 Jun 2021 18:04:36 GMT
-    license_id=TEMP
-    mcafee=1
-    name=Axway
-    sdkgenerator=1
-    unrestricted=1
-    version=7.7
-    # SIGNATURE: 793f0a144ec4cc070480a39567374a5e5421514e387eefbaf76f4a70a1a61347
-    # SIGNATURE: 936178e2c2c9b6a1fe018302a1f75b0addb048a70a930e12ae485811aae19561
-    # SIGNATURE: 1b99dfb125d376e13a5684fcff31eba10f5efcefb297afa119e0f75f04eaf52d
-    # SIGNATURE: d8e93571c32a5859dcdba73d741fced79b926709cc6244414c1ad175f1fbe976
-    # SIGNATURE: c7e3d76ea105995d9a0adcea69d94bb4f12c27568ad07b5d2f6c1a04b36eba8f
-    # SIGNATURE: 0ecffd9067631976b9c209199d376dc7a359805e9291f992c8909795fb4fc480
-    # SIGNATURE: 3de3a9aa6c4e80fbc46745bf752d4888d5b74e4214de17d8817be2f31ce9da67
-    # SIGNATURE: ddfed1c31bb387bf81824b7119021491977256b67a023a025761c7ce055c212a
