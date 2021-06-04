@@ -15,7 +15,7 @@ global:
    initImageTag: "busybox:1.33"
    updateStrategy: "RollingUpdate"
    editor: "Axway"
-   apimVersion: "7.7-20210130"
+   apimVersion: "7.7-20210330"
    domainName: ""
    dockerRegistry:
       secret: "registry-secret"
@@ -35,7 +35,7 @@ global:
 
 anm:
    name: anm
-   buildTag: "20210130"
+   buildTag: "20210330"
    imageName: "apim-anm-7.7"
    ingressName: "anm"
    replicaCount: 1
@@ -51,7 +51,7 @@ anm:
 
 apimgr:
    name: apimgr
-   buildTag: "20210130"
+   buildTag: "20210330"
    imageName: "apim-gtw-7.7"
    ingressName: "api-mgr"
    replicaCount: 1
@@ -66,7 +66,7 @@ apimgr:
 
 apitraffic:
    name: traffic
-   buildTag: "20210130"
+   buildTag: "20210330"
    imageName: "apim-gtw-7.7"
    ingressName: "api"
    portManager: 8065
@@ -95,7 +95,7 @@ apitraffic:
 apiportal:
    enable: false
    name: "api-portal"
-   buildTag: "7.7-20210130"
+   buildTag: "7.7-20210330"
    imageName: "apim-ptl"
    ingressName: "portal"
    trafficPort: 443
@@ -107,7 +107,7 @@ apiportal:
 apiaga:
    enable: true
    name: apiaga
-   buildTag: "20210130"
+   buildTag: "20210330"
    imageName: "apim-aga-7.7"
    ingressName: "api-aga"
    replicaCount: 1

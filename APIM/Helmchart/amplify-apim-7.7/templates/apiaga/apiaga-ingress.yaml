@@ -3,7 +3,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: apimanager
+  name: gatewayanalytics
   namespace: {{ .Release.Namespace }}
   annotations:
     {{- if .Values.global.managedIngress }}
