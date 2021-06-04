@@ -152,6 +152,7 @@ cassandra:
    host1: "ip_host1"
    host2: "ip_host2"
    host3: "ip_host3"
+   domain: ""
 
 mysqlPortal:
    enable: false

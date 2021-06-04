@@ -8,8 +8,8 @@ This helmchart uses Helm V3 and is compliant a minimal Kubernetes version of 1.1
 
 
 ## Prerequisite
- 
-This helmchart requires the following capabilities on the Kubernetes cluster:  
+
+This helmchart requires the following capabilities on the Kubernetes cluster:
 - A minimal kubernetes version 1.15
 - An nginx ingress-controller like nginx or Azure Application Gateway.
 - A storage class with in RWM.
@@ -78,14 +78,25 @@ The following tables lists the optional parameters of the AMPLIFY API Management
 ## Helm command examples
 
 ### Minimal installation
-The followinf command deploys components Admin Node Manager, API Manager and API Gateway in the default namespace on Kubernetes. 
+The followinf command deploys components Admin Node Manager, API Manager and API Gateway in the default namespace on Kubernetes.
 
 ```
 Helm install *<release-name>* amplify-apim-*<version>* --set global.dockerRegistry.url=*<container registry url>*,global.dockerRegistry.token=*<your token>*,anm.buildTag=*<anm tag>*,anm.imageName=*<anm image name>*,anm.ingressName=*<anm ingress url>*,apimgr.buildTag=*<API Manager tag>*,apimgr.imageName=*<API Manager image name>*,apimgr.ingressName=*<API Manager ingress url>*,apitraffic.buildTag=*<API Gateway tag>*,apitraffic.imageName=*<API Gateway image name>*,apitraffic.ingressName=*<API Gateway ingress url>*,cassandra.adminPasswd=*<your password>*,mysqlAnalytics.adminPasswd=*<your password>*,mysqlAnalytics.rootPasswd=*<your password>*
 ```
 
 ### Upgrade deployment with a new license
-Before deploy this command, please edit the file license-configmap.yaml and past your license in the data section. 
+Before deploy this command, please edit the file license-configmap.yaml and paste your license in the data section.
 ```
 helm upgrade *<release-name>* amplify-apim-*<version>* --reuse-values --set dynamicLicense=true
+```
+
+### Run a local installation
+To run a local installation on your own environment, you will need to edit the values.local.yaml, but first you will need to install the local-path storage class on your environment:
+```
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+```
+
+Then you can install the APIM helm chart:
+```
+helm install *<release-name>* amplify-apim-*<version>* --namespace *<namespace>* . --create-namespace -f ./values.local.yaml
 ```
