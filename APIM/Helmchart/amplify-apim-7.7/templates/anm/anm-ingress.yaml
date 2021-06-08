@@ -31,7 +31,7 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.anm.ingressName }}.{{ .Values.global.domainName }}
+    - {{ .Values.anm.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }}
     secretName: anm-ingress-cert
   rules:
   - host: {{ .Values.anm.ingressName }}.{{ .Values.global.domainName }}

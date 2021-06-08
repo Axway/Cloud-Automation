@@ -23,7 +23,7 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.oauth.ingressName }}.{{ .Values.global.domainName }}
+    - {{ .Values.oauth.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }}
     secretName: apioauth-ingress-cert
   rules:
   - host: {{ .Values.oauth.ingressName }}.{{ .Values.global.domainName }}
