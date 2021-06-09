@@ -36,7 +36,7 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.apimgr.ingressName }}.{{ .Values.global.domainName }}
+    - {{ .Values.apimgr.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }}
     {{- if .Values.apimgr.certInSecret }}
     secretName: apimanager-ingress-cert
     {{- end }}

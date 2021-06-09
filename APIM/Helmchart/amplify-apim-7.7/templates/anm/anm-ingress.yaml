@@ -42,7 +42,7 @@ spec:
     secretName: anm-ingress-cert
     {{- end }}
   rules:
-  - host: {{ .Values.anm.ingressName }}.{{ .Values.global.domainName }}
+  - host: {{ .Values.anm.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }}
     http:
       paths:
       - path: /

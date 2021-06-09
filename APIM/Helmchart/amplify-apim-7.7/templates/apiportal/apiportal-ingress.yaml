@@ -34,7 +34,7 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.apiportal.ingressName }}.{{ .Values.global.domainName }}
+    - {{ .Values.apiportal.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }}
     {{- if .Values.apiportal.certInSecret }}
     secretName: tls-secret-portal
     {{- end }}

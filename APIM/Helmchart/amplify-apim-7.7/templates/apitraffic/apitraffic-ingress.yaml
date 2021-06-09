@@ -29,7 +29,7 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.apitraffic.ingressName }}.{{ .Values.global.domainName }}
+    - {{ .Values.apitraffic.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }}
     {{- if .Values.apitraffic.certInSecret }}
     secretName: apitraffic-ingress-cert
     {{- end }}
