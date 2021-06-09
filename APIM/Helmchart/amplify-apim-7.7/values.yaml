@@ -32,6 +32,7 @@ global:
       scrwo:
       scrwm:
    createSecrets: true
+   issuedByLetsEncrypt: false
 
 anm:
    name: anm
@@ -48,6 +49,7 @@ anm:
    emt_topology_log_enabled: "true"
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
+   certInSecret: false
 
 apimgr:
    name: apimgr
@@ -63,6 +65,7 @@ apimgr:
    emt_topology_log_enabled: "true"
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
+   certInSecret: false
 
 apitraffic:
    name: traffic
@@ -91,6 +94,7 @@ apitraffic:
       quota: 1
    volumes:
       accessModes: ReadWriteOnce
+   certInSecret: false
 
 apiportal:
    enable: false
@@ -103,9 +107,10 @@ apiportal:
    share:
       secret: "apiportal-secret-name"
       name: "apiportal-volume-rwm-name"
+   certInSecret: false
 
 apiaga:
-   enable: true
+   enable: false
    name: apiaga
    buildTag: "20210330"
    imageName: "apim-aga-7.7"
@@ -118,6 +123,7 @@ apiaga:
    emt_heap_size_mb: "1024"
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
+   certInSecret: false
 
 mysqlAnalytics:
    enable: true
@@ -172,3 +178,4 @@ oauth:
    name: "oauth"
    ingressName: "oauth"
    trafficPort: 8089
+   certInSecret: false
