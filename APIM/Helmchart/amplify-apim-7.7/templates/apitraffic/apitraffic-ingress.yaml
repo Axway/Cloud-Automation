@@ -1,5 +1,9 @@
 {{- if ne .Values.global.platform "OPENSHIFT" }}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
 apiVersion: networking.k8s.io/v1beta1
+{{- end }}
 kind: Ingress
 metadata:
   name: traffic
@@ -15,7 +19,9 @@ metadata:
     {{- end }}
     {{- else }}
     kubernetes.io/ingress.class: nginx
+    {{- if .Values.global.issuedByLetsEncrypt }}
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
     cert-manager.io/acme-challenge-type: http01
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/affinity-mode: "persistent"
@@ -24,13 +30,23 @@ spec:
   tls:
   - hosts:
     - {{ .Values.apitraffic.ingressName }}.{{ .Values.global.domainName }}
+    {{- if .Values.apitraffic.certInSecret }}
     secretName: apitraffic-ingress-cert
+    {{- end }}
   rules:
   - host: {{ .Values.apitraffic.ingressName }}.{{ .Values.global.domainName }}
     http:
       paths:
-      - backend:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Values.apitraffic.name }}
+            port:
+              number: {{ .Values.apitraffic.portManager }}
+          {{- else }}
           serviceName: {{ .Values.apitraffic.name }}
           servicePort: {{ .Values.apitraffic.portManager }}
-        path: /
+          {{- end }}
 {{- end }}

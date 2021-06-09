@@ -15,7 +15,7 @@ global:
    initImageTag: "busybox:1.33"
    updateStrategy: "RollingUpdate"
    editor: "Axway"
-   apimVersion: "7.7-20210130"
+   apimVersion: "7.7-20210330"
    domainName: ""
    dockerRegistry:
       secret: "registry-secret"
@@ -32,10 +32,11 @@ global:
       scrwo:
       scrwm:
    createSecrets: true
+   issuedByLetsEncrypt: false
 
 anm:
    name: anm
-   buildTag: "20210130"
+   buildTag: "20210330"
    imageName: "apim-anm-7.7"
    ingressName: "anm"
    replicaCount: 1
@@ -48,10 +49,11 @@ anm:
    emt_topology_log_enabled: "true"
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
+   certInSecret: false
 
 apimgr:
    name: apimgr
-   buildTag: "20210130"
+   buildTag: "20210330"
    imageName: "apim-gtw-7.7"
    ingressName: "api-mgr"
    replicaCount: 1
@@ -63,10 +65,11 @@ apimgr:
    emt_topology_log_enabled: "true"
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
+   certInSecret: false
 
 apitraffic:
    name: traffic
-   buildTag: "20210130"
+   buildTag: "20210330"
    imageName: "apim-gtw-7.7"
    ingressName: "api"
    portManager: 8065
@@ -91,11 +94,12 @@ apitraffic:
       quota: 1
    volumes:
       accessModes: ReadWriteOnce
+   certInSecret: false
 
 apiportal:
    enable: false
    name: "api-portal"
-   buildTag: "7.7-20210130"
+   buildTag: "7.7-20210330"
    imageName: "apim-ptl"
    ingressName: "portal"
    trafficPort: 443
@@ -103,11 +107,12 @@ apiportal:
    share:
       secret: "apiportal-secret-name"
       name: "apiportal-volume-rwm-name"
+   certInSecret: false
 
 apiaga:
-   enable: true
+   enable: false
    name: apiaga
-   buildTag: "20210130"
+   buildTag: "20210330"
    imageName: "apim-aga-7.7"
    ingressName: "api-aga"
    replicaCount: 1
@@ -118,6 +123,7 @@ apiaga:
    emt_heap_size_mb: "1024"
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
+   certInSecret: false
 
 mysqlAnalytics:
    enable: true
@@ -172,3 +178,4 @@ oauth:
    name: "oauth"
    ingressName: "oauth"
    trafficPort: 8089
+   certInSecret: false
