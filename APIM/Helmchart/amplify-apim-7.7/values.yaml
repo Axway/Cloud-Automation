@@ -95,6 +95,8 @@ apitraffic:
    volumes:
       accessModes: ReadWriteOnce
    certInSecret: false
+   portProbe: 8065
+   schemeProbe: "HTTPS"
 
 apiportal:
    enable: false

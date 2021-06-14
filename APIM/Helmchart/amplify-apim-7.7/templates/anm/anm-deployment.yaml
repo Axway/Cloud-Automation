@@ -68,15 +68,17 @@ spec:
         ports:
         - containerPort: {{ .Values.anm.trafficPort }}
           protocol: TCP
+        {{- if ne .Values.anm.trafficPort .Values.anm.trafficPortUI }}
         - containerPort: {{ .Values.anm.trafficPortUI }}
           protocol: TCP
+        {{- end }}
         resources:
           limits:
             memory: "2048Mi"
             cpu: "1000m"
           requests:
             memory: "1Gi"
-            cpu: "250m" 
+            cpu: "250m"
         livenessProbe:
           httpGet:
             httpHeaders:
@@ -106,6 +108,14 @@ spec:
         volumeMounts:
         - name: events
           mountPath: {{ .Values.apitraffic.share.path | quote }}
+        - name: config-jvmxml
+          mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
+          subPath: jvm.xml
+        {{- if eq .Values.global.enableDynamicLicense true }}
+        - name: config-license
+          mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
+          subPath: license
+        {{- end }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       imagePullSecrets:
@@ -129,5 +139,18 @@ spec:
       - name: events
         persistentVolumeClaim:
           claimName: apigw-events
+      - name: config-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: jvm
+              mode: 256
+              path: jvm.xml
+      {{- if eq .Values.global.enableDynamicLicense true }}
+      - name: config-license
+        configMap:
+          name: license
+      {{- end }}
       terminationGracePeriodSeconds: 100
 status: {}

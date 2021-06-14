@@ -8,12 +8,36 @@ global:
    #Annotation
 
    # That is just a dummy domain.
-   domainName: "local.io"
+   domainName: "axway.io"
    # To have the local-path storage class, remember to run:
    # kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
    customStorageClass:
       scrwo: local-path
       scrwm: local-path
+   enableDynamicLicense: true
+   dockerRegistry:
+      url: lacg
+
+anm:
+   ingressName: "admin"
+   buildTag: "7.7.21.05"
+   imageName: "anm"
+   trafficPortUI: 8090
+
+apimgr:
+   ingressName: "apimanager"
+   buildTag: "7.7.21.05"
+   imageName: "mngr"
+
+apitraffic:
+   buildTag: "7.7.21.05"
+   imageName: "mngr"
+   portProbe: 8080
+   schemeProbe: "HTTP"
+
+apiaga:
+   buildTag: "7.7.21.05"
+   imageName: "ana"
 
 cassandra:
    external: true

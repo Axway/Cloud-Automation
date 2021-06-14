@@ -25,7 +25,7 @@ spec:
             - matchExpressions:
               - key: agentpool
                 operator: In
-                values: 
+                values:
                 - {{ .Values.global.nodeAffinity.apimName }}
       {{- end }}
       containers:
@@ -112,6 +112,9 @@ spec:
         volumeMounts:
         - mountPath: {{ .Values.apitraffic.share.path | quote }}
           name: events
+        - name: config-jvmxml
+          mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
+          subPath: jvm.xml
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
@@ -147,8 +150,16 @@ spec:
       - name: events
         persistentVolumeClaim:
           claimName: apigw-events
+      - name: config-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: jvm
+              mode: 256
+              path: jvm.xml
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:
-          name: licence
+          name: license
       {{- end }}

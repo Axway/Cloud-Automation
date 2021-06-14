@@ -83,6 +83,10 @@ spec:
           failureThreshold: 5
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        volumeMounts:
+        - name: config-jvmxml
+          mountPath: "/opt/Axway/analytics/conf/jvm.xml"
+          subPath: jvm.xml
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/analytics/conf/licenses/lic.lic"
@@ -107,9 +111,17 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: 101
       terminationGracePeriodSeconds: 100
+      - name: config-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: jvm
+              mode: 256
+              path: jvm.xml
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:
-          name: apim-config
+          name: license
       {{- end }}
 {{- end }}
