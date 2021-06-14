@@ -127,8 +127,8 @@ spec:
             - name: k8sprobe
               value: readiness.{{ .Values.apitraffic.name }}
             path: /healthcheck
-            port: .Values.apitraffic.portProbe
-            scheme: .Values.apitraffic.schemeProbe
+            port: {{ .Values.apitraffic.portProbe }}
+            scheme: {{ .Values.apitraffic.schemeProbe }}
           initialDelaySeconds: 40
           periodSeconds: 30
           failureThreshold: 5
@@ -138,8 +138,8 @@ spec:
             - name: k8sprobe
               value: liveness.{{ .Values.apitraffic.name }}
             path: /healthcheck
-            port: .Values.apitraffic.portProbe
-            scheme: .Values.apitraffic.schemeProbe
+            port: {{ .Values.apitraffic.portProbe }}
+            scheme: {{ .Values.apitraffic.schemeProbe }}
           initialDelaySeconds: 30
           periodSeconds: 30
           failureThreshold: 5
