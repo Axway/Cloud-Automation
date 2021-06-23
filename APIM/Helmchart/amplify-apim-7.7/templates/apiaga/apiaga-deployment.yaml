@@ -2,6 +2,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    apigw.version: {{ .Values.global.apimVersion | quote }}
+    apigw.editor: {{ .Values.global.editor | quote }}
   labels:
     app: {{ .Values.apiaga.name | quote }}
   name: {{ .Values.apiaga.name | quote }}
@@ -12,7 +15,7 @@ spec:
     matchLabels:
       app: {{ .Values.apiaga.name | quote }}
   strategy:
-    type: RollingUpdate
+    type: {{ .Values.global.updateStrategy }}
   template:
     metadata:
       labels:
@@ -26,7 +29,7 @@ spec:
             - matchExpressions:
               - key: agentpool
                 operator: In
-                values: 
+                values:
                 - {{ .Values.global.nodeAffinity.apimName }}
       {{- end }}
       containers:
@@ -60,33 +63,20 @@ spec:
           protocol: TCP
         resources: {}
         readinessProbe:
-          httpGet:
-            httpHeaders:
-            - name: k8sprobe
-              value: readiness.{{ .Values.apiaga.name }}
-            path: /healthcheck
+          tcpSocket:
             port: {{ .Values.apiaga.trafficPort }}
-            scheme: HTTPS
           initialDelaySeconds: 50
           periodSeconds: 15
           failureThreshold: 10
         livenessProbe:
-          httpGet:
-            httpHeaders:
-            - name: k8sprobe
-              value: liveness.{{ .Values.apiaga.name }}
-            path: /healthcheck
+          tcpSocket:
             port: {{ .Values.apiaga.trafficPort }}
-            scheme: HTTPS
           initialDelaySeconds: 30
           periodSeconds: 30
           failureThreshold: 5
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - name: config-jvmxml
-          mountPath: "/opt/Axway/analytics/conf/jvm.xml"
-          subPath: jvm.xml
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/analytics/conf/licenses/lic.lic"
@@ -101,7 +91,8 @@ spec:
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysqlAnalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
       imagePullSecrets:
-      - name: {{ .Values.global.dockerRegistry.secret }}      
+      - name: {{ .Values.global.dockerRegistry.secret }}
+      dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       {{- if ne .Values.global.platform "OPENSHIFT" }}
@@ -111,14 +102,7 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: 101
       terminationGracePeriodSeconds: 100
-      - name: config-jvmxml
-        configMap:
-          name: jvmxml
-          defaultMode: 256
-          items:
-            - key: jvm
-              mode: 256
-              path: jvm.xml
+      volumes:
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:
