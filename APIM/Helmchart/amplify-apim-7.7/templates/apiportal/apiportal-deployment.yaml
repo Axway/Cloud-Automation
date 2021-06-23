@@ -25,7 +25,7 @@ spec:
             - matchExpressions:
               - key: agentpool
                 operator: In
-                values: 
+                values:
                 - {{ .Values.global.nodeAffinity.apimName }}
         {{- end }}
         podAntiAffinity:
@@ -52,14 +52,14 @@ spec:
             secretKeyRef:
               name: apim-password
               key: dbmysqlroot
-        - name: MYSQL_USERNAME
+        - name: MYSQL_USER
           value: {{ .Values.mysqlPortal.adminUser }}
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
               name: apim-password
               key: dbmysqlportal
-        - name: MYSQL_DBNAME
+        - name: MYSQL_DATABASE
           value: {{ .Values.mysqlPortal.dbName }}
         - name: APIMANAGER_HOST
           value: {{ .Values.apimgr.name }}
@@ -73,15 +73,15 @@ spec:
         readinessProbe:
           httpGet:
             path: /
-            port: 443
-            scheme: HTTPS
+            port: {{ .Values.apiportal.trafficPort }}
+            scheme: {{ .Values.apiportal.scheme }}
           initialDelaySeconds: 10
           periodSeconds: 5
         livenessProbe:
           httpGet:
             path: /
-            port: 443
-            scheme: HTTPS
+            port: {{ .Values.apiportal.trafficPort }}
+            scheme: {{ .Values.apiportal.scheme }}
           initialDelaySeconds: 30
           periodSeconds: 5
         ports:
@@ -103,8 +103,8 @@ spec:
       schedulerName: default-scheduler
       {{- if ne .Values.global.platform "OPENSHIFT" }}
       securityContext:
-        runAsUser: 1000
-        fsGroup: 1000
+        runAsUser: {{ .Values.apiportal.runAsUser }}
+        fsGroup: {{ .Values.apiportal.runAsUser }}
       {{- end }}
   strategy:
     type: {{ .Values.global.updateStrategy }}
