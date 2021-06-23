@@ -80,6 +80,7 @@ spec:
           value: "{{ .Values.apitraffic.logOpenTrafficOutput }}"
         - name: EMT_DEPLOYMENT_ENABLED
           value: "{{ .Values.global.emtDeployment }}"
+        {{- if eq .Values.mysqlAnalytics.enable true }}
         - name: METRICS_DB_URL
           value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}
         - name: METRICS_DB_USERNAME
@@ -89,6 +90,7 @@ spec:
             secretKeyRef:
               name: apim-password
               key: dbmysqlanalytics
+        {{- end }}
         image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.apitraffic.imageName }}:{{ .Values.apitraffic.buildTag }} 
         imagePullPolicy: {{ .Values.global.pullPolicy }} 
         name: {{ .Values.apitraffic.name }}
