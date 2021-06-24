@@ -13,13 +13,14 @@ jobs:
     env:
       # This must be aligned with the folder-name of you plugin
       workingDirectory: 'APIM/Helmchart/amplify-apim-7.7'
-    name: Release Helm chart
+    name: Release Axway-APIM Helm chart
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - run: |
+        pwd
         echo "Get version number from Release-Tag: ${{ github.event.release.tag_name }}"
-        RELEASE_VERSION=`echo "${{ github.event.release.tag_name }}" | gawk 'match($0, /.*-([0-9]\.[0-9]\.[0-9][-A-Za-z]*)/, matches) {print matches[1]}'`
+        echo "${{ github.event.release.tag_name }}" | gawk 'match($0, /.*-([0-9]\.[0-9]\.[0-9][-A-Za-z]*)/, matches) {print matches[1]}' >> $GITHUB_ENV
         echo "Release version is: ${{ env.RELEASE_VERSION }}"
     - name: Create packaged Helm-Chart
       run: helm package . --dependency-update --app-version ${{ env.RELEASE_VERSION }} --version ${{ env.RELEASE_VERSION }}
