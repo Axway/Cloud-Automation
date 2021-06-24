@@ -13,7 +13,6 @@ jobs:
     env:
       # This must be aligned with the folder-name of you plugin
       workingDirectory: 'APIM/Helmchart/amplify-apim-7.7'
-    name: Release Helm chart
     needs: release-elk-apim
     runs-on: ubuntu-latest
     steps:
