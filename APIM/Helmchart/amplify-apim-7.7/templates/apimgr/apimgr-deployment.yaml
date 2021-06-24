@@ -25,7 +25,7 @@ spec:
             - matchExpressions:
               - key: agentpool
                 operator: In
-                values: 
+                values:
                 - {{ .Values.global.nodeAffinity.apimName }}
       {{- end }}
       containers:
@@ -51,6 +51,10 @@ spec:
             secretKeyRef:
               name: apim-password
               key: dbcass
+        - name: cassandraconsistency_writelevel
+          value: {{ .Values.cassandra.consistency_level }}
+        - name: cassandraconsistency_readlevel
+          value: {{ .Values.cassandra.consistency_level }}
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}:{{ .Values.anm.trafficPort }}
         - name: EMT_TOPOLOGY_LOG_ENABLED
@@ -67,6 +71,7 @@ spec:
           value: "{{ .Values.apimgr.logTraceJSONtoSTDOUT }}"
         - name: APIGW_LOG_OPENTRAFFIC_OUTPUT
           value: "{{ .Values.apimgr.logOpenTrafficOutput }}"
+        {{- if eq .Values.mysqlAnalytics.enable true }}
         - name: METRICS_DB_URL
           value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}
         - name: METRICS_DB_USERNAME
@@ -76,6 +81,7 @@ spec:
             secretKeyRef:
               name: apim-password
               key: dbmysqlanalytics
+        {{- end }}
         - name: EMT_DEPLOYMENT_ENABLED
           value: "{{ .Values.global.emtDeployment }}"
         image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.apimgr.imageName }}:{{ .Values.apimgr.buildTag }}
@@ -112,6 +118,9 @@ spec:
         volumeMounts:
         - mountPath: {{ .Values.apitraffic.share.path | quote }}
           name: events
+        - name: config-jvmxml
+          mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
+          subPath: jvm.xml
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
@@ -147,8 +156,16 @@ spec:
       - name: events
         persistentVolumeClaim:
           claimName: apigw-events
+      - name: config-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: jvm
+              mode: 256
+              path: jvm.xml
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:
-          name: licence
+          name: license
       {{- end }}

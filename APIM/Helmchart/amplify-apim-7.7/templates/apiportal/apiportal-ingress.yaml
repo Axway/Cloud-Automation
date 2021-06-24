@@ -23,10 +23,10 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     {{- end }}
     cert-manager.io/acme-challenge-type: http01
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/backend-protocol: {{ .Values.apiportal.scheme | quote }}
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/affinity-mode: "persistent"
-    nginx.ingress.kubernetes.io/session-cookie-name: "API-Gateway-Manager-UI"
+    nginx.ingress.kubernetes.io/session-cookie-name: "API-Portal"
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
     nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"

@@ -80,6 +80,7 @@ spec:
           value: "{{ .Values.apitraffic.logOpenTrafficOutput }}"
         - name: EMT_DEPLOYMENT_ENABLED
           value: "{{ .Values.global.emtDeployment }}"
+        {{- if eq .Values.mysqlAnalytics.enable true }}
         - name: METRICS_DB_URL
           value: jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}
         - name: METRICS_DB_USERNAME
@@ -89,12 +90,16 @@ spec:
             secretKeyRef:
               name: apim-password
               key: dbmysqlanalytics
+        {{- end }}
         image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.apitraffic.imageName }}:{{ .Values.apitraffic.buildTag }} 
         imagePullPolicy: {{ .Values.global.pullPolicy }} 
         name: {{ .Values.apitraffic.name }}
         volumeMounts:
         - mountPath: {{ .Values.apitraffic.share.path | quote }}
           name: events
+        - name: config-jvmxml
+          mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
+          subPath: jvm.xml
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
@@ -124,8 +129,8 @@ spec:
             - name: k8sprobe
               value: readiness.{{ .Values.apitraffic.name }}
             path: /healthcheck
-            port: {{ .Values.apitraffic.portManager }}
-            scheme: HTTPS
+            port: {{ .Values.apitraffic.portProbe }}
+            scheme: {{ .Values.apitraffic.schemeProbe }}
           initialDelaySeconds: 40
           periodSeconds: 30
           failureThreshold: 5
@@ -135,8 +140,8 @@ spec:
             - name: k8sprobe
               value: liveness.{{ .Values.apitraffic.name }}
             path: /healthcheck
-            port: {{ .Values.apitraffic.portManager }}
-            scheme: HTTPS
+            port: {{ .Values.apitraffic.portProbe }}
+            scheme: {{ .Values.apitraffic.schemeProbe }}
           initialDelaySeconds: 30
           periodSeconds: 30
           failureThreshold: 5
@@ -179,6 +184,14 @@ spec:
       - name: events
         persistentVolumeClaim:
           claimName: apigw-events
+      - name: config-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: jvm
+              mode: 256
+              path: jvm.xml
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:

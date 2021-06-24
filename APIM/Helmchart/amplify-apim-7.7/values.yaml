@@ -33,6 +33,7 @@ global:
       scrwm:
    createSecrets: true
    issuedByLetsEncrypt: false
+   bodySize: 10m
 
 anm:
    name: anm
@@ -95,26 +96,30 @@ apitraffic:
    volumes:
       accessModes: ReadWriteOnce
    certInSecret: false
+   portProbe: 8065
+   schemeProbe: "HTTPS"
 
 apiportal:
    enable: false
    name: "api-portal"
    buildTag: "7.7-20210330"
    imageName: "apim-ptl"
-   ingressName: "portal"
+   ingressName: "apiportal"
    trafficPort: 443
+   scheme: HTTPS
    replicaCount: 1
    share:
       secret: "apiportal-secret-name"
       name: "apiportal-volume-rwm-name"
    certInSecret: false
+   runAsUser: 1000
 
 apiaga:
    enable: false
    name: apiaga
    buildTag: "20210330"
    imageName: "apim-aga-7.7"
-   ingressName: "api-aga"
+   ingressName: "analytics"
    replicaCount: 1
    trafficPort: 8040
    logTraceToFile: "true"
@@ -159,9 +164,9 @@ cassandra:
    host2: "ip_host2"
    host3: "ip_host3"
    domain: ""
+   consistency_level: "LOCAL_QUORUM"
 
 mysqlPortal:
-   enable: false
    external: true
    name: "mysql-portal"
    imageName: "mysql"

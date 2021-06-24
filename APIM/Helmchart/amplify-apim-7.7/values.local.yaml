@@ -8,22 +8,55 @@ global:
    #Annotation
 
    # That is just a dummy domain.
-   domainName: "local.io"
+   domainName: "axway.io"
    # To have the local-path storage class, remember to run:
    # kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
    customStorageClass:
       scrwo: local-path
       scrwm: local-path
+   enableDynamicLicense: true
+   dockerRegistry:
+      url: lacg
+
+anm:
+   ingressName: "admin"
+   buildTag: "7.7.20210530"
+   imageName: "anm"
+   trafficPortUI: 8090
+   logTraceJSONtoSTDOUT: "true"
+   emt_heap_size_mb: "2048"
+
+apimgr:
+   ingressName: "apimanager"
+   buildTag: "7.7.20210530"
+   imageName: "mngr"
+   logTraceJSONtoSTDOUT: "true"
+
+apitraffic:
+   buildTag: "7.7.20210530"
+   imageName: "mngr"
+   portProbe: 8080
+   schemeProbe: "HTTP"
+
+apiaga:
+   enable: true
+   buildTag: "7.7.20210530"
+   imageName: "ana"
 
 cassandra:
    external: true
    # Change this IP to the Cassandra's cluster IPs.
-   host1: "10.42.12.227"
-   host2: "10.42.12.227"
-   host3: "10.42.12.227"
+   host1: "10.42.12.229"
+   host2: "10.42.12.229"
+   host3: "10.42.12.229"
    # That is the default domain for Cassandra on the default namespace.
    # Change it to your specific case if necessary.
    domain: ".default.svc.cluster.local"
 
-mysqlAnalytics:
-   enable: false
+apiportal:
+   enable: true
+   buildTag: "7.7.20210530"
+   imageName: "apiportal"
+   trafficPort: 80
+   scheme: HTTP
+   runAsUser: 1048
