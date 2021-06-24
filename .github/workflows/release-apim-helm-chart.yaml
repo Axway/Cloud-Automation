@@ -25,12 +25,12 @@ jobs:
     - name: Create packaged Helm-Chart
       run: |
         pwd
-        helm package . --dependency-update --app-version ${{ env.RELEASE_VERSION }} --version ${{ env.RELEASE_VERSION }}
+        helm package . --dependency-update --app-version ${{ env.RELEASE_VERSION }} --version ${{ env.RELEASE_VERSION }} --destination /tmp
     - name: upload-helm-chart
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: amplify-apim-7.7-${{ env.RELEASE_VERSION }}.tgz
+        asset_path: /tmp/amplify-apim-7.7-${{ env.RELEASE_VERSION }}.tgz
         asset_name: helm-chart-axway-apim-${{ env.RELEASE_VERSION }}.tgz
         asset_content_type: application/gzip
       env:
