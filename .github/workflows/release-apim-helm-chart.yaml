@@ -1,0 +1,29 @@
+name: Release Axway APIM Helm-Chart
+
+on:
+  release:
+    types: [published]
+    tags:
+      - '*apim-helm*'
+
+jobs:
+  release-helm-chart:
+    env:
+      # This must be aligned with the folder-name of you plugin
+      workingDirectory: 'APIM/Helmchart/amplify-apim-7.7'
+    name: Release Helm chart
+    needs: release-elk-apim
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create packaged Helm-Chart
+      run: helm package . --dependency-update --app-version ${{ github.event.release.tag_name }} --version ${{ github.event.release.tag_name }}
+    - name: upload-helm-chart
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: apim4elastic-${{ github.event.release.tag_name }}.tgz
+        asset_name: helm-chart-apim4elastic-${{ github.event.release.tag_name }}.tgz
+        asset_content_type: application/gzip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
