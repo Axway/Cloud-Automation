@@ -130,6 +130,8 @@ apiaga:
    emt_trace_level: "INFO"
    certInSecret: false
 
+# Disclaimers:
+# Axway does not support MySQL in Containers.
 mysqlAnalytics:
    enable: true
    external: false
@@ -146,6 +148,9 @@ mysqlAnalytics:
    quotaStorage: 10
    port: 3306
 
+# Disclaimers:
+# Axway does not support Cassandra in Containers.
+# The latest supported buildTag for Cassandra is 2.2.12.
 cassandra:
    external: false
    name: "cassandra"
@@ -166,6 +171,8 @@ cassandra:
    domain: ""
    consistency_level: "LOCAL_QUORUM"
 
+# Disclaimers:
+# Axway does not support MySQL in Containers.
 mysqlPortal:
    external: true
    name: "mysql-portal"
