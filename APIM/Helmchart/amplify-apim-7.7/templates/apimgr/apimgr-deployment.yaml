@@ -116,8 +116,16 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: {{ .Values.apitraffic.share.path | quote }}
-          name: events
+        - mountPath: {{ .Values.global.volumes.gateway.logs.path | quote }}
+          name: {{ .Values.apimgr.volumes.name | quote }}
+        - mountPath: {{ .Values.global.volumes.gateway.trace.path | quote }}
+          name: {{ .Values.apimgr.volumes.name | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+          name: {{ .Values.apimgr.volumes.name | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+          name: {{ .Values.apimgr.volumes.name | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
+          name: {{ .Values.apimgr.volumes.name | quote }}
         - name: config-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
           subPath: jvm.xml
@@ -131,6 +139,22 @@ spec:
             exec:
               command: ["sleep","90"]
       initContainers:
+      - name: init-mount
+        image: {{ .Values.global.initImageTag | quote }}
+        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.gateway.logs.path }} {{ .Values.global.volumes.gateway.trace.path }} {{ .Values.global.volumes.nodemanager.events.path }} {{ .Values.global.volumes.nodemanager.logs.path }} {{ .Values.global.volumes.nodemanager.trace.path }}']
+        volumeMounts:
+        - name: {{ .Values.apimgr.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.gateway.logs.path | quote }}
+        - name: {{ .Values.apimgr.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.gateway.trace.path | quote }}
+        - name: {{ .Values.apimgr.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+        - name: {{ .Values.apimgr.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+        - name: {{ .Values.apimgr.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
+        securityContext:
+          runAsUser: 0
       - name: init-cassandra
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v cassandra 9042; do echo waiting for cassandra-0; sleep 2; done;']
@@ -153,9 +177,9 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: 101
       volumes:
-      - name: events
+      - name: {{ .Values.apimgr.volumes.name | quote }}
         persistentVolumeClaim:
-          claimName: apigw-events
+          claimName: {{ .Values.apimgr.volumes.name | quote }}
       - name: config-jvmxml
         configMap:
           name: jvmxml

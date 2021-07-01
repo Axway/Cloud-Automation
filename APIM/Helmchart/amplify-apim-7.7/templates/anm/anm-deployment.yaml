@@ -106,8 +106,12 @@ spec:
             exec:
               command: ["sleep","90"]
         volumeMounts:
-        - name: events
-          mountPath: {{ .Values.apitraffic.share.path | quote }}
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
         - name: config-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
           subPath: jvm.xml
@@ -121,6 +125,18 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.global.dockerRegistry.secret }}
       initContainers:
+      - name: init-mount
+        image: {{ .Values.global.initImageTag | quote }}
+        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.nodemanager.events.path }} {{ .Values.global.volumes.nodemanager.logs.path }} {{ .Values.global.volumes.nodemanager.trace.path }}']
+        volumeMounts:
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
+        securityContext:
+          runAsUser: 0
       {{- if eq .Values.mysqlAnalytics.enable true }}
       - name: init-mysql
         image: {{ .Values.global.initImageTag | quote }}
@@ -132,13 +148,13 @@ spec:
       terminationGracePeriodSeconds: 101
       {{- if ne .Values.global.platform "OPENSHIFT" }}
       securityContext:
-        runAsUser: 1000
-        fsGroup: 1000
+        runAsUser: {{ .Values.global.userID }}
+        fsGroup: {{ .Values.global.userID }}
       {{- end }}
       volumes:
-      - name: events
+      - name: {{ .Values.anm.volumes.name | quote }}
         persistentVolumeClaim:
-          claimName: apigw-events
+          claimName: {{ .Values.anm.volumes.name | quote }}
       - name: config-jvmxml
         configMap:
           name: jvmxml

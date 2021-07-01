@@ -34,6 +34,27 @@ global:
    createSecrets: true
    issuedByLetsEncrypt: false
    bodySize: 10m
+   volumes:
+      accessModes: ReadWriteOnce
+      gateway:
+         logs:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/groups/emt-group/emt-service/logs"
+         trace:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/groups/emt-group/emt-service/trace"
+      nodemanager:
+         events:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/events"
+         logs:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/logs"
+         trace:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/trace"
+   userID: 1000
+
 
 anm:
    name: anm
@@ -51,6 +72,9 @@ anm:
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
    certInSecret: false
+   volumes:
+      quota: 1Gi
+      name: "anm-pvc"
 
 apimgr:
    name: apimgr
@@ -67,6 +91,9 @@ apimgr:
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
    certInSecret: false
+   volumes:
+      quota: 1Gi
+      name: "apimgr-pvc"
 
 apitraffic:
    name: traffic
@@ -88,13 +115,9 @@ apitraffic:
    emt_heap_size_mb: "1512"
    emt_topology_log_enabled: "true"
    emt_topology_ttl: 10
-   share:
-      secret: "azure-file"
-      name: "gw-events"
-      path: "/opt/Axway/apigateway/events"
-      quota: 1
    volumes:
-      accessModes: ReadWriteOnce
+      quota: 1Gi
+      name: "traffic-pvc"
    certInSecret: false
    portProbe: 8065
    schemeProbe: "HTTPS"
