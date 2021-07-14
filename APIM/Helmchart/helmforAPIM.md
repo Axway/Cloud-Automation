@@ -100,3 +100,7 @@ Then you can install the APIM helm chart:
 ```
 helm install *<release-name>* amplify-apim-*<version>* --namespace *<namespace>* . --create-namespace -f ./values.local.yaml
 ```
+
+
+### Database disclaimer
+This chart is to help you having a kick start on your APIM environment. In order to accelerate this, we added to the templates MySQL and Cassandra charts, as well, so you can have it locally for a demo/lab/dev environment. But the DB charts ARE not production ready, as Axway does not support databases in containers and you should always use your own database infrastructure.

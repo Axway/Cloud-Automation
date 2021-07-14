@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.anm.volumes.name | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  accessModes:
+    - {{ .Values.global.volumes.accessModes }}
+  {{- if eq .Values.global.platform "AZURE" }}
+  storageClassName: azurefile-premium
+  {{- end }}
+  {{- if .Values.global.customStorageClass.scrwm }}
+  storageClassName: {{ .Values.global.customStorageClass.scrwm }}
+  {{- end }}
+  resources:
+    requests:
+      {{- if eq .Values.global.platform "AZURE" }}
+      storage: 100Gi
+      {{- else }}
+      storage: {{ .Values.anm.volumes.quota }}
+      {{- end }}

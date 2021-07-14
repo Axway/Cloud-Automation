@@ -34,6 +34,27 @@ global:
    createSecrets: true
    issuedByLetsEncrypt: false
    bodySize: 10m
+   volumes:
+      accessModes: ReadWriteOnce
+      gateway:
+         logs:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/groups/emt-group/emt-service/logs"
+         trace:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/groups/emt-group/emt-service/trace"
+      nodemanager:
+         events:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/events"
+         logs:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/logs"
+         trace:
+            secret: "azure-file"
+            path: "/opt/Axway/apigateway/trace"
+   userID: 1000
+
 
 anm:
    name: anm
@@ -51,6 +72,9 @@ anm:
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
    certInSecret: false
+   volumes:
+      quota: 1Gi
+      name: "anm-pvc"
 
 apimgr:
    name: apimgr
@@ -67,6 +91,13 @@ apimgr:
    emt_topology_ttl: 10
    emt_trace_level: "INFO"
    certInSecret: false
+   volumes:
+      quota: 1Gi
+      name: "apimgr-pvc"
+   sso:
+      enable: false
+      entityID: "APIManagerDev"
+      entityIDfromMetadataXML: "https://sts.acme.com/apimanager"
 
 apitraffic:
    name: traffic
@@ -88,13 +119,9 @@ apitraffic:
    emt_heap_size_mb: "1512"
    emt_topology_log_enabled: "true"
    emt_topology_ttl: 10
-   share:
-      secret: "azure-file"
-      name: "gw-events"
-      path: "/opt/Axway/apigateway/events"
-      quota: 1
    volumes:
-      accessModes: ReadWriteOnce
+      quota: 1Gi
+      name: "traffic-pvc"
    certInSecret: false
    portProbe: 8065
    schemeProbe: "HTTPS"
@@ -113,6 +140,10 @@ apiportal:
       name: "apiportal-volume-rwm-name"
    certInSecret: false
    runAsUser: 1000
+   sso:
+      enable: false
+      entityID: "APIPortalDev"
+      entityIDfromMetadataXML: "https://sts.acme.com/apiportal"
 
 apiaga:
    enable: false
@@ -130,6 +161,8 @@ apiaga:
    emt_trace_level: "INFO"
    certInSecret: false
 
+# Disclaimers:
+# Axway does not support MySQL in Containers.
 mysqlAnalytics:
    enable: true
    external: false
@@ -146,6 +179,9 @@ mysqlAnalytics:
    quotaStorage: 10
    port: 3306
 
+# Disclaimers:
+# Axway does not support Cassandra in Containers.
+# The latest supported buildTag for Cassandra is 2.2.12.
 cassandra:
    external: false
    name: "cassandra"
@@ -166,6 +202,8 @@ cassandra:
    domain: ""
    consistency_level: "LOCAL_QUORUM"
 
+# Disclaimers:
+# Axway does not support MySQL in Containers.
 mysqlPortal:
    external: true
    name: "mysql-portal"

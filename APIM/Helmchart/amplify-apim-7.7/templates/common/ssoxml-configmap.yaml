@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+   name: sso-xml
+   namespace: {{ .Release.Namespace | quote }}
+data:
+   # You need to change the mapping filter to your specific configuration.
+   service-provider: |
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <SSOConfiguration>
+      <CertificateValidation pathValidation="false"/>
+      <!-- entityId="api-manager" is a logical id (not a machine name). Ensure this logical id is the same in your IDP configuration too -->
+      <ServiceProvider entityId="{{ .Values.apimgr.sso.entityID }}" useAppSessions="true" filteredUri="/sso/login" logoutUri="/sso/logout" logoutRedirectUri="/api/portal/v1.4/sso/login" sessionIdCookieName="spSessionId2">
+      <AssertionConsumerService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" location="/sso/login/post"/>
+      <SingleLogoutService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" location="/sso/logout/post"/>
+      </ServiceProvider>
+      <IdentityProviders>
+      <!-- Change references to axwayidp.localdomain to the Fully Qualified Domain Name of your IDP provider. -->
+      <SamlIdentityProvider entityId={{ .Values.apimgr.sso.entityIDfromMetadataXML }} metadataUrl="idp.xml" userNameAttribute="urn:oid:2.5.4.42" verifyAssertionExpiration="false">
+      <Mappings>
+      <RenameMapping source="emailaddress" target="mail"/>
+      <RenameMapping source="displayname" target="userfullname"/>
+      <FilterMapping>
+      <Filter>(groups=AdminGroup)</Filter>
+      <OutputAttribute name="role">Administrator</OutputAttribute>
+      <OutputAttribute name="organization">Axway</OutputAttribute>
+      </FilterMapping>
+      <FilterMapping>
+      <Filter>(groups=OrganizationAdminGroup)</Filter>
+      <OutputAttribute name="role">Operator</OutputAttribute>
+      <OutputAttribute name="organization">Axway</OutputAttribute>
+      </FilterMapping>
+      <FilterMapping>
+      <Filter>(groups=Developer)</Filter>
+      <OutputAttribute name="role">User</OutputAttribute>
+      <OutputAttribute name="organization">Axway</OutputAttribute>
+      </FilterMapping>
+      </Mappings>
+      <Features>
+      <Feature key="saml-verify-metadata-signature" value="false"/>
+      </Features>
+      </SamlIdentityProvider>
+      </IdentityProviders>
+      </SSOConfiguration>
+   # You need to change the mapping filter to your specific configuration.
+   service-provider-portal: |
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <SSOConfiguration>
+      <CertificateValidation pathValidation="false"/>
+      <!-- entityId="api-portal" is a logical id (not a machine name). Ensure this logical id is the same in your IDP configuration too -->
+      <!-- relaxedEndpointURICheckHostDetails: Change references to portal.int.acme.com:1234 to the Fully Qualified Domain Name:listenerport of your API Portal. This can be a CSV list
+      of hosts e.g. relaxedEndpointURICheckHostDetails=https://portal.int.acme.com:1234,https://portal2.int.acme.com:1234-->
+      <ServiceProvider entityId="{{ .Values.apiportal.sso.entityID }}" excludeHostInEndpointURICheck="true" relaxedEndpointURICheckHostDetails=https://{{ .Values.apiportal.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }} useAppSessions="true" filteredUri="/sso/externallogin" logoutUri="/sso/externallogout" logoutRedirectUri="/api/portal/v1.4/sso/proxylogout" sessionIdCookieName="spExternalSSOSessionId3">
+      <AssertionConsumerService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" location="/sso/externallogin/post"/>
+      <SingleLogoutService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" location="/sso/externallogout/post"/>
+      <SingleLogoutService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" location="/redirect"/>
+      </ServiceProvider>
+      <IdentityProviders>
+      <!-- Change references to keycloak.int.acme.com:8443 to the Fully Qualified Domain Name:port of your IDP provider. -->
+      <!-- Change verifyAssertionExpiration to false if you do not want validity time/date checking done on SAML assertions -->
+      <SamlIdentityProvider entityId={{ .Values.apiportal.sso.entityIDfromMetadataXML }} metadataUrl="idp-portal.xml" userNameAttribute="urn:oid:2.5.4.42" verifyAssertionExpiration="true">
+      <Mappings>
+      <RenameMapping source="emailaddress" target="mail"/>
+      <RenameMapping source="displayname" target="userfullname"/>
+      <OutputAttribute name="role">Operator</OutputAttribute>
+      <OutputAttribute name="organization">Axway</OutputAttribute>
+      <FilterMapping>
+      <Filter>(groups=AdminGroup)</Filter>
+      <OutputAttribute name="role">Operator</OutputAttribute>
+      <OutputAttribute name="organization">Axway</OutputAttribute>
+      </FilterMapping>
+      </Mappings>
+      <Features>
+      <Feature key="saml-verify-metadata-signature" value="false"/>
+      </Features>
+      </SamlIdentityProvider>
+      </IdentityProviders>
+      </SSOConfiguration>
+   # You need to change the idp and idp-portal to your specific needs.
+   idp: |
+      <?xml version="1.0" encoding="utf-8"?>
+      <EntityDescriptor></EntityDescriptor>
+   idp-portal: |
+      <?xml version="1.0" encoding="utf-8"?>
+      <EntityDescriptor></EntityDescriptor>
