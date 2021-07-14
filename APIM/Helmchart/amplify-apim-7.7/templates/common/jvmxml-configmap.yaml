@@ -4,9 +4,12 @@ metadata:
    name: jvmxml
    namespace: {{ .Release.Namespace | quote }}
 data:
-   jvm: |
+   nodemanager-jvm: |
     <ConfigurationFragment>
     <VMArg name="-Ddont.expect.100.continue=true"/>
+    </ConfigurationFragment>
+   gateway-jvm: |
+    <ConfigurationFragment>
     <VMArg name="-Dio.swagger.parser.util.RemoteUrl.trustAll=true"/>
     <VMArg name="-Dio.swagger.v3.parser.util.RemoteUrl.trustAll=true"/>
     </ConfigurationFragment>

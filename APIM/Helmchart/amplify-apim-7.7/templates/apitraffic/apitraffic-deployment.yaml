@@ -105,8 +105,11 @@ spec:
           name: {{ .Values.apitraffic.volumes.name | quote }}
         - mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
           name: {{ .Values.apitraffic.volumes.name | quote }}
-        - name: config-jvmxml
+        - name: nodemanager-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
+          subPath: jvm.xml
+        - name: gateway-jvmxml
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
           subPath: jvm.xml
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
@@ -208,12 +211,20 @@ spec:
       - name: {{ .Values.apitraffic.volumes.name | quote }}
         persistentVolumeClaim:
           claimName: {{ .Values.apitraffic.volumes.name | quote }}
-      - name: config-jvmxml
+      - name: nodemanager-jvmxml
         configMap:
           name: jvmxml
           defaultMode: 256
           items:
-            - key: jvm
+            - key: nodemanager-jvm
+              mode: 256
+              path: jvm.xml
+      - name: gateway-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: gateway-jvm
               mode: 256
               path: jvm.xml
       {{- if eq .Values.global.enableDynamicLicense true }}
