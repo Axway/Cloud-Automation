@@ -126,13 +126,32 @@ spec:
           name: {{ .Values.apimgr.volumes.name | quote }}
         - mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
           name: {{ .Values.apimgr.volumes.name | quote }}
-        - name: config-jvmxml
+        - name: nodemanager-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
+          subPath: jvm.xml
+        - name: gateway-jvmxml
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
           subPath: jvm.xml
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
           subPath: license
+        {{- end }}
+        {{- if eq .Values.apimgr.sso.enable true }}
+        - name: service-provider
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/service-provider.xml"
+          subPath: service-provider.xml
+        - name: idp
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/idp.xml"
+          subPath: idp.xml
+        {{- end }}
+        {{- if eq .Values.apiportal.sso.enable true }}
+        - name: service-provider-portal
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/service-provider-portal.xml"
+          subPath: service-provider-portal.xml
+        - name: idp-portal
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/idp-portal.xml"
+          subPath: idp-portal.xml
         {{- end }}
         lifecycle:
           preStop:
@@ -180,14 +199,58 @@ spec:
       - name: {{ .Values.apimgr.volumes.name | quote }}
         persistentVolumeClaim:
           claimName: {{ .Values.apimgr.volumes.name | quote }}
-      - name: config-jvmxml
+      - name: nodemanager-jvmxml
         configMap:
           name: jvmxml
           defaultMode: 256
           items:
-            - key: jvm
+            - key: nodemanager-jvm
               mode: 256
               path: jvm.xml
+      - name: gateway-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: gateway-jvm
+              mode: 256
+              path: jvm.xml
+      {{- if (eq .Values.apimgr.sso.enable true) }}
+      - name: service-provider
+        configMap:
+          name: sso-xml
+          defaultMode: 256
+          items:
+            - key: service-provider
+              mode: 256
+              path: service-provider.xml
+      - name: idp
+        configMap:
+          name: sso-xml
+          defaultMode: 256
+          items:
+            - key: idp
+              mode: 256
+              path: idp.xml
+      {{- end }}
+      {{- if (eq .Values.apiportal.sso.enable true) }}
+      - name: service-provider-portal
+        configMap:
+          name: sso-xml
+          defaultMode: 256
+          items:
+            - key: service-provider-portal
+              mode: 256
+              path: service-provider-portal.xml
+      - name: idp-portal
+        configMap:
+          name: sso-xml
+          defaultMode: 256
+          items:
+            - key: idp-portal
+              mode: 256
+              path: idp-portal.xml
+      {{- end }}
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:

@@ -94,6 +94,10 @@ apimgr:
    volumes:
       quota: 1Gi
       name: "apimgr-pvc"
+   sso:
+      enable: false
+      entityID: "APIManagerDev"
+      entityIDfromMetadataXML: "https://sts.acme.com/apimanager"
 
 apitraffic:
    name: traffic
@@ -136,6 +140,10 @@ apiportal:
       name: "apiportal-volume-rwm-name"
    certInSecret: false
    runAsUser: 1000
+   sso:
+      enable: false
+      entityID: "APIPortalDev"
+      entityIDfromMetadataXML: "https://sts.acme.com/apiportal"
 
 apiaga:
    enable: false
