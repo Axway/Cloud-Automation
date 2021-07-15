@@ -84,7 +84,7 @@ spec:
             httpHeaders:
             - name: k8sprobe
               value: liveness.{{ .Values.anm.name }}
-            path: /healthcheck
+            path: {{ .Values.global.probe.page }}
             port: {{ .Values.anm.trafficPortUI }}
             scheme: HTTPS
           initialDelaySeconds: 40
@@ -95,7 +95,7 @@ spec:
             httpHeaders:
             - name: k8sprobe
               value: readiness.{{ .Values.anm.name }}
-            path: /healthcheck
+            path: {{ .Values.global.probe.page }}
             port: {{ .Values.anm.trafficPortUI }}
             scheme: HTTPS
           initialDelaySeconds: 30
@@ -107,17 +107,21 @@ spec:
               command: ["sleep","90"]
         volumeMounts:
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.path.events | quote }}
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.path.logs | quote }}
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.path.trace | quote }}
+       {{- if eq .Values.global.jvm.nodemanager.enable true }}
         - name: nodemanager-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
           subPath: jvm.xml
+        {{- end }}
+       {{- if eq .Values.global.jvm.gateway.enable true }}
         - name: gateway-jvmxml
           mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
           subPath: jvm.xml
+        {{- end }}
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
@@ -130,14 +134,14 @@ spec:
       initContainers:
       - name: init-mount
         image: {{ .Values.global.initImageTag | quote }}
-        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.nodemanager.events.path }} {{ .Values.global.volumes.nodemanager.logs.path }} {{ .Values.global.volumes.nodemanager.trace.path }}']
+        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.nodemanager.path.events }} {{ .Values.global.volumes.nodemanager.path.logs }} {{ .Values.global.volumes.nodemanager.path.trace }}']
         volumeMounts:
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.path.events | quote }}
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.path.logs | quote }}
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.path.trace | quote }}
         securityContext:
           runAsUser: 0
       {{- if eq .Values.mysqlAnalytics.enable true }}
@@ -158,6 +162,7 @@ spec:
       - name: {{ .Values.anm.volumes.name | quote }}
         persistentVolumeClaim:
           claimName: {{ .Values.anm.volumes.name | quote }}
+      {{- if eq .Values.global.jvm.nodemanager.enable true }}
       - name: nodemanager-jvmxml
         configMap:
           name: jvmxml
@@ -166,6 +171,8 @@ spec:
             - key: nodemanager-jvm
               mode: 256
               path: jvm.xml
+      {{- end }}
+      {{- if eq .Values.global.jvm.gateway.enable true }}
       - name: gateway-jvmxml
         configMap:
           name: jvmxml
@@ -174,6 +181,7 @@ spec:
             - key: gateway-jvm
               mode: 256
               path: jvm.xml
+      {{- end }}
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:

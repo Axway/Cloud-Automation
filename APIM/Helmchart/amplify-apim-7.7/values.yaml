@@ -37,23 +37,22 @@ global:
    volumes:
       accessModes: ReadWriteOnce
       gateway:
-         logs:
-            secret: "azure-file"
-            path: "/opt/Axway/apigateway/groups/emt-group/emt-service/logs"
-         trace:
-            secret: "azure-file"
-            path: "/opt/Axway/apigateway/groups/emt-group/emt-service/trace"
+         paths:
+            logs: "/opt/Axway/apigateway/groups/emt-group/emt-service/logs"
+            trace: "/opt/Axway/apigateway/groups/emt-group/emt-service/trace"
       nodemanager:
-         events:
-            secret: "azure-file"
-            path: "/opt/Axway/apigateway/events"
-         logs:
-            secret: "azure-file"
-            path: "/opt/Axway/apigateway/logs"
-         trace:
-            secret: "azure-file"
-            path: "/opt/Axway/apigateway/trace"
+         paths:
+            events: "/opt/Axway/apigateway/events"
+            logs: "/opt/Axway/apigateway/logs"
+            trace: "/opt/Axway/apigateway/trace"
+   jvm:
+      gateway:
+         enable: false
+      nodemanager:
+         enable: false
    userID: 1000
+   probe:
+      page: "/healtchecklb"
 
 
 anm:
@@ -96,8 +95,6 @@ apimgr:
       name: "apimgr-pvc"
    sso:
       enable: false
-      entityID: "APIManagerDev"
-      entityIDfromMetadataXML: "https://sts.acme.com/apimanager"
 
 apitraffic:
    name: traffic
@@ -142,8 +139,6 @@ apiportal:
    runAsUser: 1000
    sso:
       enable: false
-      entityID: "APIPortalDev"
-      entityIDfromMetadataXML: "https://sts.acme.com/apiportal"
 
 apiaga:
    enable: false

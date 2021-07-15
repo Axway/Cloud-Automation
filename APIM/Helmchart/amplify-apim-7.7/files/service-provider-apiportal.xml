@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SSOConfiguration>
+    <CertificateValidation
+    pathValidation="false"
+    enableRevocation="false"
+    trustStorePath="conf/trustStore.jks"
+    trustStorePassword="Change this to the truststore passphrase for trustStore.jks">
+    </CertificateValidation>
+    <!-- entityId="api-portal" is a logical id (not a machine name). Ensure this logical id is the same in your IDP configuration too -->
+    <!-- relaxedEndpointURICheckHostDetails: Change references to portal.int.acme.com:1234 to the Fully Qualified Domain Name:listenerport of your API Portal. This can be a CSV list 
+         of hosts e.g. relaxedEndpointURICheckHostDetails="https://portal.int.acme.com:1234,https://portal2.int.acme.com:1234"-->
+    <ServiceProvider
+            entityId="api-portal"
+            excludeHostInEndpointURICheck="true"            
+            relaxedEndpointURICheckHostDetails="https://portal.int.acme.com:1234"
+            useAppSessions="true"
+            filteredUri="/sso/externallogin"
+            logoutUri="/sso/externallogout"
+            logoutRedirectUri="/api/portal/v1.4/sso/proxylogout"
+            keystore="conf/sso.jks"
+            keystorePassphrase="Change this to the keystore passphrase for sso.jks"
+            keyAlias="ssokey"
+            sessionIdCookieName="spExternalSSOSessionId3"
+            >
+            <AssertionConsumerService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" location="/sso/externallogin/post"/>
+            <SingleLogoutService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" location="/sso/externallogout/post"/>
+            <SingleLogoutService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" location="/redirect"/>
+    </ServiceProvider>      
+    <IdentityProviders>
+      <!-- Change references to keycloak.int.acme.com:8443 to the Fully Qualified Domain Name:port of your IDP provider. -->
+      <!-- Change verifyAssertionExpiration to false if you do not want validity time/date checking done on SAML assertions -->
+      <SamlIdentityProvider
+                entityId="https://keycloak.int.acme.com:8443/auth/realms/Axway"                
+                metadataUrl="https://keycloak.int.acme.com:8443/auth/realms/Axway/protocol/saml/descriptor"
+                userNameAttribute="urn:oid:2.5.4.42"
+                verifyAssertionExpiration="true">
+            <Mappings>
+                <!-- Sample Mappings -->
+                <FilterMapping>
+                    <Filter>(department=422 R&amp;D Chicago)</Filter>
+                    <OutputAttribute name="role">Operator</OutputAttribute>
+                </FilterMapping>
+                <FilterMapping>
+                    <Filter>(department=461 R&amp;D Paris)</Filter>
+                    <OutputAttribute name="role">Operator</OutputAttribute>
+                </FilterMapping>                
+                <FilterMapping>
+                    <Filter>(department=422 Sales)</Filter>
+                    <OutputAttribute name="role">User</OutputAttribute>
+                    <OutputAttribute name="organization">SalesOrganisation</OutputAttribute>
+                </FilterMapping>
+                <FilterMapping>
+                    <Filter>(mail=fsmyth@mycompany.com)</Filter>
+                    <OutputAttribute name="role">Operator</OutputAttribute>
+                </FilterMapping>
+                <FilterMapping>
+                    <Filter>(!(department=R&amp;D))</Filter>
+                    <OutputAttribute name="role">Other</OutputAttribute>
+                </FilterMapping>
+            </Mappings>
+            <Features>
+                <Feature key="saml-verify-metadata-signature" value="false"/>
+            </Features>
+        </SamlIdentityProvider>
+    </IdentityProviders>
+</SSOConfiguration>

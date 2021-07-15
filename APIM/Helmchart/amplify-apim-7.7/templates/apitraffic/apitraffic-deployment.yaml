@@ -95,22 +95,26 @@ spec:
         imagePullPolicy: {{ .Values.global.pullPolicy }} 
         name: {{ .Values.apitraffic.name }}
         volumeMounts:
-        - mountPath: {{ .Values.global.volumes.gateway.logs.path | quote }}
+        - mountPath: {{ .Values.global.volumes.gateway.paths.logs | quote }}
           name: {{ .Values.apitraffic.volumes.name | quote }}
-        - mountPath: {{ .Values.global.volumes.gateway.trace.path | quote }}
+        - mountPath: {{ .Values.global.volumes.gateway.paths.trace | quote }}
           name: {{ .Values.apitraffic.volumes.name | quote }}
-        - mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
           name: {{ .Values.apitraffic.volumes.name | quote }}
-        - mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
           name: {{ .Values.apitraffic.volumes.name | quote }}
-        - mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
           name: {{ .Values.apitraffic.volumes.name | quote }}
+       {{- if eq .Values.global.jvm.nodemanager.enable true }}
         - name: nodemanager-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
           subPath: jvm.xml
+        {{- end }}
+       {{- if eq .Values.global.jvm.gateway.enable true }}
         - name: gateway-jvmxml
           mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
           subPath: jvm.xml
+        {{- end }}
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
@@ -135,24 +139,34 @@ spec:
             memory: "0.5Gi"
             cpu: 0.5
         readinessProbe:
+          {{- if or (eq .Values.apitraffic.probe.scheme "HTTP") (eq .Values.apitraffic.probe.scheme "HTTPS") }}
           httpGet:
             httpHeaders:
             - name: k8sprobe
               value: readiness.{{ .Values.apitraffic.name }}
-            path: /healthcheck
-            port: {{ .Values.apitraffic.portProbe }}
-            scheme: {{ .Values.apitraffic.schemeProbe }}
+            path: {{ .Values.global.probe.page }}
+            port: {{ .Values.apitraffic.probe.port }}
+            scheme: {{ .Values.apitraffic.probe.scheme }}
+          {{- else }}
+          tcpSocket:
+            port: {{ .Values.apitraffic.probe.port }}
+          {{- end }}
           initialDelaySeconds: 40
           periodSeconds: 30
           failureThreshold: 5
         livenessProbe:
+          {{- if or (eq .Values.apitraffic.probe.scheme "HTTP") (eq .Values.apitraffic.probe.scheme "HTTPS") }}
           httpGet:
             httpHeaders:
             - name: k8sprobe
               value: liveness.{{ .Values.apitraffic.name }}
-            path: /healthcheck
-            port: {{ .Values.apitraffic.portProbe }}
-            scheme: {{ .Values.apitraffic.schemeProbe }}
+            path: {{ .Values.global.probe.page }}
+            port: {{ .Values.apitraffic.probe.port }}
+            scheme: {{ .Values.apitraffic.probe.scheme }}
+          {{- else }}
+          tcpSocket:
+            port: {{ .Values.apitraffic.probe.port }}
+          {{- end }}
           initialDelaySeconds: 30
           periodSeconds: 30
           failureThreshold: 5
@@ -168,18 +182,18 @@ spec:
       initContainers:
       - name: init-mount
         image: {{ .Values.global.initImageTag | quote }}
-        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.gateway.logs.path }} {{ .Values.global.volumes.gateway.trace.path }} {{ .Values.global.volumes.nodemanager.events.path }} {{ .Values.global.volumes.nodemanager.logs.path }} {{ .Values.global.volumes.nodemanager.trace.path }}']
+        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.gateway.paths.logs }} {{ .Values.global.volumes.gateway.paths.trace }} {{ .Values.global.volumes.nodemanager.paths.events }} {{ .Values.global.volumes.nodemanager.paths.logs }} {{ .Values.global.volumes.nodemanager.paths.trace }}']
         volumeMounts:
         - name: {{ .Values.apitraffic.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.gateway.logs.path | quote }}
+          mountPath: {{ .Values.global.volumes.gateway.paths.logs | quote }}
         - name: {{ .Values.apitraffic.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.gateway.trace.path | quote }}
+          mountPath: {{ .Values.global.volumes.gateway.paths.trace | quote }}
         - name: {{ .Values.apitraffic.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
         - name: {{ .Values.apitraffic.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
         - name: {{ .Values.apitraffic.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
         securityContext:
           runAsUser: 0
       - name: init-cassandra
@@ -211,6 +225,7 @@ spec:
       - name: {{ .Values.apitraffic.volumes.name | quote }}
         persistentVolumeClaim:
           claimName: {{ .Values.apitraffic.volumes.name | quote }}
+      {{- if eq .Values.global.jvm.nodemanager.enable true }}
       - name: nodemanager-jvmxml
         configMap:
           name: jvmxml
@@ -219,6 +234,8 @@ spec:
             - key: nodemanager-jvm
               mode: 256
               path: jvm.xml
+      {{- end }}
+      {{- if eq .Values.global.jvm.gateway.enable true }}
       - name: gateway-jvmxml
         configMap:
           name: jvmxml
@@ -227,6 +244,7 @@ spec:
             - key: gateway-jvm
               mode: 256
               path: jvm.xml
+      {{- end }}
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:

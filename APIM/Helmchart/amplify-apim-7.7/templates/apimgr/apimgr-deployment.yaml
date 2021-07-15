@@ -1,3 +1,4 @@
+{{ tpl (.Files.Get "conf/functions.conf") . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -96,7 +97,7 @@ spec:
             httpHeaders:
             - name: k8sprobe
               value: readiness.{{ .Values.apimgr.name }}
-            path: /healthcheck
+            path: {{ .Values.global.probe.page }}
             port: {{ .Values.apimgr.trafficPort }}
             scheme: HTTPS
           initialDelaySeconds: 50
@@ -107,7 +108,7 @@ spec:
             httpHeaders:
             - name: k8sprobe
               value: liveness.{{ .Values.apimgr.name }}
-            path: /healthcheck
+            path: {{ .Values.global.probe.page }}
             port: {{ .Values.apimgr.trafficPort }}
             scheme: HTTPS
           initialDelaySeconds: 30
@@ -116,22 +117,26 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: {{ .Values.global.volumes.gateway.logs.path | quote }}
+        - mountPath: {{ .Values.global.volumes.gateway.paths.logs | quote }}
           name: {{ .Values.apimgr.volumes.name | quote }}
-        - mountPath: {{ .Values.global.volumes.gateway.trace.path | quote }}
+        - mountPath: {{ .Values.global.volumes.gateway.paths.trace | quote }}
           name: {{ .Values.apimgr.volumes.name | quote }}
-        - mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
           name: {{ .Values.apimgr.volumes.name | quote }}
-        - mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
           name: {{ .Values.apimgr.volumes.name | quote }}
-        - mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
           name: {{ .Values.apimgr.volumes.name | quote }}
+       {{- if eq .Values.global.jvm.nodemanager.enable true }}
         - name: nodemanager-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
           subPath: jvm.xml
+        {{- end }}
+       {{- if eq .Values.global.jvm.gateway.enable true }}
         - name: gateway-jvmxml
           mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
           subPath: jvm.xml
+        {{- end }}
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
@@ -146,12 +151,12 @@ spec:
           subPath: idp.xml
         {{- end }}
         {{- if eq .Values.apiportal.sso.enable true }}
-        - name: service-provider-portal
-          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/service-provider-portal.xml"
-          subPath: service-provider-portal.xml
-        - name: idp-portal
-          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/idp-portal.xml"
-          subPath: idp-portal.xml
+        - name: service-provider-apiportal
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/service-provider-apiportal.xml"
+          subPath: service-provider-apiportal.xml
+        - name: idp-apiportal
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/idp-apiportal.xml"
+          subPath: idp-apiportal.xml
         {{- end }}
         lifecycle:
           preStop:
@@ -160,18 +165,18 @@ spec:
       initContainers:
       - name: init-mount
         image: {{ .Values.global.initImageTag | quote }}
-        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.gateway.logs.path }} {{ .Values.global.volumes.gateway.trace.path }} {{ .Values.global.volumes.nodemanager.events.path }} {{ .Values.global.volumes.nodemanager.logs.path }} {{ .Values.global.volumes.nodemanager.trace.path }}']
+        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.gateway.paths.logs }} {{ .Values.global.volumes.gateway.paths.trace }} {{ .Values.global.volumes.nodemanager.paths.events }} {{ .Values.global.volumes.nodemanager.paths.logs }} {{ .Values.global.volumes.nodemanager.paths.trace }}']
         volumeMounts:
         - name: {{ .Values.apimgr.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.gateway.logs.path | quote }}
+          mountPath: {{ .Values.global.volumes.gateway.paths.logs | quote }}
         - name: {{ .Values.apimgr.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.gateway.trace.path | quote }}
+          mountPath: {{ .Values.global.volumes.gateway.paths.trace | quote }}
         - name: {{ .Values.apimgr.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.events.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
         - name: {{ .Values.apimgr.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.logs.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
         - name: {{ .Values.apimgr.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.trace.path | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
         securityContext:
           runAsUser: 0
       - name: init-cassandra
@@ -199,6 +204,7 @@ spec:
       - name: {{ .Values.apimgr.volumes.name | quote }}
         persistentVolumeClaim:
           claimName: {{ .Values.apimgr.volumes.name | quote }}
+      {{- if eq .Values.global.jvm.nodemanager.enable true }}
       - name: nodemanager-jvmxml
         configMap:
           name: jvmxml
@@ -207,6 +213,8 @@ spec:
             - key: nodemanager-jvm
               mode: 256
               path: jvm.xml
+      {{- end }}
+      {{- if eq .Values.global.jvm.gateway.enable true }}
       - name: gateway-jvmxml
         configMap:
           name: jvmxml
@@ -215,6 +223,7 @@ spec:
             - key: gateway-jvm
               mode: 256
               path: jvm.xml
+      {{- end }}
       {{- if (eq .Values.apimgr.sso.enable true) }}
       - name: service-provider
         configMap:
@@ -234,22 +243,22 @@ spec:
               path: idp.xml
       {{- end }}
       {{- if (eq .Values.apiportal.sso.enable true) }}
-      - name: service-provider-portal
+      - name: service-provider-apiportal
         configMap:
           name: sso-xml
           defaultMode: 256
           items:
-            - key: service-provider-portal
+            - key: service-provider-apiportal
               mode: 256
-              path: service-provider-portal.xml
-      - name: idp-portal
+              path: service-provider-apiportal.xml
+      - name: idp-apiportal
         configMap:
           name: sso-xml
           defaultMode: 256
           items:
-            - key: idp-portal
+            - key: idp-apiportal
               mode: 256
-              path: idp-portal.xml
+              path: idp-apiportal.xml
       {{- end }}
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license

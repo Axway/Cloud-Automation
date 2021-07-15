@@ -1,0 +1,16 @@
+FIPS=1
+SalesForce Connector=1
+ServiceNow Connector=1
+analytics=1
+api_visual_mapper=1
+apiportal=1
+company=Axway
+deployment_type=docker
+expires=Sat, 31 Jul 2021 18:02:39 GMT
+license_id=TEMP
+mcafee=1
+name=Axway
+sdkgenerator=1
+unrestricted=1
+version=7.7
+# SIGNATURE: blahblahblah

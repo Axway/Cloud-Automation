@@ -17,6 +17,11 @@ global:
    enableDynamicLicense: true
    dockerRegistry:
       url: lacg
+   jvm:
+      gateway:
+         enable: true
+      nodemanager:
+         enable: true
 
 anm:
    ingressName: "admin"

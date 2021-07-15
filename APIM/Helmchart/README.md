@@ -80,11 +80,11 @@ The following tables lists the parameters used to set up storage, volumes, and c
 | global.customStorageClass.scrwo | Set the storage class for read and write only | - |
 | global.customStorageClass.scrwm | Set the storage class for read and write many | - |
 | global.volumes.accessModes | Set the access modes | ReadWriteOnce |
-| global.volumes.gateway.path.logs | Set the path for the gateway's logs folder | /opt/Axway/apigateway/groups/emt-group/emt-service/logs |
-| global.volumes.gateway.path.trace | Set the path for the gateway's trace folder | /opt/Axway/apigateway/groups/emt-group/emt-service/trace |
-| global.volumes.nodemanager.path.events | Set the path for the nodemanager's evetns folder | /opt/Axway/apigateway/events |
-| global.volumes.nodemanager.path.logs | Set the path for the nodemanager's logs folder | /opt/Axway/apigateway/logs |
-| global.volumes.nodemanager.path.trace | Set the path for the nodemanager's trace folder | /opt/Axway/apigateway/trace |
+| global.volumes.gateway.paths.logs | Set the path for the gateway's logs folder | /opt/Axway/apigateway/groups/emt-group/emt-service/logs |
+| global.volumes.gateway.paths.trace | Set the path for the gateway's trace folder | /opt/Axway/apigateway/groups/emt-group/emt-service/trace |
+| global.volumes.nodemanager.paths.events | Set the path for the nodemanager's events folder | /opt/Axway/apigateway/events |
+| global.volumes.nodemanager.paths.logs | Set the path for the nodemanager's logs folder | /opt/Axway/apigateway/logs |
+| global.volumes.nodemanager.paths.trace | Set the path for the nodemanager's trace folder | /opt/Axway/apigateway/trace |
 | global.jvm.gateway.enable | Set if the gateway will have a jvm.xml. If yes, the file contents needs to be updated on files/gateway-jvm.xml | false |
 | global.jvm.nodemanager.enable | Set if the nodemanager will have a jvm.xml. If yes, the file contents needs to be updated on files/nodemanager-jvm.xml | false |
 | anm.volumes.quota | Set the volume quota for the ANM PVC. | 1Gi |
