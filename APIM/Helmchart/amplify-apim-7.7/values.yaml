@@ -120,8 +120,9 @@ apitraffic:
       quota: 1Gi
       name: "traffic-pvc"
    certInSecret: false
-   portProbe: 8065
-   schemeProbe: "HTTPS"
+   probe:
+      port: 8065
+      scheme: "HTTPS"
 
 apiportal:
    enable: false

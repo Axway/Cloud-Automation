@@ -107,11 +107,11 @@ spec:
               command: ["sleep","90"]
         volumeMounts:
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.path.events | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.path.logs | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.path.trace | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
        {{- if eq .Values.global.jvm.nodemanager.enable true }}
         - name: nodemanager-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
@@ -134,14 +134,14 @@ spec:
       initContainers:
       - name: init-mount
         image: {{ .Values.global.initImageTag | quote }}
-        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.nodemanager.path.events }} {{ .Values.global.volumes.nodemanager.path.logs }} {{ .Values.global.volumes.nodemanager.path.trace }}']
+        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.nodemanager.paths.events }} {{ .Values.global.volumes.nodemanager.paths.logs }} {{ .Values.global.volumes.nodemanager.paths.trace }}']
         volumeMounts:
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.path.events | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.path.logs | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
         - name: {{ .Values.anm.volumes.name | quote }}
-          mountPath: {{ .Values.global.volumes.nodemanager.path.trace | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
         securityContext:
           runAsUser: 0
       {{- if eq .Values.mysqlAnalytics.enable true }}
