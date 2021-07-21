@@ -84,7 +84,7 @@ spec:
             httpHeaders:
             - name: k8sprobe
               value: liveness.{{ .Values.anm.name }}
-            path: {{ .Values.global.probe.page }}
+            path: /healthcheck
             port: {{ .Values.anm.trafficPortUI }}
             scheme: HTTPS
           initialDelaySeconds: 40
@@ -95,7 +95,7 @@ spec:
             httpHeaders:
             - name: k8sprobe
               value: readiness.{{ .Values.anm.name }}
-            path: {{ .Values.global.probe.page }}
+            path: /healthcheck
             port: {{ .Values.anm.trafficPortUI }}
             scheme: HTTPS
           initialDelaySeconds: 30
