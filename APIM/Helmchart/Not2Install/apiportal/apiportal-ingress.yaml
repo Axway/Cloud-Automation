@@ -1,0 +1,58 @@
+{{- if eq .Values.apiportal.enabled true }}
+{{- if ne .Values.global.platform "OPENSHIFT" }}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ .Values.apiportal.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- if .Values.global.managedIngress }}
+    {{- if eq .Values.global.platform "AZURE" }}
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/backend-protocol: https
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/acme-challenge-type: http01
+    {{- end }}
+    {{- else }}
+    kubernetes.io/ingress.class: nginx
+    {{- if .Values.global.issuedByLetsEncrypt }}
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
+    cert-manager.io/acme-challenge-type: http01
+    nginx.ingress.kubernetes.io/backend-protocol: {{ .Values.apiportal.scheme | quote }}
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "API-Portal"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+    {{- end }}
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.apiportal.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }}
+    {{- if .Values.apiportal.certInSecret }}
+    secretName: tls-secret-portal
+    {{- end }}
+  rules:
+  - host: {{ .Values.apiportal.ingressName }}.{{ .Values.global.domainName }}
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Values.apiportal.name }}
+            port:
+              number: {{ .Values.apiportal.trafficPort }}
+          {{- else }}
+          serviceName: {{ .Values.apiportal.name }}
+          servicePort: {{ .Values.apiportal.trafficPort }}
+          {{- end }}
+{{- end }}
+{{- end }}

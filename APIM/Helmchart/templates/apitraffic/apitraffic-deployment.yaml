@@ -1,0 +1,257 @@
+{{- if .Values.apitraffic.enabled -}}
+
+{{- $imageTag := include "imageTag" . -}}
+{{- $imagePullPolicy := include "imagePullPolicy" . -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "apitraffic.name" . }}
+  labels: {{- include "apitraffic.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.apitraffic.replicas }}
+  selector:
+    matchLabels:
+      {{- include "apitraffic.selectorLabels" . | nindent 6 }}
+  strategy:
+{{ toYaml .Values.apitraffic.updateStrategy | indent 4 }}
+  template:
+    metadata:
+      name: "{{ template "apitraffic.name" . }}"
+      labels: 
+        {{- include "apitraffic.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- range $key, $value := .Values.apitraffic.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+{{- if .Values.apitraffic.priorityClassName }}
+      priorityClassName: {{ .Values.apitraffic.priorityClassName }}
+{{- end }}
+      securityContext:
+{{ toYaml .Values.apitraffic.podSecurityContext | indent 8 }}
+      {{- if .Values.apitraffic.serviceAccount }}
+      serviceAccount: {{ .Values.apitraffic.serviceAccount }}
+      {{- end }}
+      {{- if .Values.apitraffic.hostAliases }}
+      hostAliases: {{ toYaml .Values.apitraffic.hostAliases | nindent 6 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.apitraffic.terminationGracePeriod }}
+      volumes:
+      - name: events
+        persistentVolumeClaim:
+          claimName: apigw-events
+      - name: opentraffic
+        persistentVolumeClaim:
+          claimName: apigw-opentraffic
+      - name: license
+        secret:
+          secretName: {{ .Values.global.licenseSecretName | default "license" }}
+      - name: config-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: jvm
+              mode: 256
+              path: jvm.xml
+        {{- range .Values.apitraffic.secretMounts }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+        {{- end }}
+      {{- if .Values.apitraffic.filebeat.enabled }}
+      - name: filebeat-config
+        configMap:
+          defaultMode: 0600
+          name: axway-elk-apim4elastic-filebeat-config
+      - name: axway-elk-apim4elastic-certificates
+        secret:
+          secretName: axway-elk-apim4elastic-certificates
+      - name: axway-elk-apim4elastic-filebeat-secret
+        secret:
+          secretName: axway-elk-apim4elastic-filebeat-secret
+      {{- end }}
+      {{- if .Values.apitraffic.extraVolumes }}
+{{ toYaml ( .Values.apitraffic.extraVolumes ) | indent 8 }}
+      {{- end }}
+      {{- with .Values.apitraffic.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.apitraffic.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.apitraffic.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.global.imagePullSecrets | indent 8 }}
+      {{- end }}
+      {{- if .Values.extraInitContainers }}
+      initContainers:
+{{ tpl .Values.extraInitContainers . | indent 6 }}
+      {{- end }}
+      containers:
+      - name: "{{ template "apitraffic.name" . }}"
+        securityContext:
+{{ toYaml .Values.apitraffic.securityContext | indent 10 }}
+        args:
+{{ toYaml .Values.apitraffic.args | indent 8 }}
+        # command: ["sh", "-c", "tail -f /dev/null" ]
+        image: {{ .Values.global.dockerRepository }}/{{ .Values.apitraffic.image }}:{{ $imageTag }}
+        imagePullPolicy: {{ $imagePullPolicy }}
+        livenessProbe:
+{{ toYaml .Values.apitraffic.livenessProbe | indent 10 }}
+        readinessProbe:
+{{ toYaml .Values.apitraffic.readinessProbe | indent 10 }}
+        ports:
+        {{- range $key, $value := .Values.apitraffic.containerPorts }}
+        - name: {{ $key }}
+          containerPort: {{ $value }}
+        {{- end }}
+        {{- if .Values.apitraffic.extraPorts }}
+{{- toYaml .Values.apitraffic.extraPorts | nindent 8 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.apitraffic.resources | indent 10 }}
+        env:
+        - name: EMT_ANM_HOSTS
+          value: {{ template "anm.name" . }}:{{ required "Admin Node-Manager port is missing" .Values.anm.containerPorts.anm }}
+        - name: EMT_HEAP_SIZE_MB
+          value: {{ .Values.apitraffic.EMT_HEAP_SIZE_MB | quote }}
+        - name: EMT_TRACE_LEVEL
+          value: {{ .Values.apitraffic.EMT_TRACE_LEVEL | quote }}
+        - name: EMT_TOPOLOGY_LOG_ENABLED
+          value: {{ .Values.apitraffic.EMT_TOPOLOGY_LOG_ENABLED | quote }}
+        - name: EMT_TOPOLOGY_TTL
+          value: {{ .Values.apitraffic.EMT_TOPOLOGY_TTL | quote }}
+        - name: EMT_DEPLOYMENT_ENABLED
+          value: {{ .Values.anm.EMT_DEPLOYMENT_ENABLED | quote }}
+
+        - name: CASS_HOST
+          value: "{{ template "cassandra.name" . }}"
+        - name: CASS_PORT
+          value: {{ .Values.cassandra.service.port | quote }}
+        - name: CASS_KEYSPACE
+          value: {{ .Values.cassandra.keyspace }}
+        - name: CASS_TKEYSPACE
+          value: t_{{ .Values.cassandra.keyspace }}
+        - name: CASS_USERNAME
+          value: {{ .Values.cassandra.dbUser.user }}
+        - name: CASS_PASS
+        {{- if .Values.cassandra.dbUser.existingSecret }}
+{{ toYaml .Values.cassandra.dbUser.existingSecret | indent 10 }}
+        {{- else if .Values.cassandra.dbUser.password }}
+          value: {{ .Values.cassandra.dbUser.password }}
+        {{- else }}
+          value: ""
+        {{- end }}
+        {{- if .Values.metricsDB.METRICS_DB_URL }}
+        - name: METRICS_DB_URL
+          value: {{ .Values.metricsDB.METRICS_DB_URL | quote }}
+        - name: METRICS_DB_USERNAME
+          value: {{ required "The value metricsDB.METRICS_DB_USERNAME is missing." .Values.metricsDB.METRICS_DB_USERNAME | quote }}
+        - name: METRICS_DB_PASS
+{{ toYaml .Values.metricsDB.METRICS_DB_PASS | indent 10 }}
+        {{- else if .Values.mysqlAnalytics.enabled }}
+        - name: METRICS_DB_URL
+          value: "jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}"
+        - name: METRICS_DB_USERNAME
+          value: {{ .Values.mysqlAnalytics.adminUser | quote }}
+        - name: METRICS_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: apim-password
+              key: dbmysqlanalytics
+        {{- end }}
+        {{- if .Values.apitraffic.extraEnvs }}
+{{ toYaml .Values.apitraffic.extraEnvs | indent 8 }}
+        {{- end }}
+        volumeMounts:
+        - mountPath: /opt/Axway/apigateway/events
+          name: events
+        - mountPath: /opt/Axway/apigateway/logs/opentraffic
+          name: opentraffic
+        #- name: config-jvmxml
+        #  mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
+        #  subPath: jvm.xml
+        - name: license
+          mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
+          subPath: license
+      {{- if .Values.apitraffic.filebeat.enabled }}          
+      # -------------------------- Filebeat container -------------------------- #
+      - name: filebeat
+        securityContext:
+{{ toYaml .Values.apitraffic.filebeat.securityContext | indent 10 }}
+        args:
+{{ toYaml .Values.apitraffic.filebeat.args | indent 8 }}
+        # command: ["sh", "-c", "tail -f /dev/null" ]
+        image: {{ .Values.apitraffic.filebeat.image }}:{{ .Values.apitraffic.filebeat.imageTag }}
+        imagePullPolicy: {{ $imagePullPolicy }}
+        livenessProbe:
+{{ toYaml .Values.apitraffic.filebeat.livenessProbe | indent 10 }}
+        readinessProbe:
+{{ toYaml .Values.apitraffic.filebeat.readinessProbe | indent 10 }}
+        ports:
+        {{- range $key, $value := .Values.apitraffic.filebeat.containerPorts }}
+        - name: {{ $key }}
+          containerPort: {{ $value }}
+        {{- end }}
+        {{- if .Values.apitraffic.filebeat.extraPorts }}
+{{- toYaml .Values.apitraffic.filebeat.extraPorts | nindent 8 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.apitraffic.filebeat.resources | indent 10 }}
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        {{- if .Values.apitraffic.filebeat.extraEnvs }}
+{{ toYaml .Values.apitraffic.filebeat.extraEnvs | indent 8 }}
+        {{- end }}
+        envFrom:
+          - configMapRef:
+              name: axway-elk-apim4elastic-filebeat-env-config
+          - secretRef:
+              name: axway-elk-apim4elastic-filebeat-secret
+          {{- if .Values.apitraffic.filebeat.envFrom }}
+{{ toYaml .Values.apitraffic.filebeat.envFrom | nindent 10 }}
+          {{- end }}
+        volumeMounts:
+        - name: filebeat-config
+          mountPath: /usr/share/filebeat/filebeat.yml
+          subPath: filebeat.yml
+        - name: axway-elk-apim4elastic-certificates
+          mountPath: /usr/share/filebeat/config/certificates
+        - mountPath: /var/opentraffic
+          name: opentraffic
+      {{- end }}
+      {{- if .Values.apitraffic.extraContainers }}
+{{ toYaml .Values.apitraffic.extraContainers | indent 6 }}
+      {{- end }}
+        lifecycle:
+{{ toYaml .Values.apitraffic.lifecycle | indent 10 }}
+      initContainers:
+      - name: init-cassandra
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "cassandra.name" . }} {{ .Values.cassandra.service.port }}; do echo waiting for cassandra-0; sleep 2; done;']
+      {{- if .Values.mysqlAnalytics.enabled }}
+      - name: init-mysql
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Chart.Name }}-{{ .Values.mysqlanalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
+      {{- end }}
+      - name: init-anm
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "anm.name" . }} {{ .Values.anm.service.port }}; do echo waiting for anm; sleep 2; done;']
+{{- end }}

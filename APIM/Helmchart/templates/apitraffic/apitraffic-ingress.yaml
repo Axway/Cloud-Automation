@@ -1,0 +1,58 @@
+{{- if .Values.apitraffic.enabled -}}
+{{- if ne .Values.global.platform "OPENSHIFT" }}
+
+{{- $httpPort := .Values.apitraffic.httpPort -}}
+{{- $ingressPath := .Values.apitraffic.ingress.path -}}
+
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ template "apitraffic.name" . }}
+  labels: {{ include "apitraffic.labels" . | nindent 4 }}
+  {{- with .Values.apitraffic.ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.apitraffic.ingress.tls }}
+  tls:
+{{ toYaml .Values.apitraffic.ingress.tls | indent 4 }}
+  {{- end }}
+  rules:
+  {{- if .Values.apitraffic.ingress.hosts }}
+  {{- range .Values.apitraffic.ingress.hosts }}
+  - host: {{ .host }}
+    http:
+      paths:
+      {{- range .paths }}
+        - path: {{ .path }}
+          backend:
+            serviceName: {{ template "apitraffic.name" . }}
+            servicePort: {{ .servicePort | default $httpPort }}
+      {{- end }}
+  {{- end }}
+  {{- else }}
+  - host: {{ .Values.apitraffic.ingress.name }}.{{ required "global.domainName is required." .Values.global.domainName }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          service:
+            name: {{ template "apitraffic.name" . }}
+            port:
+              number: {{ .Values.apitraffic.service.port | default .Values.apitraffic.httpPort }}
+          {{- else }}
+          serviceName: {{ template "apitraffic.name" . }}
+          servicePort: {{ .Values.apitraffic.service.port | default .Values.apitraffic.httpPort }}
+          {{- end }}
+
+  {{- end }}
+
+{{- end }}
+{{- end }}

@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apigw-events
+  namespace: {{ .Release.Namespace | quote }}
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.eventsVolumeClaim | indent 2 }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apigw-opentraffic
+  namespace: {{ .Release.Namespace | quote }}
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.opentrafficVolumeClaim | indent 2 }}
+---
+{{- if .Values.mysqlanalytics.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apigw-mysql-analytics
+  labels:
+    data: mysql-analytics
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.opentrafficVolumeClaim | indent 2 }}
+{{- end}}
+---
+{{- if .Values.mysqlportal.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apigw-mysql-portal
+  labels:
+    data: mysql-portal
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.opentrafficVolumeClaim | indent 2 }}
+{{- end}}

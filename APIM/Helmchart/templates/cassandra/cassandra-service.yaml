@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels: {{- include "cassandra.labels" . | nindent 4 }}
+  name: {{ template "cassandra.name" . }}
+spec:
+{{- if eq .Values.cassandra.external false }}
+  clusterIP: None
+  ports:
+    - name: cql
+      port: {{ .Values.cassandra.service.port }}
+      targetPort: cql
+      {{- if and (or (eq .Values.cassandra.service.type "NodePort") (eq .Values.cassandra.service.type "LoadBalancer")) (not (empty .Values.cassandra.service.nodePorts.cql)) }}
+      nodePort: {{ .Values.cassandra.service.nodePorts.cql }}
+      {{- else if eq .Values.cassandra.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.cassandra.cluster.enableRPC }}
+    - name: thrift
+      port: {{ .Values.cassandra.service.thriftPort }}
+      targetPort: thrift
+      {{- if and (or (eq .Values.cassandra.service.type "NodePort") (eq .Values.cassandra.service.type "LoadBalancer")) (not (empty .Values.cassandra.service.nodePorts.thrift)) }}
+      nodePort: {{ .Values.cassandra.service.thriftPort }}
+      {{- else if eq .Values.cassandra.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- end }}
+    - name: metrics
+      port: {{ .Values.cassandra.service.metricsPort }}
+      {{- if and (or (eq .Values.cassandra.service.type "NodePort") (eq .Values.cassandra.service.type "LoadBalancer")) (not (empty .Values.cassandra.service.nodePorts.metrics)) }}
+      nodePort: {{ .Values.cassandra.service.metricsPort }}
+      {{- else if eq .Values.cassandra.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }} 
+  selector:
+    {{- include "cassandra.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- if eq .Values.cassandra.external true }}
+  type: ExternalName
+  externalName: {{ .Values.cassandra.name }}{{ .Values.cassandra.domain }}
+{{- end }}

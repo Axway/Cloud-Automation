@@ -1,0 +1,24 @@
+{{- if eq .Values.global.platform "OPENSHIFT" }}
+
+{{- if .Values.base.useImagestream }}
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  generation: 1
+  name: {{ .Values.base.imageName }}
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - from:
+      kind: DockerImage
+      name: {{ .Values.global.dockerRepository }}/{{ required "Missing base.imageName" .Values.base.imageName }}:{{ required "Missing base.imageTag" .Values.base.imageTag }}
+    name: latest
+    importPolicy:
+      insecure: true 
+    referencePolicy:
+      type: Local
+  lookupPolicy:
+    local: true 
+{{- end }}
+{{- end }}

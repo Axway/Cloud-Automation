@@ -1,0 +1,61 @@
+{{- if eq .Values.apiaga.enable true }}
+{{- if ne .Values.global.platform "OPENSHIFT" }}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ .Values.apiaga.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- if .Values.global.managedIngress }}
+    {{- if eq .Values.global.platform "AZURE" }}
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/backend-protocol: https
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/acme-challenge-type: http01
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    appgw.ingress.kubernetes.io/connection-draining: "true"
+    appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
+    {{- end }}
+    {{- else }}
+    kubernetes.io/ingress.class: nginx
+    {{- if .Values.global.issuedByLetsEncrypt }}
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
+    cert-manager.io/acme-challenge-type: http01
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/affinity-mode: persistent
+    nginx.ingress.kubernetes.io/session-cookie-name: "API-Analytics-UI"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+    {{- end }}
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.apiaga.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }}
+    {{- if .Values.apiaga.certInSecret }}
+    secretName: apimanager-ingress-cert
+    {{- end }}
+  rules:
+  - host: {{ .Values.apiaga.ingressName }}.{{ .Values.global.domainName }}
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Values.apiaga.name }}
+            port:
+              number: {{ .Values.apiaga.trafficPort }}
+          {{- else }}
+          serviceName: {{ .Values.apiaga.name }}
+          servicePort: {{ .Values.apiaga.trafficPort }}
+          {{- end }}
+{{- end }}
+{{- end }}

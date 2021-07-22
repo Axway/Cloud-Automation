@@ -1,0 +1,20 @@
+{{- if .Values.apimgr.enabled -}}
+
+{{- if eq .Values.global.platform "OPENSHIFT" }}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: {{ .Values.apimgr.name }}
+spec:
+  to:
+    kind: Service
+    name: {{ .Values.apimgr.name }}
+  port:
+    targetPort: {{ .Values.apimgr.trafficPort }}
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+{{- end }}
+
+{{- end }}

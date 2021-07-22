@@ -1,0 +1,29 @@
+{{- if .Values.anm.enabled -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "anm.name" . }}
+  labels: {{- include "anm.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.anm.service.type }}
+{{- if .Values.anm.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+{{- end }}
+{{- with .Values.anm.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  ports:
+  - name: {{ .Values.anm.service.httpPortName | default "http" }}
+    port: {{ .Values.anm.service.port }}
+{{- if .Values.anm.service.nodePort }}
+    nodePort: {{ .Values.anm.service.nodePort }}
+{{- end }}
+    protocol: TCP
+    targetPort: {{ .Values.anm.httpPort }}
+  selector:
+    {{- include "anm.selectorLabels" . | nindent 4 }}
+  sessionAffinity: ClientIP
+  
+{{- end }}

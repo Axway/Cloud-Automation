@@ -1,0 +1,16 @@
+{{- if eq .Values.global.platform "OPENSHIFT" }}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: {{ template "anm.name" . }}
+spec:
+  to:
+    kind: Service
+    name: {{ template "anm.name" . }}
+  port:
+    targetPort: {{ .Values.anm.service.port | default .Values.anm.httpPort }}
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+{{- end }}

@@ -1,0 +1,18 @@
+{{- if eq .Values.apiaga.enable true }}
+{{- if eq .Values.global.platform "OPENSHIFT" }}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: {{ .Values.apiaga.name }}
+spec:
+  to:
+    kind: Service
+    name: {{ .Values.apiaga.name }}
+  port:
+    targetPort: {{ .Values.apiaga.trafficPort }}
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+{{- end }}
+{{- end }}

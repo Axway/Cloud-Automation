@@ -1,0 +1,185 @@
+{{- if .Values.apimgr.enabled -}}
+
+{{- $imageTag := include "imageTag" . -}}
+{{- $imagePullPolicy := include "imagePullPolicy" . -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "apimgr.name" . }}
+  labels: {{- include "apimgr.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.apimgr.replicas }}
+  selector:
+    matchLabels:
+      {{- include "apimgr.selectorLabels" . | nindent 6 }}
+  strategy:
+{{ toYaml .Values.apimgr.updateStrategy | indent 4 }}
+  template:
+    metadata:
+      name: "{{ template "apimgr.name" . }}"
+      labels: 
+        {{- include "apimgr.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- range $key, $value := .Values.apimgr.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+{{- if .Values.apimgr.priorityClassName }}
+      priorityClassName: {{ .Values.apimgr.priorityClassName }}
+{{- end }}
+      securityContext:
+{{ toYaml .Values.apimgr.podSecurityContext | indent 8 }}
+      {{- if .Values.apimgr.serviceAccount }}
+      serviceAccount: {{ .Values.apimgr.serviceAccount }}
+      {{- end }}
+      {{- if .Values.apimgr.hostAliases }}
+      hostAliases: {{ toYaml .Values.apimgr.hostAliases | nindent 6 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.apimgr.terminationGracePeriod }}
+      volumes:
+        {{- range .Values.apimgr.secretMounts }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+        {{- end }}
+      - name: events
+        persistentVolumeClaim:
+          claimName: apigw-events
+      - name: config-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: jvm
+              mode: 256
+              path: jvm.xml
+      - name: license
+        secret:
+          secretName: {{ .Values.global.licenseSecretName | default "license" }}
+      {{- if .Values.apimgr.extraVolumes }}
+{{ toYaml ( .Values.apimgr.extraVolumes ) | indent 8 }}
+      {{- end }}
+      {{- with .Values.apimgr.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.apimgr.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.apimgr.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.global.imagePullSecrets | indent 8 }}
+      {{- end }}
+      {{- if .Values.extraInitContainers }}
+      initContainers:
+{{ tpl .Values.extraInitContainers . | indent 6 }}
+      {{- end }}
+      containers:
+      - name: "{{ template "apimgr.name" . }}"
+        securityContext:
+{{ toYaml .Values.apimgr.securityContext | indent 10 }}
+        args:
+{{ toYaml .Values.apimgr.args | indent 8 }}
+        # command: ["sh", "-c", "tail -f /dev/null" ]
+        image: {{ .Values.global.dockerRepository }}/{{ .Values.apimgr.image }}:{{ $imageTag }}
+        imagePullPolicy: {{ $imagePullPolicy }}
+        livenessProbe:
+{{ toYaml .Values.apimgr.livenessProbe | indent 10 }}
+        readinessProbe:
+{{ toYaml .Values.apimgr.readinessProbe | indent 10 }}
+        ports:
+        {{- range $key, $value := .Values.apimgr.containerPorts }}
+        - name: {{ $key }}
+          containerPort: {{ $value }}
+        {{- end }}
+        {{- if .Values.apimgr.extraPorts }}
+{{- toYaml .Values.apimgr.extraPorts | nindent 8 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.apimgr.resources | indent 10 }}
+        env:
+        - name: EMT_ANM_HOSTS
+          value: {{ template "anm.name" . }}:{{ required "Admin Node-Manager port is missing" .Values.anm.containerPorts.anm }}
+        - name: EMT_HEAP_SIZE_MB
+          value: {{ .Values.apimgr.EMT_HEAP_SIZE_MB | quote }}
+        - name: EMT_TRACE_LEVEL
+          value: {{ .Values.apimgr.EMT_TRACE_LEVEL | quote }}
+        - name: EMT_TOPOLOGY_LOG_ENABLED
+          value: {{ .Values.apimgr.EMT_TOPOLOGY_LOG_ENABLED | quote }}
+        - name: EMT_TOPOLOGY_TTL
+          value: {{ .Values.apimgr.EMT_TOPOLOGY_TTL | quote }}
+        - name: EMT_DEPLOYMENT_ENABLED
+          value: {{ .Values.anm.EMT_DEPLOYMENT_ENABLED | quote }}
+
+        - name: CASS_HOST
+          value: "{{ template "cassandra.name" . }}"
+        - name: CASS_PORT
+          value: {{ .Values.cassandra.service.port | quote }}
+        - name: CASS_KEYSPACE
+          value: {{ .Values.cassandra.keyspace }}
+        - name: CASS_TKEYSPACE
+          value: t_{{ .Values.cassandra.keyspace }}
+        - name: CASS_USERNAME
+          value: {{ .Values.cassandra.dbUser.user }}
+        - name: CASS_PASS
+        {{- if .Values.cassandra.dbUser.existingSecret }}
+{{ toYaml .Values.cassandra.dbUser.existingSecret | indent 10 }}
+        {{- else if .Values.cassandra.dbUser.password }}
+          value: {{ .Values.cassandra.dbUser.password }}
+        {{- else }}
+          value: ""
+        {{- end }}
+        {{- if .Values.metricsDB.METRICS_DB_URL }}
+        - name: METRICS_DB_URL
+          value: {{ .Values.metricsDB.METRICS_DB_URL | quote }}
+        - name: METRICS_DB_USERNAME
+          value: {{ required "The value metricsDB.METRICS_DB_USERNAME is missing." .Values.metricsDB.METRICS_DB_USERNAME | quote }}
+        - name: METRICS_DB_PASS
+{{ toYaml .Values.metricsDB.METRICS_DB_PASS | indent 10 }}
+        {{- else if .Values.mysqlAnalytics.enabled }}
+        - name: METRICS_DB_URL
+          value: "jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}"
+        - name: METRICS_DB_USERNAME
+          value: {{ .Values.mysqlAnalytics.adminUser | quote }}
+        - name: METRICS_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: apim-password
+              key: dbmysqlanalytics
+        {{- end }}
+        {{- if .Values.apimgr.extraEnvs }}
+{{ toYaml .Values.apimgr.extraEnvs | indent 8 }}
+        {{- end }}
+        volumeMounts:
+        - mountPath: {{ .Values.apitraffic.share.path | quote }}
+          name: events
+        - name: config-jvmxml
+          mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
+          subPath: jvm.xml
+        - name: license
+          mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
+          subPath: license
+      {{- if .Values.apimgr.extraContainers }}
+{{ toYaml .Values.apimgr.extraContainers | indent 6 }}
+      {{- end }}
+        lifecycle:
+{{ toYaml .Values.apimgr.lifecycle | indent 10 }}
+      initContainers:
+      - name: init-cassandra
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "cassandra.name" . }} {{ .Values.cassandra.service.port }}; do echo waiting for cassandra-0; sleep 2; done;']
+      {{- if .Values.mysqlAnalytics.enabled }}
+      - name: init-mysql
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysqlAnalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
+      {{- end }}
+      - name: init-anm
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "anm.name" . }} {{ .Values.anm.service.port }}; do echo waiting for anm; sleep 2; done;']
+{{- end }}

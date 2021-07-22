@@ -1,0 +1,58 @@
+{{- if .Values.apimgr.enabled -}}
+{{- if ne .Values.global.platform "OPENSHIFT" }}
+
+{{- $httpPort := .Values.apimgr.httpPort -}}
+{{- $ingressPath := .Values.apimgr.ingress.path -}}
+
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ template "apimgr.name" . }}
+  labels: {{ include "apimgr.labels" . | nindent 4 }}
+  {{- with .Values.apimgr.ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.apimgr.ingress.tls }}
+  tls:
+{{ toYaml .Values.apimgr.ingress.tls | indent 4 }}
+  {{- end }}
+  rules:
+  {{- if .Values.apimgr.ingress.hosts }}
+  {{- range .Values.apimgr.ingress.hosts }}
+  - host: {{ .host }}
+    http:
+      paths:
+      {{- range .paths }}
+        - path: {{ .path }}
+          backend:
+            serviceName: {{ template "apimgr.name" . }}
+            servicePort: {{ .servicePort | default $httpPort }}
+      {{- end }}
+  {{- end }}
+  {{- else }}
+  - host: {{ .Values.apimgr.ingress.name }}.{{ required "global.domainName is required." .Values.global.domainName }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          service:
+            name: {{ template "apimgr.name" . }}
+            port:
+              number: {{ .Values.apimgr.service.port | default .Values.apimgr.httpPort }}
+          {{- else }}
+          serviceName: {{ template "apimgr.name" . }}
+          servicePort: {{ .Values.apimgr.service.port | default .Values.apimgr.httpPort }}
+          {{- end }}
+
+  {{- end }}
+
+{{- end }}
+{{- end }}

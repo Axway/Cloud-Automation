@@ -1,0 +1,162 @@
+{{- if .Values.anm.enabled -}}
+
+{{- $imageTag := include "imageTag" . -}}
+{{- $imagePullPolicy := include "imagePullPolicy" . -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "anm.name" . }}
+  labels: {{- include "anm.labels" . | nindent 4 }}
+  annotations:
+    {{- range $key, $value := .Values.anm.deploymentAnnotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.anm.replicas }}
+  selector:
+    matchLabels:
+      {{- include "anm.selectorLabels" . | nindent 6 }}
+  strategy:
+{{ toYaml .Values.anm.updateStrategy | indent 4 }}
+  template:
+    metadata:
+      name: "{{ template "anm.name" . }}"
+      labels: 
+        {{- include "anm.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- range $key, $value := .Values.anm.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+{{- if .Values.anm.priorityClassName }}
+      priorityClassName: {{ .Values.anm.priorityClassName }}
+{{- end }}
+      securityContext:
+{{ toYaml .Values.anm.podSecurityContext | indent 8 }}
+      {{- if .Values.anm.serviceAccount }}
+      serviceAccount: {{ .Values.anm.serviceAccount }}
+      {{- end }}
+      {{- if .Values.anm.hostAliases }}
+      hostAliases: {{ toYaml .Values.anm.hostAliases | nindent 6 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.anm.terminationGracePeriod }}
+      volumes:
+        {{- range .Values.anm.secretMounts }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+        {{- end }}
+        {{- if .Values.anm.extraVolumes }}
+{{ toYaml ( .Values.anm.extraVolumes ) | indent 8 }}
+        {{- end }}
+      
+      {{- with .Values.anm.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.anm.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.anm.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.global.imagePullSecrets | indent 8 }}
+      {{- end }}
+      {{- if .Values.extraInitContainers }}
+      initContainers:
+{{ tpl .Values.extraInitContainers . | indent 6 }}
+      {{- end }}
+      containers:
+      - name: "{{ template "anm.name" . }}"
+        args:
+{{ toYaml .Values.anm.args | indent 8 }}
+        securityContext:
+{{ toYaml .Values.anm.securityContext | indent 10 }}
+        {{- if .Values.base.useImagestream }}
+        command: ["sh", "-c", "tail -f /dev/null" ]
+        image: {{ .Values.anm.image }}:{{ $imageTag }}
+        {{- else }}
+        image: {{ .Values.global.dockerRepository }}/{{ .Values.anm.image }}:{{ $imageTag }}
+        {{- end }}
+        imagePullPolicy: {{ $imagePullPolicy }}
+        livenessProbe:
+{{ toYaml .Values.anm.livenessProbe | indent 10 }}
+        readinessProbe:
+{{ toYaml .Values.anm.readinessProbe | indent 10 }}
+        ports:
+        {{- range $key, $value := .Values.anm.containerPorts }}
+        - name: {{ $key }}
+          containerPort: {{ $value }}
+        {{- end }}
+        {{- if .Values.anm.extraPorts }}
+{{- toYaml .Values.anm.extraPorts | nindent 8 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.anm.resources | indent 10 }}
+        env:
+        - name: EMT_TOPOLOGY_TTL
+          value: {{ .Values.anm.EMT_TOPOLOGY_TTL | quote }}
+        - name: EMT_HEAP_SIZE_MB
+          value: {{ .Values.anm.EMT_HEAP_SIZE_MB | quote }}
+        - name: EMT_TRACE_LEVEL
+          value: {{ .Values.anm.EMT_TRACE_LEVEL | quote }}
+        - name: EMT_DEPLOYMENT_ENABLED
+          value: {{ .Values.anm.EMT_DEPLOYMENT_ENABLED | quote }}
+        - name: EMT_TOPOLOGY_LOG_DEST
+          value: {{ .Values.anm.EMT_TOPOLOGY_LOG_DEST | quote }}
+        - name: EMT_TOPOLOGY_LOG_DIR
+          value: {{ .Values.anm.EMT_TOPOLOGY_LOG_DIR | quote }}
+        - name: EMT_TOPOLOGY_LOG_ENABLED
+          value: {{ .Values.anm.EMT_TOPOLOGY_LOG_ENABLED | quote }}
+        - name: EMT_TOPOLOGY_LOG_INTERVAL
+          value: {{ .Values.anm.EMT_TOPOLOGY_LOG_INTERVAL | quote }}
+        - name: EMT_PARENT_HOST
+          value: {{ .Values.anm.EMT_PARENT_HOST | default "" | quote }}
+        - name: EMT_POLL_INTERVAL
+          value: {{ .Values.anm.EMT_POLL_INTERVAL | quote }}
+        {{- if .Values.metricsDB.METRICS_DB_URL }}
+        - name: METRICS_DB_URL
+          value: {{ .Values.metricsDB.METRICS_DB_URL | quote }}
+        - name: METRICS_DB_USERNAME
+          value: {{ required "The value metricsDB.METRICS_DB_USERNAME is missing." .Values.metricsDB.METRICS_DB_USERNAME | quote }}
+        - name: METRICS_DB_PASS
+{{ toYaml .Values.metricsDB.METRICS_DB_PASS | indent 10 }}
+        {{- else if .Values.mysqlAnalytics.enabled }}
+        - name: METRICS_DB_URL
+          value: "jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}"
+        - name: METRICS_DB_USERNAME
+          value: {{ .Values.mysqlAnalytics.adminUser | quote }}
+        - name: METRICS_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: apim-password
+              key: dbmysqlanalytics
+        {{- end }}
+        {{- if .Values.anm.extraEnvs }}
+{{ toYaml .Values.anm.extraEnvs | indent 8 }}
+        {{- end }}
+        {{- if .Values.anm.envFrom }}
+        envFrom:
+{{ toYaml .Values.anm.envFrom | indent 8 }}
+        {{- end }}
+        volumeMounts:
+          {{- range .Values.anm.secretMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .path }}
+            {{- if .subPath }}
+            subPath: {{ .subPath }}
+            {{- end }}
+          {{- end }}
+        {{- if .Values.anm.extraContainers }}
+{{ tpl .Values.anm.extraContainers . | indent 6 }}
+        {{- end }}
+        {{- if .Values.anm.lifecycle }}
+        lifecycle:
+{{ toYaml .Values.anm.lifecycle | indent 10 }}
+        {{- end }}
+{{- end }}

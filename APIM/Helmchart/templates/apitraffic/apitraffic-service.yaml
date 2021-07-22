@@ -1,0 +1,29 @@
+{{- if .Values.apitraffic.enabled -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "apitraffic.name" . }}
+  labels: {{- include "apitraffic.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.apitraffic.service.type }}
+{{- if .Values.apitraffic.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+{{- end }}
+{{- with .Values.apitraffic.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  ports:
+  - name: {{ .Values.apitraffic.service.httpPortName | default "http" }}
+    port: {{ .Values.apitraffic.service.port }}
+{{- if .Values.apitraffic.service.nodePort }}
+    nodePort: {{ .Values.apitraffic.service.nodePort }}
+{{- end }}
+    protocol: TCP
+    targetPort: {{ .Values.apitraffic.containerPorts.traffic }}
+  selector:
+    {{- include "apitraffic.selectorLabels" . | nindent 4 }}
+  sessionAffinity: ClientIP
+
+{{- end }}

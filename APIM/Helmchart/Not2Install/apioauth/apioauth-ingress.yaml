@@ -1,0 +1,53 @@
+{{- if eq .Values.oauth.enabled true }}
+{{- if ne .Values.global.platform "OPENSHIFT" }}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: oauth
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- if .Values.global.managedIngress }}
+    {{- if eq .Values.global.platform "AZURE" }}
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/backend-protocol: https
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
+    cert-manager.io/cluster-issuer: azure-dns-issuer
+    {{- end }}
+    {{- else }}
+    kubernetes.io/ingress.class: nginx
+    {{- if .Values.global.issuedByLetsEncrypt }}
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
+    cert-manager.io/acme-challenge-type: http01
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    {{- end }}
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.oauth.ingressName }}.{{ required "global.domainName is required." .Values.global.domainName }}
+    {{- if .Values.oauth.certInSecret }}
+    secretName: apioauth-ingress-cert
+    {{- end }}
+  rules:
+  - host: {{ .Values.oauth.ingressName }}.{{ .Values.global.domainName }}
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Values.oauth.name }}
+            port:
+              number: {{ .Values.oauth.trafficPort }}
+          {{- else }}
+          serviceName: {{ .Values.oauth.name }}
+          servicePort: {{ .Values.oauth.trafficPort }}
+          {{- end }}
+{{- end }}
+{{- end }}

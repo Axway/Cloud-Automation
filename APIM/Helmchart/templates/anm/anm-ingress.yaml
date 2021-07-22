@@ -1,0 +1,58 @@
+{{- if .Values.anm.ingress.enabled -}}
+{{- if ne .Values.global.platform "OPENSHIFT" }}
+
+{{- $httpPort := .Values.anm.httpPort -}}
+{{- $ingressPath := .Values.anm.ingress.path -}}
+
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ template "anm.name" . }}
+  labels: {{ include "anm.labels" . | nindent 4 }}
+  {{- with .Values.anm.ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.anm.ingress.tls }}
+  tls:
+{{ toYaml .Values.anm.ingress.tls | indent 4 }}
+  {{- end }}
+  rules:
+  {{- if .Values.anm.ingress.hosts }}
+  {{- range .Values.anm.ingress.hosts }}
+  - host: {{ .host }}
+    http:
+      paths:
+      {{- range .paths }}
+        - path: {{ .path }}
+          backend:
+            serviceName: {{ template "anm.name" . }}
+            servicePort: {{ .servicePort | default $httpPort }}
+      {{- end }}
+  {{- end }}
+  {{- else }}
+  - host: {{ .Values.anm.ingress.name }}.{{ required "global.domainName is required." .Values.global.domainName }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          service:
+            name: {{ template "anm.name" . }}
+            port:
+              number: {{ .Values.anm.service.port | default .Values.anm.httpPort }}
+          {{- else }}
+          serviceName: {{ template "anm.name" . }}
+          servicePort: {{ .Values.anm.service.port | default .Values.anm.httpPort }}
+          {{- end }}
+
+  {{- end }}
+
+{{- end }}
+{{- end }}

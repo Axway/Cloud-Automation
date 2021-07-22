@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-   name: license
-   namespace: {{ .Release.Namespace | quote }}
-data:
-   license: |

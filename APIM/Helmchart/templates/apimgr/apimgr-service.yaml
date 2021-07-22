@@ -1,0 +1,29 @@
+{{- if .Values.apimgr.enabled -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "apimgr.name" . }}
+  labels: {{- include "apimgr.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.apimgr.service.type }}
+{{- if .Values.apimgr.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+{{- end }}
+{{- with .Values.apimgr.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  ports:
+  - name: {{ .Values.apimgr.service.httpPortName | default "http" }}
+    port: {{ .Values.apimgr.service.port }}
+{{- if .Values.apimgr.service.nodePort }}
+    nodePort: {{ .Values.apimgr.service.nodePort }}
+{{- end }}
+    protocol: TCP
+    targetPort: {{ .Values.apimgr.httpPort }}
+  selector:
+    {{- include "apimgr.selectorLabels" . | nindent 4 }}
+  sessionAffinity: ClientIP
+
+{{- end }}

@@ -1,0 +1,71 @@
+global:
+  platform: "OPENSHIFT"
+  domainName: "apps.ocp.axwayita.com"
+  imageTag: "7.7-20200530"
+  imagePullSecrets:
+  - name: docker-registry.demo.axway.com
+
+  license: |
+    FIPS=1
+    SalesForce Connector=1
+    ServiceNow Connector=1
+    analytics=1
+    api_visual_mapper=1
+    apiportal=1
+    company=Axway
+    deployment_type=docker
+    expires=Sat, 31 Jul 2021 18:02:39 GMT
+    license_id=TEMP
+    mcafee=1
+    name=Axway
+    sdkgenerator=1
+    unrestricted=1
+    version=7.7
+    # SIGNATURE: 891d7950a86d80c5b2d02ce5e0cc238eb4e0e42430f893cec7dc4be9416d4743
+    # SIGNATURE: f8653ce937ce47622fa915c22d8b2cd13d4707204deecd721e403ed35044c6a1
+    # SIGNATURE: 34e7be02189add9122b82c23aa81d79ac3cf1190517ba30ec9fa5ae0f729ca5d
+    # SIGNATURE: e78c5861ae84335d48e29f1f92159f5a5fc3d15f14cabe422d7528cf4c16124c
+    # SIGNATURE: 202cdd2685d955362a47e7be38ab2fdb0f45f13a10ef143517c95195a8feaaa1
+    # SIGNATURE: c7403fce8b20338ff638d0b6962274b18f31b6642687fbe6338b940888223d45
+    # SIGNATURE: 8eee280ede1a7fd94b91130c78da44f403f8bd9f927bc96bfd6a2a94839c049b
+    # SIGNATURE: 096e86bb928c5865c77596de3814f116b9b3f4923441ac0cb8e7189f9c0f5971
+
+base: 
+   useImagestream: false
+   imageName: base
+   imageTag: 77-20210530
+
+anm:
+  enabled: true
+
+  #deploymentAnnotations: 
+  #  image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"{{ .Values.anm.imageName }}:latest","namespace":"apim"},"fieldPath":"spec.template.spec.containers[?(@.name==\"{{ .Values.anm.name }}\")].image"}]'
+
+  podSecurityContext: null
+
+  EMT_TOPOLOGY_TTL: true
+
+apimgr:
+  enabled: false
+
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/group.name: axway-apim-on-eks
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/backend-protocol: "HTTPS"
+
+apitraffic:
+  enabled: false
+
+  filebeat:
+    enabled: true
+
+mysqlAnalytics:
+   enabled: false
+
+#cassandra:
+#  dbUser:
+#    password: axway

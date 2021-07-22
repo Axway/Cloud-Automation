@@ -1,0 +1,39 @@
+apiVersion: v2
+
+appVersion: 7.7-20210330
+
+version: 7.7-20210330
+
+description: Package for demo instance of Axway AMPLIFY API Management.
+icon: https://images.app.goo.gl/MbQyRo2M2jzAsed79
+home: https://github.com/Axway/Cloud-Automation/tree/master/APIM/Helmchart
+keywords:
+- API Management, Axway, AMPLIFY API, Demo, Azure
+#kubeVersion: '>=1.15.0'
+maintainers:
+- email: ncomandini@axway.com
+  name: cloud-automation community
+- email: cwiechmann@axway.com
+  name: cloud-automation community
+name: axway-apim
+
+dependencies:
+  - name: common
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami-common
+    version: 1.x.x
+  - name: mysql
+    alias: mysqlanalytics
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami/mysql
+    version: 8.x.x
+    condition: mysqlAnalytics.enabled
+  - name: mysql
+    alias: mysqlportal
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami/mysql
+    version: 8.x.x
+    condition: mysqlPortal.enabled

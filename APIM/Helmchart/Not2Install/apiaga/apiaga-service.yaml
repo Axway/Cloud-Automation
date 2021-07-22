@@ -1,0 +1,21 @@
+{{- if eq .Values.apiaga.enable true }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.apiaga.name | quote }}
+  name: {{ .Values.apiaga.name | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ .Values.apiaga.trafficPort }}
+    targetPort: {{ .Values.apiaga.trafficPort }} 
+    protocol: TCP
+  selector:
+    app: {{ .Values.apiaga.name | quote }}
+  sessionAffinity: ClientIP
+  type: ClusterIP
+status:
+  loadBalancer: {}
+{{- end }}
