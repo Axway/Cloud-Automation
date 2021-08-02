@@ -32,6 +32,8 @@ The following tables lists the mandatory parameters of the AMPLIFY API Managemen
 | apitraffic.buildTag | Docker image tag of API Gateway component | - |
 | apitraffic.imageName | Docker image name of API Gateway component | - |
 | apitraffic.ingressName |  | - |
+| apiportal.imageName | Docker image name for API Portal component | |
+| apiportal.buildTag | Docker image tag for API Portal component | |
 | cassandra.adminPasswd | Password of cassandra User | changeme |
 | mysqlAnalytics.adminPasswd | Password of Mysql user | changeme |
 | mysqlAnalytics.rootPasswd | Password of Mysql root user | changeme |
@@ -59,6 +61,12 @@ The following tables lists the parameters and their default values to configure 
 | apitraffic.emt_heap_size_mb | Specifies the initial and maximum Java heap size | 1512 |
 | oauth.enable | Enable oauth feature | false |
 | oauth.ingressName | Url to access to the oauth API | - |
+
+You will also need to include a certificate and key for configuring Apache HTTP server in your API Portal pod. These certificate and key should be included in the configmap yaml file at:
+
+```bash
+Cloud-Automation/APIM/Helmchart/amplify-apim-7.7/templates/common/apache-configmap.yaml
+```
 
 ## Optional Configuration
 The following tables lists the optional parameters of the AMPLIFY API Management Helm chart and their default values.

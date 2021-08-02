@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apache-store
+  namespace: {{ .Release.Namespace | quote }}
+data:
+  apache.crt: |
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----
+  apache.key: |
+    -----BEGIN PRIVATE KEY-----
+    -----END PRIVATE KEY-----
