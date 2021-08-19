@@ -187,7 +187,7 @@ cassandra:
    portJmx: 7199
    portIntraNode: 7000
    portTlsIntraNode: 7001
-   buildTag: "3.11.6"
+   buildTag: "3.11.11"
    registry: "bitnami/cassandra"
    replicaCount: 1
    clusterName: "cassandra"

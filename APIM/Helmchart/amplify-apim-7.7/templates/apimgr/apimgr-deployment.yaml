@@ -149,6 +149,12 @@ spec:
         - name: idp
           mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/idp.xml"
           subPath: idp.xml
+        - name: sso-jks
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/sso.jks"
+          subPath: sso.jks
+        - name: truststore-jks
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/truststore.jks"
+          subPath: truststore.jks
         {{- end }}
         {{- if eq .Values.apiportal.sso.enable true }}
         - name: service-provider-apiportal
@@ -241,6 +247,22 @@ spec:
             - key: idp
               mode: 256
               path: idp.xml
+      - name: sso-jks
+        configMap:
+          name: sso-xml
+          defaultMode: 256
+          items:
+            - key: sso-jks
+              mode: 256
+              path: sso.jks
+      - name: truststore-jks
+        configMap:
+          name: sso-xml
+          defaultMode: 256
+          items:
+            - key: truststore-jks
+              mode: 256
+              path: truststore.jks
       {{- end }}
       {{- if (eq .Values.apiportal.sso.enable true) }}
       - name: service-provider-apiportal

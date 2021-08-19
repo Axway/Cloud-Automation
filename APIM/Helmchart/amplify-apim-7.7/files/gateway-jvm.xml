@@ -1,4 +1,5 @@
 <ConfigurationFragment>
 	<VMArg name="-Dio.swagger.parser.util.RemoteUrl.trustAll=true"/>
 	<VMArg name="-Dio.swagger.v3.parser.util.RemoteUrl.trustAll=true"/>
+	<VMArg name="-Dcom.axway.sso.domain.name=axway.int" />
 </ConfigurationFragment>

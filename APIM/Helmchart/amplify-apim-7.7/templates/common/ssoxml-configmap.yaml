@@ -21,4 +21,11 @@ data:
    idp-apiportal: |
 {{ .Files.Get "files/idp-apiportal.xml" | indent 8 }}
    {{- end }}
+binaryData:
+   {{- if eq .Values.apimgr.sso.enable true }}
+   sso-jks: |
+{{ .Files.Get "files/sso.jks" | b64enc | indent 8 }}
+   truststore-jks: |
+{{ .Files.Get "files/truststore.jks" | b64enc | indent 8 }}
+   {{- end }}
 {{- end }}
