@@ -107,12 +107,14 @@ apiportal:
    ingressName: "apiportal"
    trafficPort: 443
    scheme: HTTPS
+   ssl: 1
+   configureManager: 1
    replicaCount: 1
    share:
       secret: "apiportal-secret-name"
       name: "apiportal-volume-rwm-name"
    certInSecret: false
-   runAsUser: 1000
+   runAsUser: 1048
 
 apiaga:
    enable: false

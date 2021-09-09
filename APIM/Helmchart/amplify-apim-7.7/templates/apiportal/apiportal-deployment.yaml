@@ -43,6 +43,8 @@ spec:
         - name: {{ .Values.global.dockerRegistry.secret }}
       containers:
       - env:
+        - name: APACHE_SSL_ON
+          value: {{ .Values.apiportal.ssl | quote }}
         - name: MYSQL_HOST
           value: {{ .Values.mysqlPortal.name | quote }}
         - name: MYSQL_PORT
@@ -61,15 +63,21 @@ spec:
               key: dbmysqlportal
         - name: MYSQL_DATABASE
           value: {{ .Values.mysqlPortal.dbName }}
+        - name: APIMANAGER_CONFIGURED
+          value: {{ .Values.apiportal.configureManager | quote }}
         - name: APIMANAGER_HOST
           value: {{ .Values.apimgr.name }}
         - name: APIMANAGER_PORT
           value: {{ .Values.apimgr.trafficPort | quote }}
-        - name: APIMANAGER_PUBLIC_NAME
+        - name: APIMANAGER_NAME
           value: {{ .Values.apimgr.name }}
         name: {{ .Values.apiportal.name }}
         image: {{ .Values.global.dockerRegistry.url }}/{{ .Values.apiportal.imageName }}:{{ .Values.apiportal.buildTag }}
         imagePullPolicy: {{ .Values.global.pullPolicy }}
+        volumeMounts:
+        - name: apache-store
+          mountPath: "/opt/axway/apiportal/certs/apache/"
+          readOnly: true
         readinessProbe:
           httpGet:
             path: /
@@ -106,6 +114,10 @@ spec:
         runAsUser: {{ .Values.apiportal.runAsUser }}
         fsGroup: {{ .Values.apiportal.runAsUser }}
       {{- end }}
+      volumes:
+      - name: apache-store
+        configMap:
+          name: apache-store
   strategy:
     type: {{ .Values.global.updateStrategy }}
 status: {}
