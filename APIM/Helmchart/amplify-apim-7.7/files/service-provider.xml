@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SSOConfiguration>
+	<CertificateValidation pathValidation="false" enableRevocation="false" trustStorePath="conf/truststore.jks" trustStorePassword="Axway123">
+	</CertificateValidation>
+	<!-- entityId="api-manager" is a logical id (not a machine name). Ensure this logical id is the same in your IDP configuration too -->
+	<ServiceProvider entityId="APIManager" useAppSessions="true" filteredUri="/sso/login" logoutUri="/sso/logout" logoutRedirectUri="/api/portal/v1.4/sso/login" keystore="conf/sso.jks" keystorePassphrase="Axway123" keyAlias="ssokey" sessionIdCookieName="spSessionId2">
+		<AssertionConsumerService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" location="/sso/login/post"/>
+		<SingleLogoutService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" location="/sso/logout/post"/>
+		<SingleLogoutService binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" location="/redirect"/>
+	</ServiceProvider>
+	<IdentityProviders>
+		<!-- Change references to keycloak.int.acme.com:8443 to the Fully Qualified Domain Name:port of your IDP provider. -->
+		<!-- Change verifyAssertionExpiration to false if you do not want validity time/date checking done on SAML assertions -->
+		<SamlIdentityProvider entityId="https://slnxphxshvra232.lab.phx.axway.int:8443/auth/realms/Axway" metadataUrl="https://slnxphxshvra232.lab.phx.axway.int:8443/auth/realms/Axway/protocol/saml/descriptor" userNameAttribute="urn:oid:2.5.4.42" verifyAssertionExpiration="false">
+			<Mappings>
+				<FilterMapping>
+					<Filter>(Role=admin)</Filter>
+					<OutputAttribute name="role">Administrator</OutputAttribute>
+					<OutputAttribute name="organization">API Development</OutputAttribute>
+				</FilterMapping>
+				<FilterMapping>
+					<Filter>(Role=oadmin)</Filter>
+					<OutputAttribute name="role">Operator</OutputAttribute>
+					<OutputAttribute name="organization">API Development</OutputAttribute>
+				</FilterMapping>
+				<FilterMapping>
+					<Filter>(Role=user)</Filter>
+					<OutputAttribute name="role">User</OutputAttribute>
+					<OutputAttribute name="organization">API Development</OutputAttribute>
+				</FilterMapping>
+			</Mappings>
+			<Features>
+				<Feature key="saml-verify-metadata-signature" value="false"/>
+			</Features>
+		</SamlIdentityProvider>
+	</IdentityProviders>
+</SSOConfiguration>

@@ -17,6 +17,11 @@ global:
    enableDynamicLicense: true
    dockerRegistry:
       url: lacg
+   jvm:
+      gateway:
+         enable: true
+      nodemanager:
+         enable: true
 
 anm:
    ingressName: "admin"
@@ -35,8 +40,9 @@ apimgr:
 apitraffic:
    buildTag: "7.7.20210530"
    imageName: "mngr"
-   portProbe: 8080
-   schemeProbe: "HTTP"
+   probe:
+      port: 8065
+      scheme: "TCP"
 
 apiaga:
    enable: true

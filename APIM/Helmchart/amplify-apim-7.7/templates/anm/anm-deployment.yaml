@@ -106,11 +106,22 @@ spec:
             exec:
               command: ["sleep","90"]
         volumeMounts:
-        - name: events
-          mountPath: {{ .Values.apitraffic.share.path | quote }}
-        - name: config-jvmxml
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
+       {{- if eq .Values.global.jvm.nodemanager.enable true }}
+        - name: nodemanager-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
           subPath: jvm.xml
+        {{- end }}
+       {{- if eq .Values.global.jvm.gateway.enable true }}
+        - name: gateway-jvmxml
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
+          subPath: jvm.xml
+        {{- end }}
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
@@ -121,6 +132,18 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.global.dockerRegistry.secret }}
       initContainers:
+      - name: init-mount
+        image: {{ .Values.global.initImageTag | quote }}
+        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.nodemanager.paths.events }} {{ .Values.global.volumes.nodemanager.paths.logs }} {{ .Values.global.volumes.nodemanager.paths.trace }}']
+        volumeMounts:
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
+        - name: {{ .Values.anm.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
+        securityContext:
+          runAsUser: 0
       {{- if eq .Values.mysqlAnalytics.enable true }}
       - name: init-mysql
         image: {{ .Values.global.initImageTag | quote }}
@@ -132,21 +155,33 @@ spec:
       terminationGracePeriodSeconds: 101
       {{- if ne .Values.global.platform "OPENSHIFT" }}
       securityContext:
-        runAsUser: 1000
-        fsGroup: 1000
+        runAsUser: {{ .Values.global.userID }}
+        fsGroup: {{ .Values.global.userID }}
       {{- end }}
       volumes:
-      - name: events
+      - name: {{ .Values.anm.volumes.name | quote }}
         persistentVolumeClaim:
-          claimName: apigw-events
-      - name: config-jvmxml
+          claimName: {{ .Values.anm.volumes.name | quote }}
+      {{- if eq .Values.global.jvm.nodemanager.enable true }}
+      - name: nodemanager-jvmxml
         configMap:
           name: jvmxml
           defaultMode: 256
           items:
-            - key: jvm
+            - key: nodemanager-jvm
               mode: 256
               path: jvm.xml
+      {{- end }}
+      {{- if eq .Values.global.jvm.gateway.enable true }}
+      - name: gateway-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: gateway-jvm
+              mode: 256
+              path: jvm.xml
+      {{- end }}
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:
