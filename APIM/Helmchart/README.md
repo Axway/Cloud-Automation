@@ -56,12 +56,12 @@ The following tables lists the parameters and their default values to configure 
 | anm.logTraceJSONtoSTDOUT | Enable JSON format for logs and STDOUT | false |
 | anm.emt_heap_size_mb | Specifies the initial and maximum Java heap size | 1024 |
 | anm.emt_topology_ttl | The time, in seconds that | 10 |
-| anm.emt_trace_level | Specifies the trace level. Possible values are INFO, DEBUG, DATA | INFO | 
+| anm.emt_trace_level | Specifies the trace level. Possible values are INFO, DEBUG, DATA | INFO |
 | apimgr.logTraceToFile | Enable traces to file | true |
 | apimgr.logTraceJSONtoSTDOUT | Enable JSON format for logs and STDOUT | false |
 | apimgr.emt_heap_size_mb | Specifies the initial and maximum Java heap size | 1024 |
 | apimgr.emt_topology_ttl | The time, in seconds that | 10 |
-| apimgr.emt_trace_level | Specifies the trace level. Possible values are INFO, DEBUG, DATA | INFO | 
+| apimgr.emt_trace_level | Specifies the trace level. Possible values are INFO, DEBUG, DATA | INFO |
 | apimgr.logOpenTrafficOutput |  | stdout |
 | apitraffic.logTraceToFile | Enable traces to file | true |
 | apitraffic.logTraceJSONtoSTDOUT | Enable JSON format for logs and STDOUT | false |

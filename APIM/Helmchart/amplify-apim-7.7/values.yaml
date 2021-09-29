@@ -132,6 +132,8 @@ apiportal:
    ingressName: "apiportal"
    trafficPort: 443
    scheme: HTTPS
+   ssl: 1
+   configureManager: 1
    replicaCount: 1
    share:
       secret: "apiportal-secret-name"
