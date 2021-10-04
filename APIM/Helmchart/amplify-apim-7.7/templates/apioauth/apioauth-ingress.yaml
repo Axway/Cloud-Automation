@@ -24,7 +24,8 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     {{- end }}
     cert-manager.io/acme-challenge-type: http01
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     {{- end }}
 spec:
   tls:
