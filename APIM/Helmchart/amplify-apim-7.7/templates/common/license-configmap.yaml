@@ -1,7 +1,10 @@
+{{- if eq .Values.global.enableDynamicLicense true }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
    name: license
    namespace: {{ .Release.Namespace | quote }}
 data:
-   license: |
+   license:
+{{ .Files.Get "files/license.lic" | toYaml | indent 8 }}
+{{- end }}

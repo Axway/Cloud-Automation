@@ -10,8 +10,8 @@ Join the Axway community **Cloud - Automation** to share your needs and have som
 
 ## Table of Contents
 - [Deploy the solution on Azure](Azure/deployOnAzure.md)
-- [Techlabs on the solution in EMT mode](Techlabs/techlabsSummary.md) ]
-- [Play with helmchart in a specific context](Helmchart/helmforAPIM.md)
+- [Techlabs on the solution in EMT mode](Techlabs/techlabsSummary.md)
+- [Play with helmchart in a specific context](Helmchart/README.md)
 
 
 ## External links

@@ -1,12 +1,16 @@
+{{- if or (eq .Values.global.jvm.gateway.enable true) (eq .Values.global.jvm.nodemanager.enable true) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
    name: jvmxml
    namespace: {{ .Release.Namespace | quote }}
 data:
-   jvm: |
-    <ConfigurationFragment>
-    <VMArg name="-Ddont.expect.100.continue=true"/>
-    <VMArg name="-Dio.swagger.parser.util.RemoteUrl.trustAll=true"/>
-    <VMArg name="-Dio.swagger.v3.parser.util.RemoteUrl.trustAll=true"/>
-    </ConfigurationFragment>
+   {{- if eq .Values.global.jvm.nodemanager.enable true }}
+   nodemanager-jvm: |
+{{ .Files.Get "files/nodemanager-jvm.xml" | indent 8 }}
+   {{- end }}
+   {{- if eq .Values.global.jvm.gateway.enable true }}
+   gateway-jvm: |
+{{ .Files.Get "files/gateway-jvm.xml" | indent 8 }}
+   {{- end }}
+{{- end }}

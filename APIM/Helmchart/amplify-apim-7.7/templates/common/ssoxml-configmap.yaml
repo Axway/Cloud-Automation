@@ -1,0 +1,31 @@
+{{- if or (eq .Values.apimgr.sso.enable true) (eq .Values.apiportal.sso.enable true) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+   name: sso-xml
+   namespace: {{ .Release.Namespace | quote }}
+data:
+   {{- if eq .Values.apimgr.sso.enable true }}
+   # You need to change the mapping filter to your specific configuration.
+   service-provider: |
+{{ .Files.Get "files/service-provider.xml" | indent 8 }}
+   # You need to change the idp to your specific needs.
+   idp: |
+{{ .Files.Get "files/idp.xml" | indent 8 }}
+   {{- end }}
+   {{- if eq .Values.apiportal.sso.enable true }}
+   # You need to change the mapping filter to your specific configuration.
+   service-provider-apiportal: |
+{{ .Files.Get "files/service-provider-apiportal.xml" | indent 8 }}
+   # You need to change the idp-portal to your specific needs.
+   idp-apiportal: |
+{{ .Files.Get "files/idp-apiportal.xml" | indent 8 }}
+   {{- end }}
+binaryData:
+   {{- if eq .Values.apimgr.sso.enable true }}
+   sso-jks: |
+{{ .Files.Get "files/sso.jks" | b64enc | indent 8 }}
+   truststore-jks: |
+{{ .Files.Get "files/truststore.jks" | b64enc | indent 8 }}
+   {{- end }}
+{{- end }}

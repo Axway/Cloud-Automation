@@ -95,11 +95,26 @@ spec:
         imagePullPolicy: {{ .Values.global.pullPolicy }} 
         name: {{ .Values.apitraffic.name }}
         volumeMounts:
-        - mountPath: {{ .Values.apitraffic.share.path | quote }}
-          name: events
-        - name: config-jvmxml
+        - mountPath: {{ .Values.global.volumes.gateway.paths.logs | quote }}
+          name: {{ .Values.apitraffic.volumes.name | quote }}
+        - mountPath: {{ .Values.global.volumes.gateway.paths.trace | quote }}
+          name: {{ .Values.apitraffic.volumes.name | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
+          name: {{ .Values.apitraffic.volumes.name | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
+          name: {{ .Values.apitraffic.volumes.name | quote }}
+        - mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
+          name: {{ .Values.apitraffic.volumes.name | quote }}
+       {{- if eq .Values.global.jvm.nodemanager.enable true }}
+        - name: nodemanager-jvmxml
           mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
           subPath: jvm.xml
+        {{- end }}
+       {{- if eq .Values.global.jvm.gateway.enable true }}
+        - name: gateway-jvmxml
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
+          subPath: jvm.xml
+        {{- end }}
         {{- if eq .Values.global.enableDynamicLicense true }}
         - name: config-license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
@@ -124,24 +139,34 @@ spec:
             memory: "0.5Gi"
             cpu: 0.5
         readinessProbe:
+          {{- if or (eq .Values.apitraffic.probe.scheme "HTTP") (eq .Values.apitraffic.probe.scheme "HTTPS") }}
           httpGet:
             httpHeaders:
             - name: k8sprobe
               value: readiness.{{ .Values.apitraffic.name }}
-            path: /healthcheck
-            port: {{ .Values.apitraffic.portProbe }}
-            scheme: {{ .Values.apitraffic.schemeProbe }}
+            path: {{ .Values.global.probe.page }}
+            port: {{ .Values.apitraffic.probe.port }}
+            scheme: {{ .Values.apitraffic.probe.scheme }}
+          {{- else }}
+          tcpSocket:
+            port: {{ .Values.apitraffic.probe.port }}
+          {{- end }}
           initialDelaySeconds: 40
           periodSeconds: 30
           failureThreshold: 5
         livenessProbe:
+          {{- if or (eq .Values.apitraffic.probe.scheme "HTTP") (eq .Values.apitraffic.probe.scheme "HTTPS") }}
           httpGet:
             httpHeaders:
             - name: k8sprobe
               value: liveness.{{ .Values.apitraffic.name }}
-            path: /healthcheck
-            port: {{ .Values.apitraffic.portProbe }}
-            scheme: {{ .Values.apitraffic.schemeProbe }}
+            path: {{ .Values.global.probe.page }}
+            port: {{ .Values.apitraffic.probe.port }}
+            scheme: {{ .Values.apitraffic.probe.scheme }}
+          {{- else }}
+          tcpSocket:
+            port: {{ .Values.apitraffic.probe.port }}
+          {{- end }}
           initialDelaySeconds: 30
           periodSeconds: 30
           failureThreshold: 5
@@ -155,6 +180,22 @@ spec:
 {{ tpl .Values.extraContainers . | indent 6 }}
       {{- end }}
       initContainers:
+      - name: init-mount
+        image: {{ .Values.global.initImageTag | quote }}
+        command: ['sh', '-c', 'chown -R {{ .Values.global.userID }}:{{ .Values.global.userID }} {{ .Values.global.volumes.gateway.paths.logs }} {{ .Values.global.volumes.gateway.paths.trace }} {{ .Values.global.volumes.nodemanager.paths.events }} {{ .Values.global.volumes.nodemanager.paths.logs }} {{ .Values.global.volumes.nodemanager.paths.trace }}']
+        volumeMounts:
+        - name: {{ .Values.apitraffic.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.gateway.paths.logs | quote }}
+        - name: {{ .Values.apitraffic.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.gateway.paths.trace | quote }}
+        - name: {{ .Values.apitraffic.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.events | quote }}
+        - name: {{ .Values.apitraffic.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.logs | quote }}
+        - name: {{ .Values.apitraffic.volumes.name | quote }}
+          mountPath: {{ .Values.global.volumes.nodemanager.paths.trace | quote }}
+        securityContext:
+          runAsUser: 0
       - name: init-cassandra
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.name }} 9042; do echo waiting for cassandra; sleep 60; done;']
@@ -181,17 +222,29 @@ spec:
         fsGroup: 1000
       {{- end }}
       volumes:
-      - name: events
+      - name: {{ .Values.apitraffic.volumes.name | quote }}
         persistentVolumeClaim:
-          claimName: apigw-events
-      - name: config-jvmxml
+          claimName: {{ .Values.apitraffic.volumes.name | quote }}
+      {{- if eq .Values.global.jvm.nodemanager.enable true }}
+      - name: nodemanager-jvmxml
         configMap:
           name: jvmxml
           defaultMode: 256
           items:
-            - key: jvm
+            - key: nodemanager-jvm
               mode: 256
               path: jvm.xml
+      {{- end }}
+      {{- if eq .Values.global.jvm.gateway.enable true }}
+      - name: gateway-jvmxml
+        configMap:
+          name: jvmxml
+          defaultMode: 256
+          items:
+            - key: gateway-jvm
+              mode: 256
+              path: jvm.xml
+      {{- end }}
       {{- if eq .Values.global.enableDynamicLicense true }}
       - name: config-license
         configMap:

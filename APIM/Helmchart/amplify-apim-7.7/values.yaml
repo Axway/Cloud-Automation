@@ -35,6 +35,26 @@ global:
    issuedByLetsEncrypt: false
    bodySize: 10m
    dashboard: false
+   volumes:
+      accessModes: ReadWriteOnce
+      gateway:
+         paths:
+            logs: "/opt/Axway/apigateway/groups/emt-group/emt-service/logs"
+            trace: "/opt/Axway/apigateway/groups/emt-group/emt-service/trace"
+      nodemanager:
+         paths:
+            events: "/opt/Axway/apigateway/events"
+            logs: "/opt/Axway/apigateway/logs"
+            trace: "/opt/Axway/apigateway/trace"
+   jvm:
+      gateway:
+         enable: false
+      nodemanager:
+         enable: false
+   userID: 1000
+   probe:
+      page: "/healtchecklb"
+
 
 anm:
    name: anm
@@ -52,6 +72,9 @@ anm:
    emt_topology_ttl: 140
    emt_trace_level: "INFO"
    certInSecret: false
+   volumes:
+      quota: 1Gi
+      name: "anm-pvc"
 
 apimgr:
    name: apimgr
@@ -66,6 +89,11 @@ apimgr:
    emt_heap_size_mb: "1024"
    emt_trace_level: "INFO"
    certInSecret: false
+   volumes:
+      quota: 1Gi
+      name: "apimgr-pvc"
+   sso:
+      enable: false
 
 apitraffic:
    name: traffic
@@ -91,10 +119,12 @@ apitraffic:
       path: "/opt/Axway/apigateway/events"
       quota: 1
    volumes:
-      accessModes: ReadWriteOnce
+      quota: 1Gi
+      name: "traffic-pvc"
    certInSecret: false
-   portProbe: 8065
-   schemeProbe: "HTTPS"
+   probe:
+      port: 8065
+      scheme: "HTTPS"
 
 apiportal:
    enable: false
@@ -111,7 +141,9 @@ apiportal:
       secret: "apiportal-secret-name"
       name: "apiportal-volume-rwm-name"
    certInSecret: false
-   runAsUser: 1048
+   runAsUser: 1000
+   sso:
+      enable: false
 
 apiaga:
    enable: false
@@ -125,10 +157,11 @@ apiaga:
    logTraceJSONtoSTDOUT: "false"
    logOpenTrafficOutput: "stdout"
    emt_heap_size_mb: "1024"
-   emt_topology_ttl: 10
    emt_trace_level: "INFO"
    certInSecret: false
 
+# Disclaimers:
+# Axway does not support MySQL in Containers.
 mysqlAnalytics:
    enable: true
    external: false
@@ -145,6 +178,9 @@ mysqlAnalytics:
    quotaStorage: 10
    port: 3306
 
+# Disclaimers:
+# Axway does not support Cassandra in Containers.
+# The latest supported buildTag for Cassandra is 2.2.12.
 cassandra:
    external: false
    name: "cassandra"
@@ -154,7 +190,7 @@ cassandra:
    portJmx: 7199
    portIntraNode: 7000
    portTlsIntraNode: 7001
-   buildTag: "3.11.6"
+   buildTag: "3.11.11"
    registry: "bitnami/cassandra"
    replicaCount: 1
    clusterName: "cassandra"
@@ -165,6 +201,8 @@ cassandra:
    domain: ""
    consistency_level: "LOCAL_QUORUM"
 
+# Disclaimers:
+# Axway does not support MySQL in Containers.
 mysqlPortal:
    external: true
    name: "mysql-portal"
