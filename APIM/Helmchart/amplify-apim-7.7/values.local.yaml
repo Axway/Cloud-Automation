@@ -12,39 +12,51 @@ global:
    # To have the local-path storage class, remember to run:
    # kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
    customStorageClass:
-      scrwo: local-path
-      scrwm: local-path
-   enableDynamicLicense: true
+      scrwo: hostpath
+      scrwm: hostpath
+   enableDynamicLicense: false
+   pullPolicy: IfNotPresent
    dockerRegistry:
-      url: lacg
+      url: docker-registry.demo.axway.com/apim-demo
+   jvm:
+      gateway:
+         enable: true
+      nodemanager:
+         enable: true
+   dashboard: true
+   probe:
+      page: "/healthcheck"
+
 
 anm:
-   ingressName: "admin"
-   buildTag: "7.7.20210530"
-   imageName: "anm"
+   buildTag: "7.7.20210830-01"
+   imageName: "anm-demo"
    trafficPortUI: 8090
    logTraceJSONtoSTDOUT: "true"
    emt_heap_size_mb: "2048"
 
 apimgr:
-   ingressName: "apimanager"
-   buildTag: "7.7.20210530"
-   imageName: "mngr"
+   buildTag: "7.7.20210830-01"
+   imageName: "apimgt-demo"
    logTraceJSONtoSTDOUT: "true"
 
 apitraffic:
-   buildTag: "7.7.20210530"
-   imageName: "mngr"
-   portProbe: 8080
-   schemeProbe: "HTTP"
+   buildTag: "7.7.20210830-01"
+   imageName: "apimgt-demo"
+   probe:
+     port: 8080
+     scheme: "HTTP"
 
 apiaga:
-   enable: true
-   buildTag: "7.7.20210530"
-   imageName: "ana"
+   enable: false
+   buildTag: "7.7.20210830-01"
+   imageName: "apigw-analytics-demo"
+
+mysqlAnalytics:
+   enable: false
 
 cassandra:
-   external: true
+   external: false
    # Change this IP to the Cassandra's cluster IPs.
    host1: "10.42.12.229"
    host2: "10.42.12.229"
@@ -54,8 +66,8 @@ cassandra:
    domain: ".default.svc.cluster.local"
 
 apiportal:
-   enable: true
-   buildTag: "7.7.20210530"
+   enable: false
+   buildTag: "7.7.20210830-01"
    imageName: "apiportal"
    trafficPort: 80
    scheme: HTTP
