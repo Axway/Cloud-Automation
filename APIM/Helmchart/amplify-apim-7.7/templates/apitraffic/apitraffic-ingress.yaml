@@ -24,6 +24,7 @@ metadata:
     {{- end }}
     cert-manager.io/acme-challenge-type: http01
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     nginx.ingress.kubernetes.io/affinity-mode: "persistent"
     {{- end }}
 spec:

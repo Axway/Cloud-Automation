@@ -34,6 +34,7 @@ global:
    createSecrets: true
    issuedByLetsEncrypt: false
    bodySize: 10m
+   dashboard: false
    volumes:
       accessModes: ReadWriteOnce
       gateway:
@@ -68,7 +69,7 @@ anm:
    logTraceJSONtoSTDOUT: "false"
    emt_heap_size_mb: "1024"
    emt_topology_log_enabled: "true"
-   emt_topology_ttl: 10
+   emt_topology_ttl: 140
    emt_trace_level: "INFO"
    certInSecret: false
    volumes:
@@ -86,8 +87,6 @@ apimgr:
    logTraceJSONtoSTDOUT: "false"
    logOpenTrafficOutput: "stdout"
    emt_heap_size_mb: "1024"
-   emt_topology_log_enabled: "true"
-   emt_topology_ttl: 10
    emt_trace_level: "INFO"
    certInSecret: false
    volumes:
@@ -114,8 +113,11 @@ apitraffic:
    logOpenTrafficOutput: "stdout"
    emt_trace_level: "INFO"
    emt_heap_size_mb: "1512"
-   emt_topology_log_enabled: "true"
-   emt_topology_ttl: 10
+   share:
+      secret: "azure-file"
+      name: "gw-events"
+      path: "/opt/Axway/apigateway/events"
+      quota: 1
    volumes:
       quota: 1Gi
       name: "traffic-pvc"
@@ -155,7 +157,6 @@ apiaga:
    logTraceJSONtoSTDOUT: "false"
    logOpenTrafficOutput: "stdout"
    emt_heap_size_mb: "1024"
-   emt_topology_ttl: 10
    emt_trace_level: "INFO"
    certInSecret: false
 
