@@ -1,4 +1,4 @@
-{{- if eq .Values.cassandra.external false }}
+{{- if .Values.cassandra.internal }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:

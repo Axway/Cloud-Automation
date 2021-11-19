@@ -1,10 +1,14 @@
 {{- if .Values.apitraffic.enabled -}}
 {{- if ne .Values.global.platform "OPENSHIFT" }}
 
-{{- $httpPort := .Values.apitraffic.httpPort -}}
-{{- $ingressPath := .Values.apitraffic.ingress.path -}}
+{{- $apitrafficName := include "apitraffic.name" . -}}
+{{- $domainName := include "domain.name" . -}}
+{{ $hasIngressV1 := "false" }}
+{{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+  {{ $hasIngressV1 := true }}
+{{ end }}
 
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+{{- if eq $hasIngressV1 "true" }}
 apiVersion: networking.k8s.io/v1
 {{- else }}
 apiVersion: networking.k8s.io/v1beta1
@@ -23,36 +27,26 @@ spec:
 {{ toYaml .Values.apitraffic.ingress.tls | indent 4 }}
   {{- end }}
   rules:
-  {{- if .Values.apitraffic.ingress.hosts }}
-  {{- range .Values.apitraffic.ingress.hosts }}
-  - host: {{ .host }}
-    http:
-      paths:
-      {{- range .paths }}
-        - path: {{ .path }}
-          backend:
-            serviceName: {{ template "apitraffic.name" . }}
-            servicePort: {{ .servicePort | default $httpPort }}
-      {{- end }}
-  {{- end }}
-  {{- else }}
-  - host: {{ .Values.apitraffic.ingress.name }}.{{ required "global.domainName is required." .Values.global.domainName }}
+{{- range .Values.apitraffic.service.ports }}
+  {{- if .ingress.enabled }}
+  - host: {{ .ingress.host }}.{{ $domainName }}
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
-          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          {{- if eq $hasIngressV1 "true" }}
           service:
-            name: {{ template "apitraffic.name" . }}
+            name: {{ $apitrafficName }}
             port:
-              number: {{ .Values.apitraffic.service.port | default .Values.apitraffic.httpPort }}
+              number: {{ .port }}
           {{- else }}
-          serviceName: {{ template "apitraffic.name" . }}
-          servicePort: {{ .Values.apitraffic.service.port | default .Values.apitraffic.httpPort }}
+          serviceName: {{ $apitrafficName }}
+          servicePort: {{ .port }}
           {{- end }}
-
   {{- end }}
+{{- end }}
+
 
 {{- end }}
 {{- end }}

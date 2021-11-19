@@ -1,0 +1,57 @@
+{{- if and (.Values.apiportal.ingress.enabled) (.Values.apiportal.enabled) -}}
+{{- if ne .Values.global.platform "OPENSHIFT" }}
+
+{{- $httpPort := .Values.apiportal.httpPort -}}
+
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ template "apiportal.name" . }}
+  labels: {{ include "apiportal.labels" . | nindent 4 }}
+  {{- with .Values.apiportal.ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.apiportal.ingress.tls }}
+  tls:
+{{ toYaml .Values.apiportal.ingress.tls | indent 4 }}
+  {{- end }}
+  rules:
+  {{- if .Values.apiportal.ingress.hosts }}
+  {{- range .Values.apiportal.ingress.hosts }}
+  - host: {{ .host }}
+    http:
+      paths:
+      {{- range .paths }}
+        - path: {{ .path }}
+          backend:
+            serviceName: {{ template "apiportal.name" . }}
+            servicePort: {{ .servicePort | default $httpPort }}
+      {{- end }}
+  {{- end }}
+  {{- else }}
+  - host: {{ .Values.apiportal.ingress.name }}.{{ required "Either apiportal.ingress.name or global.domainName is required. Please configure your values.yaml accordingly." .Values.global.domainName }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+          service:
+            name: {{ template "apiportal.name" . }}
+            port:
+              number: {{ .Values.apiportal.service.port | default .Values.anm.httpPort }}
+          {{- else }}
+          serviceName: {{ template "apiportal.name" . }}
+          servicePort: {{ .Values.apiportal.service.port | default .Values.apiportal.httpPort }}
+          {{- end }}
+
+  {{- end }}
+
+{{- end }}
+{{- end }}

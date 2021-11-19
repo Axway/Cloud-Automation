@@ -1,10 +1,9 @@
-{{- if .Values.anm.ingress.enabled -}}
+{{- if and (.Values.anm.ingress.enabled) (.Values.anm.enabled) -}}
 {{- if ne .Values.global.platform "OPENSHIFT" }}
 
 {{- $httpPort := .Values.anm.httpPort -}}
-{{- $ingressPath := .Values.anm.ingress.path -}}
 
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 apiVersion: networking.k8s.io/v1
 {{- else }}
 apiVersion: networking.k8s.io/v1beta1
@@ -36,13 +35,13 @@ spec:
       {{- end }}
   {{- end }}
   {{- else }}
-  - host: {{ .Values.anm.ingress.name }}.{{ required "global.domainName is required." .Values.global.domainName }}
+  - host: {{ .Values.anm.ingress.name }}.{{ required "Either anm.ingress.name or global.domainName is required. Please configure your values.yaml accordingly." .Values.global.domainName }}
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
-          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
           service:
             name: {{ template "anm.name" . }}
             port:

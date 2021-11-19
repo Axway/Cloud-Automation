@@ -1,7 +1,8 @@
 {{- if .Values.apimgr.enabled -}}
 
-{{- $imageTag := include "imageTag" . -}}
+{{- $imageTag := include "apimgrImageTag" . -}}
 {{- $imagePullPolicy := include "imagePullPolicy" . -}}
+{{- $licenseSecret := include "licenseSecretName" . -}}
 
 apiVersion: apps/v1
 kind: Deployment
@@ -38,25 +39,27 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.apimgr.terminationGracePeriod }}
       volumes:
+{{- if $licenseSecret }}
+      - name: license
+        secret:
+          secretName: {{ $licenseSecret }}
+{{- end }}
         {{- range .Values.apimgr.secretMounts }}
-        - name: {{ .name }}
-          secret:
-            secretName: {{ .secretName }}
+      - name: {{ .name }}
+        secret:
+          secretName: {{ .secretName }}
         {{- end }}
+      {{- if .Values.apimgr.jvm.enabled }}
+      - name: apimgr-jvmxml
+        configMap:
+          name: jvmxml
+          items:
+            - key: apimgr-jvmxml
+              path: jvm.xml
+      {{- end }}
       - name: events
         persistentVolumeClaim:
           claimName: apigw-events
-      - name: config-jvmxml
-        configMap:
-          name: jvmxml
-          defaultMode: 256
-          items:
-            - key: jvm
-              mode: 256
-              path: jvm.xml
-      - name: license
-        secret:
-          secretName: {{ .Values.global.licenseSecretName | default "license" }}
       {{- if .Values.apimgr.extraVolumes }}
 {{ toYaml ( .Values.apimgr.extraVolumes ) | indent 8 }}
       {{- end }}
@@ -76,17 +79,33 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.global.imagePullSecrets | indent 8 }}
       {{- end }}
-      {{- if .Values.extraInitContainers }}
       initContainers:
+      - name: init-cassandra
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "cassandra.name" . }} {{ .Values.cassandra.service.port }}; do echo waiting for cassandra-0; sleep 2; done;']
+      {{- if .Values.mysqlmetrics.internal }}
+      - name: init-mysql
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "mysqlmetrics.name" . }} {{ .Values.mysqlmetrics.primary.service.port }}; do echo waiting for mysql; sleep 2; done;']
+      {{- end }}
+      - name: init-anm
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "anm.name" . }} {{ .Values.anm.service.port }}; do echo waiting for anm; sleep 2; done;']      
+      {{- if .Values.extraInitContainers }}
 {{ tpl .Values.extraInitContainers . | indent 6 }}
       {{- end }}
       containers:
       - name: "{{ template "apimgr.name" . }}"
         securityContext:
 {{ toYaml .Values.apimgr.securityContext | indent 10 }}
+      {{- if .Values.apimgr.args }}
         args:
 {{ toYaml .Values.apimgr.args | indent 8 }}
-        # command: ["sh", "-c", "tail -f /dev/null" ]
+      {{- end }}
+      {{- if .Values.apimgr.command }}
+        command:
+{{ toYaml .Values.apimgr.command | indent 8 }}
+      {{- end }}
         image: {{ .Values.global.dockerRepository }}/{{ .Values.apimgr.image }}:{{ $imageTag }}
         imagePullPolicy: {{ $imagePullPolicy }}
         livenessProbe:
@@ -122,9 +141,9 @@ spec:
         - name: CASS_PORT
           value: {{ .Values.cassandra.service.port | quote }}
         - name: CASS_KEYSPACE
-          value: {{ .Values.cassandra.keyspace }}
+          value: {{ .Values.cassandra.cluster.keyspace }}
         - name: CASS_TKEYSPACE
-          value: t_{{ .Values.cassandra.keyspace }}
+          value: t_{{ .Values.cassandra.cluster.keyspace }}
         - name: CASS_USERNAME
           value: {{ .Values.cassandra.dbUser.user }}
         - name: CASS_PASS
@@ -133,53 +152,48 @@ spec:
         {{- else if .Values.cassandra.dbUser.password }}
           value: {{ .Values.cassandra.dbUser.password }}
         {{- else }}
-          value: ""
+          valueFrom:
+            secretKeyRef:
+              name: "{{ template "cassandra.name" . }}"
+              key: "cassandra-password"
         {{- end }}
-        {{- if .Values.metricsDB.METRICS_DB_URL }}
+{{- if .Values.mysqlmetrics.internal }}
         - name: METRICS_DB_URL
-          value: {{ .Values.metricsDB.METRICS_DB_URL | quote }}
+          value: "jdbc:mysql://{{ template "mysqlmetrics.name" . }}:{{ .Values.mysqlmetrics.primary.service.port }}/{{ .Values.mysqlmetrics.auth.database }}?useSSL={{ .Values.mysqlmetrics.ssl }}"
         - name: METRICS_DB_USERNAME
-          value: {{ required "The value metricsDB.METRICS_DB_USERNAME is missing." .Values.metricsDB.METRICS_DB_USERNAME | quote }}
-        - name: METRICS_DB_PASS
-{{ toYaml .Values.metricsDB.METRICS_DB_PASS | indent 10 }}
-        {{- else if .Values.mysqlAnalytics.enabled }}
-        - name: METRICS_DB_URL
-          value: "jdbc:mysql://{{ .Values.mysqlAnalytics.name }}:{{ .Values.mysqlAnalytics.port }}/{{ .Values.mysqlAnalytics.dbName }}?useSSL={{ .Values.mysqlAnalytics.ssl }}"
-        - name: METRICS_DB_USERNAME
-          value: {{ .Values.mysqlAnalytics.adminUser | quote }}
+          value: {{ .Values.mysqlmetrics.auth.username | quote }}
         - name: METRICS_DB_PASS
           valueFrom:
             secretKeyRef:
-              name: apim-password
-              key: dbmysqlanalytics
-        {{- end }}
+              name: {{ template "mysql.metrics.secretName" . }}
+              key: mysql-password
+{{- else if .Values.externalMetricsDB.env }}
+{{ toYaml .Values.externalMetricsDB.env | nindent 8 }}
+{{- end }}
         {{- if .Values.apimgr.extraEnvs }}
 {{ toYaml .Values.apimgr.extraEnvs | indent 8 }}
         {{- end }}
         volumeMounts:
-        - mountPath: {{ .Values.apitraffic.share.path | quote }}
-          name: events
-        - name: config-jvmxml
-          mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
+        {{- if .Values.apimgr.jvm.enabled }}
+        - name: apimgr-jvmxml
+          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
           subPath: jvm.xml
+        {{- end }}
+{{- if $licenseSecret }}
         - name: license
           mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
           subPath: license
-      {{- if .Values.apimgr.extraContainers }}
-{{ toYaml .Values.apimgr.extraContainers | indent 6 }}
-      {{- end }}
+{{- end }}
+        - name: events
+          mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apimgr.volumeMountsPaths.events | quote }}
+        {{- if .Values.apimgr.extraVolumeMounts }}
+{{ toYaml (.Values.apimgr.extraVolumeMounts ) | indent 8 }}
+        {{- end }}
+        {{- if .Values.apimgr.lifecycle }}
         lifecycle:
 {{ toYaml .Values.apimgr.lifecycle | indent 10 }}
-      initContainers:
-      - name: init-cassandra
-        image: busybox:1.33
-        command: ['sh', '-c', 'until nc -w 3 -v {{ template "cassandra.name" . }} {{ .Values.cassandra.service.port }}; do echo waiting for cassandra-0; sleep 2; done;']
-      {{- if .Values.mysqlAnalytics.enabled }}
-      - name: init-mysql
-        image: busybox:1.33
-        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysqlAnalytics.name }} 3306; do echo waiting for mysql; sleep 2; done;']
-      {{- end }}
-      - name: init-anm
-        image: busybox:1.33
-        command: ['sh', '-c', 'until nc -w 3 -v {{ template "anm.name" . }} {{ .Values.anm.service.port }}; do echo waiting for anm; sleep 2; done;']
+        {{- end }}
+        {{- if .Values.apimgr.extraContainers }}
+{{ toYaml .Values.apimgr.extraContainers | indent 6 }}
+        {{- end }}
 {{- end }}

@@ -1,0 +1,100 @@
+{{- if .Values.mysqlmetrics.internal }}
+kind: ConfigMap
+metadata:
+  name: metrics
+  namespace: {{ .Release.Namespace | quote }}
+apiVersion: v1
+data:
+  metrics.sql: "/* MySQL SQL Script */\n\n/* Don't Drop the Tables when running
+    in Kubernetes */\n-- DROP TABLE if EXISTS audit_message_payload;\n-- DROP TABLE
+    if EXISTS audit_log_points;\n-- DROP TABLE if EXISTS audit_log_sign;\n-- DROP
+    TABLE if EXISTS transaction_data;\n-- DROP TABLE IF EXISTS metrics_alerts;\n--
+    DROP TABLE IF EXISTS metrics_data;\n-- DROP TABLE IF EXISTS metric_groups;\n--
+    DROP TABLE IF EXISTS processes;\n-- DROP TABLE IF EXISTS process_groups;\n-- DROP
+    TABLE IF EXISTS metric_group_types_map;\n-- DROP TABLE if EXISTS metric_group_types;\n--
+    DROP TABLE if EXISTS metric_types;\n-- DROP TABLE if EXISTS time_window_types;\n--
+    DROP TABLE if EXISTS versions;\n\nCREATE TABLE IF NOT EXISTS process_groups (\n
+    \ ID int NOT NULL auto_increment,\n  TopologyID nvarchar(32) NOT NULL,    \n  Name
+    nvarchar(255) NOT NULL,\n  PRIMARY KEY (ID),\n  CONSTRAINT UQ_ProcessGroups_TopologyID
+    UNIQUE(TopologyID)  \n);\n\nCREATE TABLE IF NOT EXISTS processes (\n  ID int NOT
+    NULL auto_increment,\n  TopologyID nvarchar(32) NOT NULL,  \n  Name nvarchar(255)
+    NOT NULL,\n  Host varchar(255) NOT NULL,\n  GroupID int NOT NULL,\n  PRIMARY KEY
+    (ID),\n  CONSTRAINT UQ_Processes_TopologyID UNIQUE(TopologyID),\n  CONSTRAINT
+    FK_ProcessGroups_Processes_ID FOREIGN KEY(GroupID) REFERENCES process_groups(ID)\n);\n\nCREATE
+    TABLE IF NOT EXISTS metric_group_types (\n  ID int NOT NULL AUTO_INCREMENT,\n
+    \ Name nvarchar(255) NOT NULL,\n  \n  PRIMARY KEY (ID),\n  CONSTRAINT UQ_MetricGroupTypes_Name
+    UNIQUE(Name)\n);\n\nCREATE TABLE IF NOT EXISTS metric_types (\n  ID int NOT NULL
+    AUTO_INCREMENT,\n  Name nvarchar(255) NOT NULL,\n  AggregationFunction enum('Unknown',
+    'None', 'SUM', 'AVG', 'MAX', 'MIN') NOT NULL, \n\n  PRIMARY KEY (ID),\n  KEY `AggregationFunction`
+    (`AggregationFunction`),                -- D-82336 \n  CONSTRAINT UQ_MetricTypes_Name
+    UNIQUE(Name)\n);\n\nCREATE TABLE IF NOT EXISTS metric_group_types_map (\n  MetricGroupTypeID
+    int NOT NULL,\n  MetricTypeID int NOT NULL,\n  CONSTRAINT PK_MetricGroupTypesMap
+    PRIMARY KEY (MetricGroupTypeID, MetricTypeID),\n  CONSTRAINT FK_MetricGroupTypesMap_MetricTypes_ID
+    FOREIGN KEY(MetricTypeID) REFERENCES metric_types(ID),\n  CONSTRAINT FK_MetricGroupTypesMap_MetricGroupTypes_ID
+    FOREIGN KEY(MetricGroupTypeID) REFERENCES metric_group_types(ID)\n);\n\nCREATE
+    TABLE IF NOT EXISTS time_window_types (\n  ID int NOT NULL,\n  Name nvarchar(255)
+    NOT NULL,\n  WindowSizeMillis int NOT NULL,\n  PRIMARY KEY (ID)\n);\n\n# Add the
+    currently supported entries\nINSERT IGNORE INTO time_window_types (ID, Name, WindowSizeMillis)
+    VALUES(0, '5-second', 5000);\nINSERT IGNORE INTO time_window_types (ID, Name,
+    WindowSizeMillis) VALUES(1, '5-minute', 300000);\nINSERT IGNORE INTO time_window_types
+    (ID, Name, WindowSizeMillis) VALUES(2, '1-hour', 3600000);\n\nCREATE TABLE IF
+    NOT EXISTS metric_groups (\n  ID int NOT NULL auto_increment,\n  ProcessID int
+    NOT NULL,\n  MetricGroupTypeID int NOT NULL,\n  Name nvarchar(255) default NULL,\n
+    \ DisplayName nvarchar(255) default NULL,\n  ParentID int NOT NULL,\n  \n  PRIMARY
+    KEY (ID),\n  KEY `Name` (`Name`),                -- D-82336 \n  KEY `DisplayName`
+    (`DisplayName`),  -- D-82336 \n  KEY `ParentID` (`ParentID`),        -- D-82336
+    \n  CONSTRAINT FK_MetricGroups_Processes_ID FOREIGN KEY(ProcessID) REFERENCES
+    processes(ID),\n  CONSTRAINT FK_MetricGroups_MetricGroupTypes_ID FOREIGN KEY(MetricGroupTypeID)
+    REFERENCES metric_group_types(ID)\n  /* do not enable constraints ParentID */\n);\n\n\n\n--
+    D-82336 change primary key so that MetricTimestamp is last in the composite index:
+    \"The order of the fields in the index is very important. \n-- The way b-tree
+    works, it is more beneficial to have a field which will be used for “equality”
+    comparison first and the \n-- fields with “range” (more than and less than comparison)
+    second.\n\nCREATE TABLE IF NOT EXISTS metrics_data (\n  MetricTimestamp datetime
+    NOT NULL,\n  MetricGroupID int NOT NULL,\n  MetricTypeID int NOT NULL,    \n  TimeWindowTypeID
+    int NOT NULL,\n  Value BIGINT NOT NULL,\n    PRIMARY KEY (MetricGroupID, MetricTypeID,
+    TimeWindowTypeID, MetricTimestamp),  -- D-82336\n    KEY `MetricTimestamp` (`MetricTimestamp`),
+    \               -- D-82336 \n    CONSTRAINT FK_MetricsData_MetricGroups_ID FOREIGN
+    KEY(MetricGroupID) REFERENCES metric_groups(ID),\n    CONSTRAINT FK_MetricsData_MetricTypes_ID
+    FOREIGN KEY(MetricTypeID) REFERENCES metric_types(ID),\n    CONSTRAINT FK_MetricsData_TimeWindowTypes_ID
+    FOREIGN KEY(TimeWindowTypeID) REFERENCES time_window_types(ID)\n);\n\n\nCREATE
+    TABLE IF NOT EXISTS metrics_alerts (\n  ID varchar(255) NOT NULL,\n  ProcessID
+    int NOT NULL,\n  AlertTimestamp datetime NULL,\n  AlertLevel varchar(5) NOT NULL,\n
+    \ AlertType enum(\n      'AlertMessage',\n      'SlaBreachAlertMessage',\n      'SlaClearAlertMessage')
+    NOT NULL,\n  Message nvarchar(4096) default NULL,\n  MessageID varchar(255) default
+    NULL,\n\n  PRIMARY KEY (ID, ProcessID),\n  KEY MessageID (MessageID),\n  CONSTRAINT
+    FK_MetricsAlerts_Processes_ID FOREIGN KEY(ProcessID) REFERENCES processes(ID)\n);\n\nCREATE
+    TABLE IF NOT EXISTS audit_log_points (                        \n     ID int NOT
+    NULL auto_increment,     \n     ProcessID int NOT NULL,\n     MessageID varchar(255)
+    NOT NULL,                \n     Text longtext NOT NULL,                \n     LogLevel
+    bigint NOT NULL default '0',           \n     LogTimestamp timestamp NOT NULL,\n
+    \    LogTimeMillis bigint NOT NULL default '0',\n     FilterName nvarchar(255)
+    NOT NULL,               \n     FilterType varchar(255) NOT NULL,\n     FilterCategory
+    varchar(255) default NULL,                                                                                         \n\n
+    \    PRIMARY KEY  (ID),                            \n     KEY MessageID (MessageID),\n
+    \    CONSTRAINT FK_AuditLogPoints_Processes_ID FOREIGN KEY(ProcessID) REFERENCES
+    processes(ID)                                             \n   );\n\nCREATE TABLE
+    IF NOT EXISTS audit_message_payload (                                                                                                                         \n
+    \ AuditLogPointsID int NOT NULL default '0',                                                                                                           \n
+    \ MessageBody longblob default NULL,                                                                                                                                       \n
+    \ MessageHeader longblob default NULL,                                                                                                                                     \n
+    \ HttpRequestVerb varchar(10) default NULL,                                                                                                                    \n
+    \ HttpRequestURI varchar(255) default NULL,                                                                                                                   \n
+    \ HttpRequestVersion varchar(4) default NULL,                                           \n
+    \ PRIMARY KEY  (AuditLogPointsID),                                                                                                                             \n
+    \ CONSTRAINT FK_AuditMessagePayload_AuditLogPoints FOREIGN KEY (AuditLogPointsID)
+    REFERENCES audit_log_points (ID) ON DELETE CASCADE ON UPDATE CASCADE  \n);\n\nCREATE
+    TABLE IF NOT EXISTS audit_log_sign (      \n   ProcessID int NOT NULL,                                                   \n
+    \  MessageID varchar(255) NOT NULL,\n   Signature longblob default NULL,                                                                  \n
+    \  PRIMARY KEY  (ProcessID, MessageID),\n   CONSTRAINT FK_AuditLogSign_Processes_ID
+    FOREIGN KEY(ProcessID) REFERENCES processes(ID)                                                                                                            \n
+    );\n\nCREATE TABLE IF NOT EXISTS transaction_data (\n  ProcessID int NOT NULL,\n
+    \ MessageID varchar(255) NOT NULL,\n  TransactionTimestamp datetime NOT NULL,\n
+    \ AttributeName varchar(255) NOT NULL,\n  AttributeValue nvarchar(255) NOT NULL,
+    \n  PRIMARY KEY(ProcessID, MessageID, AttributeName),\n  CONSTRAINT FK_TransactionData_Processes_ID
+    FOREIGN KEY(ProcessID) REFERENCES processes(ID) \n);\n\nCREATE TABLE IF NOT EXISTS
+    versions (\n    Name nvarchar(255) NOT NULL,\n    Value nvarchar(255) NOT NULL,\n
+    \   CONSTRAINT UQ_Versions_Name UNIQUE(Name)  \n);\n\nINSERT IGNORE INTO versions(Name,
+    Value) VALUES('schema', '002-leaf');\n\nCOMMIT;                 \n\nSHOW TABLES;\n\nSHOW
+    DATABASES;\n"
+{{- end }}

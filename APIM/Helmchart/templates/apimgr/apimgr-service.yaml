@@ -15,13 +15,15 @@ spec:
 {{ toYaml . | indent 4 }}
 {{- end }}
   ports:
-  - name: {{ .Values.apimgr.service.httpPortName | default "http" }}
-    port: {{ .Values.apimgr.service.port }}
-{{- if .Values.apimgr.service.nodePort }}
-    nodePort: {{ .Values.apimgr.service.nodePort }}
+  {{- range .Values.apimgr.service.ports }}
+  - name: {{ .name }}
+    port: {{ .port }}
+{{- if .nodePort }}
+    nodePort: {{ .nodePort }}
 {{- end }}
     protocol: TCP
-    targetPort: {{ .Values.apimgr.httpPort }}
+    targetPort: {{ .targetPort }}
+  {{- end }}
   selector:
     {{- include "apimgr.selectorLabels" . | nindent 4 }}
   sessionAffinity: ClientIP

@@ -21,7 +21,7 @@ spec:
     nodePort: {{ .Values.anm.service.nodePort }}
 {{- end }}
     protocol: TCP
-    targetPort: {{ .Values.anm.httpPort }}
+    targetPort: {{ .Values.anm.containerPorts.anm }}
   selector:
     {{- include "anm.selectorLabels" . | nindent 4 }}
   sessionAffinity: ClientIP

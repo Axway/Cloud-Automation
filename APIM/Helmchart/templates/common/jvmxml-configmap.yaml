@@ -1,9 +1,24 @@
+{{- if or .Values.anm.jvm.enabled .Values.apimgr.jvm.enabled .Values.apitraffic.jvm.enabled }}
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
    name: jvmxml
+   namespace: {{ .Release.Namespace | quote }}
 data:
-   {{- range $path, $config := .Values.filebeatConfig }}
-   {{ $path }}: |
-{{ $config | indent 4 -}}
-   {{- end -}}
+{{- if .Values.anm.jvm.enabled }}
+    anm-jvmxml: |
+{{ .Values.anm.jvm.config | indent 6 }}
+{{- end -}}
+
+{{- if .Values.apimgr.jvm.enabled }}
+    apimgr-jvmxml: |
+{{ .Values.apimgr.jvm.config | indent 6 }}
+{{- end -}}
+
+{{- if .Values.apitraffic.jvm.enabled }}
+    apitraffic-jvmxml: |
+{{ .Values.apitraffic.jvm.config | indent 6 }}
+{{- end -}}
+
+{{- end }}

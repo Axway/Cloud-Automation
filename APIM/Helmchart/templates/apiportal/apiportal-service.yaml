@@ -1,0 +1,29 @@
+{{- if .Values.apiportal.enabled -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "apiportal.name" . }}
+  labels: {{- include "apiportal.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.apiportal.service.type }}
+{{- if .Values.apiportal.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+{{- end }}
+{{- with .Values.apiportal.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  ports:
+  - name: {{ .Values.apiportal.service.httpPortName | default "http" }}
+    port: {{ .Values.apiportal.service.port }}
+{{- if .Values.apiportal.service.nodePort }}
+    nodePort: {{ .Values.apiportal.service.nodePort }}
+{{- end }}
+    protocol: TCP
+    targetPort: {{ .Values.apiportal.containerPorts.apiportal }}
+  selector:
+    {{- include "apiportal.selectorLabels" . | nindent 4 }}
+  sessionAffinity: ClientIP
+  
+{{- end }}

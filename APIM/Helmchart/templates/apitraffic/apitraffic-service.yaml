@@ -15,13 +15,15 @@ spec:
 {{ toYaml . | indent 4 }}
 {{- end }}
   ports:
-  - name: {{ .Values.apitraffic.service.httpPortName | default "http" }}
-    port: {{ .Values.apitraffic.service.port }}
-{{- if .Values.apitraffic.service.nodePort }}
-    nodePort: {{ .Values.apitraffic.service.nodePort }}
+  {{- range .Values.apitraffic.service.ports }}
+  - name: {{ .name }}
+    port: {{ .port }}
+{{- if .nodePort }}
+    nodePort: {{ .nodePort }}
 {{- end }}
     protocol: TCP
-    targetPort: {{ .Values.apitraffic.containerPorts.traffic }}
+    targetPort: {{ .targetPort }}
+  {{- end }}
   selector:
     {{- include "apitraffic.selectorLabels" . | nindent 4 }}
   sessionAffinity: ClientIP

@@ -18,28 +18,97 @@ metadata:
 spec:
 {{ toYaml .Values.pvcs.opentrafficVolumeClaim | indent 2 }}
 ---
-{{- if .Values.mysqlanalytics.persistence.enabled }}
+{{- if and .Values.mysqlmetrics.internal .Values.mysqlmetrics.primary.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: apigw-mysql-analytics
+  name: apigw-mysql-metrics
   labels:
-    data: mysql-analytics
+    data: mysql-metrics
   annotations:
     helm.sh/resource-policy: "keep"
 spec:
-{{ toYaml .Values.pvcs.opentrafficVolumeClaim | indent 2 }}
+{{ toYaml .Values.pvcs.metricsDbVolumeClaim | indent 2 }}
 {{- end}}
 ---
-{{- if .Values.mysqlportal.persistence.enabled }}
+{{- if and .Values.mysqlapiportal.internal .Values.mysqlapiportal.primary.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: apigw-mysql-portal
+  name: apigw-mysql-apiportal
   labels:
-    data: mysql-portal
+    data: mysql-apiportal
   annotations:
     helm.sh/resource-policy: "keep"
 spec:
-{{ toYaml .Values.pvcs.opentrafficVolumeClaim | indent 2 }}
+{{ toYaml .Values.pvcs.apiportalDbVolumeClaim | indent 2 }}
+{{- end}}
+
+{{- if and .Values.apiportal.enabled .Values.apiportal.persistence.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apiportal-enckey
+  labels:
+    data: apiportal-enckey
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.apiportalEnckeyVolumeClaim | indent 2 }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apiportal-images
+  labels:
+    data: apiportal-images
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.apiportalImagesVolumeClaim | indent 2 }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apiportal-language
+  labels:
+    data: apiportal-language
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.apiportalLanguageVolumeClaim | indent 2 }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apiportal-templates
+  labels:
+    data: apiportal-templates
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.apiportalTemplatesVolumeClaim | indent 2 }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apiportal-adm-language
+  labels:
+    data: apiportal-adm-language
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.apiportalAdmLanguageVolumeClaim | indent 2 }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apiportal-certs
+  labels:
+    data: apiportal-certs
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.apiportalCertsVolumeClaim | indent 2 }}
 {{- end}}

@@ -1,0 +1,211 @@
+{{- if .Values.apiportal.enabled -}}
+
+{{- $imagePullPolicy := include "imagePullPolicy" . -}}
+{{- $check := include "validateDockerRepo" . -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "apiportal.name" . }}
+  labels: {{- include "apiportal.labels" . | nindent 4 }}
+  annotations:
+    {{- range $key, $value := .Values.apiportal.deploymentAnnotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.apiportal.replicas }}
+  selector:
+    matchLabels:
+      {{- include "apiportal.selectorLabels" . | nindent 6 }}
+  strategy:
+{{ toYaml .Values.apiportal.updateStrategy | indent 4 }}
+  template:
+    metadata:
+      name: "{{ template "apiportal.name" . }}"
+      labels: 
+        {{- include "apiportal.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- range $key, $value := .Values.apiportal.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+{{- if .Values.apiportal.priorityClassName }}
+      priorityClassName: {{ .Values.apiportal.priorityClassName }}
+{{- end }}
+      securityContext:
+{{ toYaml .Values.apiportal.podSecurityContext | indent 8 }}
+      {{- if .Values.apiportal.serviceAccount }}
+      serviceAccount: {{ .Values.apiportal.serviceAccount }}
+      {{- end }}
+      {{- if .Values.apiportal.hostAliases }}
+      hostAliases: {{ toYaml .Values.apiportal.hostAliases | nindent 6 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.apiportal.terminationGracePeriod }}
+      volumes:
+      {{- if .Values.apiportal.persistence.enabled }}
+        - name: enckey
+          persistentVolumeClaim:
+            claimName: apiportal-enckey
+        - name: images
+          persistentVolumeClaim:
+            claimName: apiportal-images
+        - name: language
+          persistentVolumeClaim:
+            claimName: apiportal-language
+        - name: templates
+          persistentVolumeClaim:
+            claimName: apiportal-templates
+        - name: admlanguage
+          persistentVolumeClaim:
+            claimName: apiportal-adm-language
+        - name: certs
+          persistentVolumeClaim:
+            claimName: apiportal-certs
+      {{- end }}
+        {{- range .Values.apiportal.secretMounts }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+        {{- end }}
+        {{- if .Values.apiportal.extraVolumes }}
+{{ toYaml ( .Values.apiportal.extraVolumes ) | indent 8 }}
+        {{- end }}
+      
+      {{- with .Values.apiportal.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.apiportal.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.apiportal.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.global.imagePullSecrets | indent 6 }}
+      {{- end }}
+      initContainers:
+      {{- if .Values.mysqlapiportal.internal }}
+      - name: init-mysql-apiportal
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "mysqlapiportal.name" . }} {{ .Values.mysqlapiportal.primary.service.port }}; do echo waiting for apiportal mysql; sleep 2; done;']
+      {{- end }}
+      - name: init-apimgmt
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "apimgr.name" . }} 8075; do echo waiting for apimgr; sleep 2; done;']
+      {{- if .Values.extraInitContainers }}
+{{ tpl .Values.extraInitContainers . | indent 6 }}
+      {{- end }}
+      containers:
+      - name: "{{ template "apiportal.name" . }}"
+      {{- if .Values.apiportal.args }}
+        args:
+{{ toYaml .Values.apiportal.args | indent 8 }}
+      {{- end }}
+      {{- if .Values.apiportal.command }}
+        command:
+{{ toYaml .Values.apiportal.command | indent 8 }}
+      {{- end }}
+        securityContext:
+{{ toYaml .Values.apiportal.securityContext | indent 10 }}
+        image: {{ template "apiportalDockerRepository" . }}/{{ required "apiportal.image is required" .Values.apiportal.image }}:{{ required "apiportal.imageTag is required" .Values.apiportal.imageTag }}
+        imagePullPolicy: {{ $imagePullPolicy }}
+        livenessProbe:
+{{ toYaml .Values.apiportal.livenessProbe | indent 10 }}
+        readinessProbe:
+{{ toYaml .Values.apiportal.readinessProbe | indent 10 }}
+        ports:
+        {{- range $key, $value := .Values.apiportal.containerPorts }}
+        - name: {{ $key }}
+          containerPort: {{ $value }}
+        {{- end }}
+        {{- if .Values.apiportal.extraPorts }}
+{{- toYaml .Values.apiportal.extraPorts | nindent 8 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.apiportal.resources | indent 10 }}
+        env:
+{{- if .Values.mysqlapiportal.internal }}
+        - name: MYSQL_HOST
+          value: {{ template "mysqlapiportal.name" . }}
+        - name: MYSQL_PORT
+          value: {{ .Values.mysqlapiportal.primary.service.port | quote }}
+        - name: MYSQL_DATABASE
+          value: {{ .Values.mysqlapiportal.auth.database | quote }}
+        - name: MYSQL_USER
+          value: {{ .Values.mysqlapiportal.auth.username | quote }}
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "mysql.apiportal.secretName" . }}
+              key: mysql-password
+{{- else if .Values.externalApiportalDB.env }}
+{{ toYaml .Values.externalApiportalDB.env | nindent 8 }}
+{{- end }}
+{{ if .Values.apiportal.config.master.enabled }}
+        - name: APIMANAGER_CONFIGURED
+          value: "1"
+        - name: APIMANAGER_NAME
+          value: {{ .Values.apiportal.config.master.name | quote }}
+        - name: APIMANAGER_HOST
+          value: {{ template "apimgr.name" }}
+        - name: APIMANAGER_PORT
+          value: "8075"
+{{- end }}
+{{ if .Values.apiportal.config.ssl.enabled }}
+        - name: APACHE_SSL_ON
+          value: "1"
+        - name: APACHE_SSL_CERT
+          valueFrom: 
+            secretKeyRef:
+              name: {{ template "apiportalCertificateSecretName" . }}
+              key: apache.crt
+        - name: APACHE_SSL_PRIVATE_KEY
+          valueFrom: 
+            secretKeyRef:
+              name: {{ template "apiportalCertificateSecretName" . }}
+              key: apache.key
+{{- end }}
+        {{- if .Values.apiportal.extraEnvs }}
+{{ toYaml .Values.apiportal.extraEnvs | indent 8 }}
+        {{- end }}
+        {{- if .Values.apiportal.envFrom }}
+        envFrom:
+{{ toYaml .Values.apiportal.envFrom | indent 8 }}
+        {{- end }}
+        volumeMounts:
+          {{- if .Values.apiportal.persistence.enabled }}
+          - name: enckey
+            mountPath: /opt/axway/apiportal/enckey
+          - name: images
+            mountPath: /opt/axway/apiportal/htdoc/images
+          - name: language
+            mountPath: /opt/axway/apiportal/htdoc/language
+          - name: templates
+            mountPath: /opt/axway/apiportal/htdoc/templates
+          - name: admlanguage
+            mountPath: /opt/axway/apiportal/htdoc/administrator/language
+          - name: certs
+            mountPath: /opt/axway/apiportal/htdoc/administrator/components/com_apiportal/assets/cert
+          {{- end }}
+          {{- range .Values.apiportal.secretMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .path }}
+            {{- if .subPath }}
+            subPath: {{ .subPath }}
+            {{- end }}
+          {{- end }}
+        {{- if .Values.apiportal.extraVolumeMounts }}
+{{ toYaml (.Values.apiportal.extraVolumeMounts ) | indent 8 }}
+        {{- end }}
+        {{- if .Values.apiportal.lifecycle }}
+        lifecycle:
+{{ toYaml .Values.apiportal.lifecycle | indent 10 }}
+        {{- end }}
+        {{- if .Values.apiportal.extraContainers }}
+{{ toYaml (.Values.apiportal.extraContainers) | indent 6 }}
+        {{- end }}
+{{- end }}

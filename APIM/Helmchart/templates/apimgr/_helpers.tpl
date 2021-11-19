@@ -1,4 +1,11 @@
 {{/*
+API-Manager ImageTag
+*/}}
+{{- define "apimgrImageTag" -}}
+{{- if .Values.apimgr.imageTag }}{{ .Values.apimgr.imageTag }}{{- else }}{{ required "Either apimgr.imageTag or global.imageTag is required. Please configure your values.yaml accordingly." .Values.global.imageTag }}{{- end }}
+{{- end }}
+
+{{/*
 Common labels
 */}}
 {{- define "apimgr.labels" -}}
@@ -25,11 +32,4 @@ API-Manager ImagePullPolicy
 */}}
 {{- define "imagePullPolicy" -}}
 {{- if .Values.apimgr.imagePullPolicy }}{{ .Values.apimgr.imagePullPolicy }}{{- else }}{{ .Values.global.imagePullPolicy }}{{- end }}
-{{- end }}
-
-{{/*
-API-Manager ImageTag
-*/}}
-{{- define "imageTag" -}}
-{{- if .Values.apimgr.imageTag }}{{ .Values.apimgr.imageTag }}{{- else }}{{ .Values.global.imageTag }}{{- end }}
 {{- end }}

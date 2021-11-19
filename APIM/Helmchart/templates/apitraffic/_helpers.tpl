@@ -30,6 +30,10 @@ API-Gateway Traffic ImagePullPolicy
 {{/*
 API-Gateway Traffic ImageTag
 */}}
-{{- define "imageTag" -}}
+{{- define "apitrafficImageTag" -}}
 {{- if .Values.apitraffic.imageTag }}{{ .Values.apitraffic.imageTag }}{{- else }}{{ .Values.global.imageTag }}{{- end }}
 {{- end }}
+
+{{- define "domain.name" -}}
+{{ required "Either apimgr.ingress.name or global.domainName is required. Please configure your values.yaml accordingly." .Values.global.domainName }}
+{{- end -}}

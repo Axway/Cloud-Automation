@@ -9,7 +9,6 @@ icon: https://images.app.goo.gl/MbQyRo2M2jzAsed79
 home: https://github.com/Axway/Cloud-Automation/tree/master/APIM/Helmchart
 keywords:
 - API Management, Axway, AMPLIFY API, Demo, Azure
-#kubeVersion: '>=1.15.0'
 maintainers:
 - email: ncomandini@axway.com
   name: cloud-automation community
@@ -23,17 +22,22 @@ dependencies:
     tags:
       - bitnami-common
     version: 1.x.x
+  - name: cassandra
+    alias: cassandra
+    repository: https://charts.bitnami.com/bitnami
+    version: 7.7.3 # Installs Cassandra 3.11.11
+    condition: cassandra.internal
   - name: mysql
-    alias: mysqlanalytics
+    alias: mysqlmetrics
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami/mysql
     version: 8.x.x
-    condition: mysqlAnalytics.enabled
+    condition: mysqlmetrics.internal
   - name: mysql
-    alias: mysqlportal
+    alias: mysqlapiportal
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami/mysql
     version: 8.x.x
-    condition: mysqlPortal.enabled
+    condition: mysqlapiportal.internal

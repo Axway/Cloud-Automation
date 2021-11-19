@@ -4,7 +4,7 @@ metadata:
   labels: {{- include "cassandra.labels" . | nindent 4 }}
   name: {{ template "cassandra.name" . }}
 spec:
-{{- if eq .Values.cassandra.external false }}
+{{- if .Values.cassandra.internal }}
   clusterIP: None
   ports:
     - name: cql
@@ -35,7 +35,7 @@ spec:
   selector:
     {{- include "cassandra.selectorLabels" . | nindent 4 }}
 {{- end }}
-{{- if eq .Values.cassandra.external true }}
+{{- if eq .Values.cassandra.internal false }}
   type: ExternalName
   externalName: {{ .Values.cassandra.name }}{{ .Values.cassandra.domain }}
 {{- end }}

@@ -4,21 +4,29 @@
 
 
 global:
+   # ImagePullSecrets made available to all Deployments/StateFullSets
    imagePullSecrets: []
+   #  - name: myRegistryKeySecretName
 
    imagePullPolicy: "IfNotPresent"
 
-   dockerRepository: "docker-registry.demo.axway.com/other-demo"
-   imageTag: "7.7-20210530"
+   # Setup the docker repository used to pull images for anm, apimgr & traffic
+   # Example: docker-registry.demo.axway.com/other-demo
+   dockerRepository: ""
+   # Setup the image tag (e.g. 7.7-20210530)
+   # You can override the image tag used for anm, api-manager & api-traffic
+   imageTag: ""
 
    updateStrategy: "RollingUpdate"
 
    domainName: ""
 
    # AZURE, OPENSHIFT, MINIKUBE
-   platform: {}
-   # If you store your license in your myValues.yaml, the corresponding Secret license will be created and referenced 
-   # accordingly in the API Gateway PoDs. Alternatively, you can use your own secret and reference it via licenseSecretName.
+   platform: ""
+   # If you provide your license in your myValues.yaml, a Secret axway-apim-license will be created and automatically mountered 
+   # into the API Gateway PODs. 
+   # Alternatively, you can use your own secret and reference it via licenseSecretName below.
+   # Or you can build the image with the license included.
    license: {}
       # FIPS=1
       # SalesForce Connector=1
@@ -30,13 +38,12 @@ global:
       # # SIGNATURE: 8eee280ede1a7fd94b91130c78da44f403f8bd9f927bc96bfd6a2a94839c049b
       # # SIGNATURE: 096e86bb928c5865c77596de3814f116b9b3f4923441ac0cb8e7189f9c0f5971
 
-   # The necessary API gateway license is included as a Secret. If you use your own secret, you can specify the name of the 
-   # secret here, which contains the license Base64 encoded. If you do not specify the name, license will be used as default.
+   # If the necessary API-Gateway license is included as a Secret define the name of the secret.
+   # If you use your own secret, you can specify the name of the  secret here, which contains the license Base64 encoded. 
+   # If you specified a license above no need to set a secret name as it defaults to axway-apim-license
    licenseSecretName: 
 
    createSecrets: true
-
-   #Annotation
 
    initImageTag: "busybox:1.33"
    
@@ -51,6 +58,8 @@ anm:
    image: "anm"
    containerPorts:
       anm: 8090
+
+   # Controls the service for ANM incl. belonging ingress resources
    service:
       type: "ClusterIP"
       loadBalancerIP: ""
@@ -58,9 +67,11 @@ anm:
       nodePort: ""
       labels: {}
       annotations: {}
+   # General ingress settings.
    ingress:
       enabled: true
       name: anm
+      # Set the annotations according to your Ingress-Controller
       annotations: {}
          # kubernetes.io/ingress.class: azure/application-gateway
          # appgw.ingress.kubernetes.io/backend-protocol: https
@@ -88,7 +99,33 @@ anm:
    EMT_POLL_INTERVAL: 30
    EMT_TOPOLOGY_TTL: 500
 
+   # Allows you to add any environment variables
+   extraEnvs: []
+   # - name: MY_ENVIRONMENT_VAR
+   #   value: the_value_goes_here
+
    securityContext: {}
+
+   # Allows you to add any config files
+   extraVolumes: []
+   # - name: extras
+   #   emptyDir: {}
+   extraVolumeMounts: []
+   # - name: extras
+   #   mountPath: /usr/share/extras
+   #   readOnly: true
+
+   # A list of secrets and their paths to mount inside the pod
+   # This is useful for mounting certificates for security other sensitive values
+   secretMounts: []
+   #  - name: some-secret-stuff
+   #    secretName: some-secret-stuff
+   #    path: /opt/Axway/apigateway/conf/some/secret
+
+   # Defines where to mount required standard volumes such as events, opentraffic, etc. into the container
+   volumeMountsPaths:
+      # Where to mount events (defaults to /opt/Axway/apigateway/events)
+      events: ""
 
    podSecurityContext:
       runAsUser: 1000
@@ -99,7 +136,6 @@ anm:
    affinity: {}
 
    nameOverride: ""
-   fullnameOverride: ""
 
    labels: {}
 
@@ -149,42 +185,41 @@ anm:
    args: 
    - /opt/Axway/apigateway/posix/bin/start-emt-nodemanager
 
-   #name: anm
-   #buildTag: "20210330"
-   #imageName: "apim-anm-7.7"
-   #ingressName: "anm"
-   #replicaCount: 1
-   #pvcQuota: 1
-   #trafficPort: 8090
-   #trafficPortUI: 8091
-   #logTraceToFile: "true"
-   #logTraceJSONtoSTDOUT: "false"
-   #emt_heap_size_mb: "1024"
-   #emt_topology_log_enabled: "true"
-   #emt_topology_ttl: 10
-   #emt_trace_level: "INFO"
-   #certInSecret: false
+   # Set jvm.enabled false if you prefer to include (bake in) you jvm.xml using a mergeDir option
+   # Or overwrite the config according to your needs.
+   jvm: 
+      enabled: true
+      config: |
+         <ConfigurationFragment>
+            <VMArg name="-Ddont.expect.100.continue=true"/>
+         </ConfigurationFragment>
 
 ##################################################################################################################################
 #   API MANAGER
 ##################################################################################################################################
 apimgr:
    enabled: true
-
-   nameOverride: "apimanager"
-
+   # For API-Manager it is recommended to have only 1 replica
    replicas: 1
+   nameOverride: ""
    image: "manager"
+   imageTag: ""
    containerPorts:
       manager: 8075
 
    service:
       type: "ClusterIP"
       loadBalancerIP: ""
-      port: 8075
-      nodePort: ""
       labels: {}
       annotations: {}
+      ports:
+      - name: manager
+        port: 8075
+        targetPort: 8075
+        nodePort: ""
+        ingress: 
+         enabled: true
+         host: manager
 
    EMT_DEPLOYMENT_ENABLED: false
    EMT_TOPOLOGY_LOG_DEST: 1
@@ -196,16 +231,34 @@ apimgr:
    EMT_POLL_INTERVAL: 30
    EMT_TOPOLOGY_TTL: 500
 
-   jvm: |
-      <ConfigurationFragment>
-      <VMArg name="-Ddont.expect.100.continue=true"/>
-      <VMArg name="-Dio.swagger.parser.util.RemoteUrl.trustAll=true"/>
-      <VMArg name="-Dio.swagger.v3.parser.util.RemoteUrl.trustAll=true"/>
-      </ConfigurationFragment>
+   # Allows you to add any environment variables
+   extraEnvs: []
+   # - name: MY_ENVIRONMENT_VAR
+   #   value: the_value_goes_here
+
+   # Defines where to mount required standard volumes such as events, opentraffic, etc. into the container
+   volumeMountsPaths:
+      # Where to mount events (defaults to /opt/Axway/apigateway/events)
+      events: ""
+
+   # Allows you to add any config files
+   extraVolumes: []
+   # - name: extras
+   #   emptyDir: {}
+   extraVolumeMounts: []
+   # - name: extras
+   #   mountPath: /usr/share/extras
+   #   readOnly: true
+
+   # A list of secrets and their paths to mount inside the pod
+   # This is useful for mounting certificates for security other sensitive values
+   secretMounts: []
+   #  - name: some-secret-stuff
+   #    secretName: some-secret-stuff
+   #    path: /opt/Axway/apigateway/conf/some/secret
 
    ingress:
       enabled: true
-      name: manager
       annotations: {}
          # kubernetes.io/ingress.class: azure/application-gateway
          # appgw.ingress.kubernetes.io/backend-protocol: https
@@ -214,10 +267,6 @@ apimgr:
          # appgw.ingress.kubernetes.io/ssl-redirect: "true"
          # appgw.ingress.kubernetes.io/connection-draining: "true"
          # appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
-      hosts: {}
-         # - host: anm.domain.internal
-         #  paths:
-         #   - path: /
       tls: []
       #  - secretName: chart-example-tls
       #    hosts:
@@ -239,17 +288,17 @@ apimgr:
          httpHeaders:
          - name: k8sprobe
            value: readiness.apimgr
-         path: /healthcheck
+         path: /
          port: manager
          scheme: HTTPS
-      initialDelaySeconds: 20
+      initialDelaySeconds: 30
       periodSeconds: 5
       successThreshold: 1
       timeoutSeconds: 1
 
    livenessProbe:
       httpGet:
-         path: /healthcheck
+         path: /
          port: manager
          httpHeaders:
          - name: k8sprobe
@@ -280,20 +329,16 @@ apimgr:
          maxUnavailable: 25%
       type: RollingUpdate
 
-
-   #buildTag: "20210330"
-   #imageName: "apim-gtw-7.7"
-   #ingressName: "api-mgr"
-   #replicaCount: 1
-   #trafficPort: 8075
-   #logTraceToFile: "true"
-   #logTraceJSONtoSTDOUT: "false"
-   #logOpenTrafficOutput: "stdout"
-   #emt_heap_size_mb: "1024"
-   #emt_topology_log_enabled: "true"
-   #emt_topology_ttl: 10
-   #emt_trace_level: "INFO"
-   #certInSecret: false
+   # Set jvm.enabled false if you prefer to include (bake in) you jvm.xml using a mergeDir option
+   # Or overwrite the config according to your needs.
+   jvm: 
+      enabled: true
+      config: |
+         <ConfigurationFragment>
+            <VMArg name="-DCASSANDRA_PROTOCOL_VERSION=4" />
+            <VMArg name="-Dio.swagger.parser.util.RemoteUrl.trustAll=true"/>
+            <VMArg name="-Dio.swagger.v3.parser.util.RemoteUrl.trustAll=true"/>
+         </ConfigurationFragment>
 
 ##################################################################################################################################
 #   API TRAFFIC
@@ -302,7 +347,8 @@ apitraffic:
    enabled: true
    replicas: 2
    image: "manager"
-   nameOverride: "traffic"
+   imageTag: ""
+   nameOverride: ""
 
    EMT_DEPLOYMENT_ENABLED: false
    EMT_TOPOLOGY_LOG_DEST: 1
@@ -313,6 +359,55 @@ apitraffic:
    EMT_TRACE_LEVEL: "INFO"
    EMT_POLL_INTERVAL: 30
    EMT_TOPOLOGY_TTL: 500
+
+   # Allows you to add any environment variables
+   extraEnvs: []
+   # - name: MY_ENVIRONMENT_VAR
+   #   value: the_value_goes_here
+   
+   # Ports to be exposed by the API-Traffic PODs
+   containerPorts:
+      traffic: 8065
+      plain: 8080
+      tls: 8081
+      oauth: 8089
+   
+   # Service and Ingress configuration for the API-Traffic PoD
+   service:
+      type: "ClusterIP"
+      loadBalancerIP: ""
+      labels: {}
+      annotations: {}
+      ports:
+      - name: traffic
+        port: 8065
+        targetPort: 8065
+        nodePort: ""
+        ingress: 
+          enabled: true
+          host: traffic
+      - name: oauth
+        port: 8089
+        targetPort: 8089
+        nodePort: ""
+        ingress: 
+          enabled: true
+          host: oauth
+      - name: tls
+        port: 8081
+        targetPort: 8081
+        nodePort: ""
+        ingress: 
+          enabled: false
+          host: tls
+      - name: plain
+        port: 8080
+        targetPort: 8080
+        nodePort: ""
+        # Ingress is currently not supported for HTTP-Connections - Would required another Ingress with additional annotations
+        ingress: 
+         enabled: false
+         host: plain
 
    ingress:
       enabled: true
@@ -325,28 +420,33 @@ apitraffic:
          # appgw.ingress.kubernetes.io/ssl-redirect: "true"
          # appgw.ingress.kubernetes.io/connection-draining: "true"
          # appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
-      hosts: {}
-         # - host: anm.domain.internal
-         #  paths:
-         #   - path: /
       tls: []
       #  - secretName: chart-example-tls
       #    hosts:
       #      - chart-example.local
 
-   containerPorts:
-      traffic: 8065
-      plain: 8080
-      tls: 8081
-      oauth: 8089
+   # Defines where to mount required standard volumes such as events, opentraffic, etc. into the container
+   volumeMountsPaths:
+      # events mount location (defaults to /opt/Axway/apigateway/events)
+      events: ""
+      # opentraffic mount location (defaults to /opt/Axway/apigateway/logs/opentraffic)
+      opentraffic: ""
 
-   service:
-      type: "ClusterIP"
-      loadBalancerIP: ""
-      port: 8065
-      nodePort: ""
-      labels: {}
-      annotations: {}
+   # Allows you to add any config files
+   extraVolumes: []
+   # - name: extras
+   #   emptyDir: {}
+   extraVolumeMounts: []
+   # - name: extras
+   #   mountPath: /usr/share/extras
+   #   readOnly: true
+
+   # A list of secrets and their paths to mount inside the pod
+   # This is useful for mounting certificates for security other sensitive values
+   secretMounts: []
+   #  - name: some-secret-stuff
+   #    secretName: some-secret-stuff
+   #    path: /opt/Axway/apigateway/conf/some/secret
 
    resources:
       requests:
@@ -368,7 +468,7 @@ apitraffic:
          path: /healthcheck
          port: plain
          scheme: HTTP
-      initialDelaySeconds: 20
+      initialDelaySeconds: 40
       periodSeconds: 5
       successThreshold: 1
       timeoutSeconds: 1
@@ -380,7 +480,7 @@ apitraffic:
          httpHeaders:
          - name: k8sprobe
            value: liveness.apimgr
-         scheme: HTTPS
+         scheme: HTTP
       initialDelaySeconds: 300
       periodSeconds: 10
       timeoutSeconds: 5
@@ -401,68 +501,180 @@ apitraffic:
          exec:
             command: ["sleep","10"]
 
-   filebeat:
-      enabled: false
-      image: docker.elastic.co/beats/filebeat
-      imageTag: 7.12.1
-      securityContext:
-         runAsUser: 0
-         privileged: false
-      args: ["-e", "-E", "http.enabled=true"]
-      resources:
-         requests:
-            cpu: "500m"
-            memory: "150Mi"
-         limits:
-            cpu: "1000m"
-            memory: "200Mi"
-      readinessProbe:
-         exec:
-            command: [ "sh", "-c", "filebeat test output" ]
-         initialDelaySeconds: 10
-         periodSeconds: 10
-         timeoutSeconds: 5
-         failureThreshold: 3
-         successThreshold: 1
-      livenessProbe:
-         exec:
-            command: [ "sh", "-c", "curl --fail 127.0.0.1:5066" ]
-         initialDelaySeconds: 10
-         periodSeconds: 10
-         timeoutSeconds: 5
-         failureThreshold: 3
-         successThreshold: 1
+   extraContainers: []
+   # - name: do-something
+   #   image: busybox
+   #   command: ['do', 'something']
 
+   # Set jvm.enabled false if you prefer to include (bake in) you jvm.xml using a mergeDir option
+   # Or overwrite the config according to your needs.
+   jvm: 
+      enabled: true
+      config: |
+         <ConfigurationFragment>
+            <VMArg name="-DCASSANDRA_PROTOCOL_VERSION=4" />
+            <VMArg name="-Dio.swagger.parser.util.RemoteUrl.trustAll=true"/>
+            <VMArg name="-Dio.swagger.v3.parser.util.RemoteUrl.trustAll=true"/>
+         </ConfigurationFragment>
 
-   #name: traffic
-   #buildTag: "20210330"
-   #imageName: "apim-gtw-7.7"
-   #ingressName: "api"
-   #portManager: 8065
-   #portGateway: 8080
-   #portGatewaySSL: 8081
-   #replicaCount: 1
-   #autoscaling:
-   #   enable: false
-   #   maxReplicas: 3
-   #   averageUtilization: 70
-   #logTraceToFile: "true"
-   #logTraceJSONtoSTDOUT: "false"
-   #logOpenTrafficOutput: "stdout"
-   #emt_trace_level: "INFO"
-   #emt_heap_size_mb: "1512"
-   #emt_topology_log_enabled: "true"
-   #emt_topology_ttl: 10
-   share:
-      secret: "azure-file"
-      name: "gw-events"
-      path: "/opt/Axway/apigateway/events"
-   #   quota: 1
-   #volumes:
-   #   accessModes: ReadWriteOnce
-   #certInSecret: false
-   #portProbe: 8065
-   #schemeProbe: "HTTPS"
+##################################################################################################################################
+#   API-Portal
+##################################################################################################################################
+apiportal:
+   enabled: true
+   replicas: 1
+   image: "apim-ptl"
+   imageTag: ""
+   # overwrites the globals.dockerRepository
+   dockerRepository: ""
+   containerPorts:
+      apiportal: 443
+
+   # Controls the service for the API-Portal
+   service:
+      type: "ClusterIP"
+      loadBalancerIP: ""
+      port: 443
+      nodePort: ""
+      labels: {}
+      annotations: {}
+
+   config: 
+      # Enable if you would like to pre-configure the API-Manager service in API-Portal
+      master: 
+         enabled: true
+         name: "Master"
+      ssl:
+         enabled: true
+         generateCertificates: true
+         # Use an existing secret object for the required certificates. 
+         # Certificate and Key must be stored with keys: apiportal.crt and apiportal.key: 
+         existingSecret: ""
+   
+
+   # Allows you to add any environment variables
+   extraEnvs: []
+   # - name: MY_ENVIRONMENT_VAR
+   #   value: the_value_goes_here
+
+   # General ingress settings.
+   ingress:
+      enabled: true
+      name: apiportal
+      # Set the annotations according to your Ingress-Controller
+      annotations: {}
+         # kubernetes.io/ingress.class: azure/application-gateway
+         # appgw.ingress.kubernetes.io/backend-protocol: https
+         # cert-manager.io/cluster-issuer: letsencrypt-prod
+         # cert-manager.io/acme-challenge-type: http01
+         # appgw.ingress.kubernetes.io/ssl-redirect: "true"
+         # appgw.ingress.kubernetes.io/connection-draining: "true"
+         # appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
+      hosts: {}
+         # - host: anm.domain.internal
+         #  paths:
+         #   - path: /
+      tls: []
+      #  - secretName: chart-example-tls
+      #    hosts:
+      #      - chart-example.local
+
+   securityContext: {}
+
+   podSecurityContext:
+      runAsUser: 1048
+      fsGroup: 1048
+
+   persistence: 
+      enabled: true
+
+   # Allows you to add any config files
+   extraVolumes: []
+   # - name: extras
+   #   emptyDir: {}
+   extraVolumeMounts: []
+   # - name: extras
+   #   mountPath: /usr/share/extras
+   #   readOnly: true
+
+   # A list of secrets and their paths to mount inside the pod
+   # This is useful for mounting certificates for security other sensitive values
+   secretMounts: []
+   #  - name: some-secret-stuff
+   #    secretName: some-secret-stuff
+   #    path: /opt/Axway/apigateway/conf/some/secret
+
+   # 1048 is the Apache user, which is required during installation
+   podSecurityContext:
+      runAsUser: 1048
+      fsGroup: 1048
+      
+   nodeSelector: {}
+   tolerations: []
+   affinity: {}
+
+   nameOverride: ""
+
+   labels: {}
+
+   podAnnotations: {}
+
+   readinessProbe:
+      httpGet:
+         httpHeaders:
+            - name: k8sprobe
+              value: readiness.apiportal
+         path: /
+         port: apiportal
+         scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 1
+
+   livenessProbe:
+      httpGet:
+         httpHeaders:
+            - name: k8sprobe
+              value: liveness.apiportal
+         path: /
+         port: apiportal
+         scheme: HTTPS
+      initialDelaySeconds: 60
+      periodSeconds: 60
+      timeoutSeconds: 5
+      failureThreshold: 3
+      successThreshold: 1
+
+   updateStrategy: 
+      rollingUpdate:
+         maxSurge: 25%
+         maxUnavailable: 25%
+      type: RollingUpdate
+
+   resources:
+      requests:
+         cpu: "100m"
+         memory: "500Mi"
+      limits:
+         cpu: "500m"
+         memory: "1000Mi"
+
+   args: []
+   # - /do/some/other/stuff
+
+   command: []
+   # e.g. a do nothing command
+   # command: [ "sh", "-c", "tail -f /dev/null" ]
+
+   extraContainers: []
+   # - name: do-something
+   #   image: busybox
+   #   command: ['do', 'something']
+
+##################################################################################################################################
+#   PVCs
+##################################################################################################################################
 
 pvcs:
    eventsVolumeClaim:
@@ -470,199 +682,224 @@ pvcs:
       resources:
          requests:
             storage: 10Gi
+
    opentrafficVolumeClaim:
       accessModes: [ "ReadWriteOnce" ]
       resources:
          requests:
             storage: 10Gi
-   apigw-mysql-analytics:
+
+   metricsDbVolumeClaim:
       accessModes: [ "ReadWriteOnce" ]
       resources:
          requests:
             storage: 10Gi
 
+   apiportalDbVolumeClaim:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+         requests:
+            storage: 1Gi
+
+   apiportalImagesVolumeClaim: 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+         requests:
+            storage: 25Mi
+
+   apiportalEnckeyVolumeClaim: 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+         requests:
+            storage: 2Mi
+
+   apiportalLanguageVolumeClaim: 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+         requests:
+            storage: 2Mi
+
+   apiportalTemplatesVolumeClaim: 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+         requests:
+            storage: 5Mi
+
+   apiportalAdmLanguageVolumeClaim: 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+         requests:
+            storage: 2Mi
+
+   apiportalCertsVolumeClaim: 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+         requests:
+            storage: 2Mi
+
 ##################################################################################################################################
 #   CASSANDRA DATABASE
 ##################################################################################################################################
 cassandra:
-   enabled: true
-   external: false
+   # Set to false, to use an existing (external) Cassandra-DB
+   internal: true
+
+   # Only a subset of possible parameters is mentioned here. You can review and use all configuration values 
+   # as documented here:
+   # https://github.com/bitnami/charts/blob/master/bitnami/cassandra/values.yaml
+
+   nameOverride: "cassandra"
+   fullnameOverride: "cassandra"
+
    dbUser:
-      user: "cassandra"
-      password: "changeme"
+     # You need to configure Cassandra authentication with ${environment.CASS_USERNAME} using Policy-Studio
+     user: cassandra
+     # You need to configure Cassandra authentication with ${environment.CASS_PASS} using Policy-Studio
+     # When not providing a password, it must be provided during Helm release upgrades
+     password: "changeme"
+     # Use an existing secret object for dbUser.user password (will ignore dbUser.password)
+     # Password must be stored using key: cassandra-password
+     existingSecret: ""
+
    cluster: 
-      name: "cassandra"
-      seedCount: 1
-      numTokens: 256
-      datacenter: dc1
-      rack: rack1
-      enableRPC: true
-      endpointSnitch: SimpleSnitch
-      clientEncryption: false
-   containerPorts:
-      intra: 7000
-      tls: 7001
-      jmx: 7199
-      cql: 9042
-      thrift: 9160
-   service:
-      type: ClusterIP
-      port: 9042
-      thriftPort: 9160
-      metricsPort: 8080
-      nodePorts:
-         cql: ''
-         thrift: ''
-         metrics: ''
-      annotations: {}
+     # Name of the cluster - You cannot change this later
+     name: "axway-apim-management"
+     # Keyspace to use - You cannot change this later
+     keyspace: "axway-apim-management"
 
    persistence:
-      enabled: true
-      annotations:
-      accessModes:
-         - ReadWriteOnce
-      size: 8Gi
-      mountPath: /var/lib/cassandra/data
+     # @param persistence.enabled Enable Cassandra data persistence using PVC, use a Persistent Volume Claim, If false, use emptyDir
+     enabled: true
+     # @param persistence.storageClass PVC Storage Class for Cassandra data volume
+     # If defined, storageClassName: <storageClass>
+     # If set to "-", storageClassName: "", which disables dynamic provisioning
+     # If undefined (the default) or set to null, no storageClassName spec is
+     #   set, choosing the default provisioner.  (gp2 on AWS, standard on GKE, AWS & OpenStack)
+     storageClass: ""
+     # @param persistence.size PVC Storage Request for Cassandra data volume
+     size: 8Gi
 
-   podManagementPolicy: OrderedReady
+   metrics:
+     # @param metrics.enabled Start a side-car prometheus exporter
+     enabled: false
 
-   podAffinityPreset: ""
-
-   podAntiAffinityPreset: soft
-
-   nodeAffinityPreset:
-      type: ""
-      key: ""
-      values: []
-
-   nodeSelector: {}
-
-   tolerations: []
-
-   podSecurityContext:
-      fsGroup: 1000
-
-   resources:
-      limits:
-         cpu: "1000m"
-         memory: 2Gi
-      requests:
-         cpu: "500m"
-         memory: 1Gi
-
-   lifecycle:
-      preStop:
-         exec:
-            command: 
-            - /bin/sh
-            - -c
-            - nodetool drain   
-
-   updateStrategy: RollingUpdate
-   
-   buildTag: "2.2.19"
-   registry: "cassandra"
-   replicaCount: 1
-   clusterName: "axway-apim-management"
-   keyspace: "axway-apim-management"
-   host1: "ip_host1"
-   host2: "ip_host2"
-   host3: "ip_host3"
-   domain: ""
-   consistency_level: "LOCAL_QUORUM"
-
-metricsDB:
-   METRICS_DB_URL: 
-   METRICS_DB_USERNAME: 
-   METRICS_DB_PASS: 
-      valueFrom:
-         secretKeyRef:
-            name: apim-password
-
-apiportal:
-   enabled: false
-   name: "api-portal"
-   buildTag: "7.7-20210330"
-   imageName: "apim-ptl"
-   ingressName: "apiportal"
-   trafficPort: 443
-   scheme: HTTPS
-   replicaCount: 1
-   share:
-      secret: "apiportal-secret-name"
-      name: "apiportal-volume-rwm-name"
-   certInSecret: false
-   runAsUser: 1000
-
-apiaga:
-   enabled: false
-   name: apiaga
-   buildTag: "20210330"
-   imageName: "apim-aga-7.7"
-   ingressName: "analytics"
-   replicaCount: 1
-   trafficPort: 8040
-   logTraceToFile: "true"
-   logTraceJSONtoSTDOUT: "false"
-   logOpenTrafficOutput: "stdout"
-   emt_heap_size_mb: "1024"
-   emt_topology_ttl: 10
-   emt_trace_level: "INFO"
-   certInSecret: false
 
 ##################################################################################################################################
-#   ANALYTICS/METRICS DATABASE
+#   EXTERNAL Metrics DB
 ##################################################################################################################################
-mysqlanalytics:
-   enabled: true
 
-   persistence:
-      enabled: true
-      existingClaim: apigw-mysql-analytics
+# Is used by ANM, API-Manager and API-Gateway to establish the Metrics-DB-Connection
+# This is ignored, when using mysqlmetrics.internal.
+externalMetricsDB: {}
+#   env:
+     #- name: METRICS_DB_URL
+     #  value: ""
+     #- name: METRICS_DB_USERNAME
+     #  value: ""
+     #- name: METRICS_DB_PASS
+     #  valueFrom: 
+     #    secretKeyRef: 
+     #      name: my-secret
+     #      key: my-key
+
+##################################################################################################################################
+#   EXTERNAL API-Portal DB
+##################################################################################################################################
+
+# Is used by the API-Portal to establish the API-Portal-DB-Connection
+# This is ignored, when using mysqlapiportal.internal.
+externalApiportalDB: {}
+#   env:
+     #- name: MYSQL_HOST
+     #  value: ""
+     #- name: MYSQL_PORT
+     #  value: ""
+     #- name: MYSQL_DATABASE
+     #  value: ""
+     #- name: MYSQL_USER
+     #  value: ""
+     #- name: MYSQL_PASSWORD
+     #  valueFrom: 
+     #    secretKeyRef: 
+     #      name: my-secret
+     #      key: my-key
+
+##################################################################################################################################
+#   INTERNAL METRICS DATABASE
+##################################################################################################################################
+mysqlmetrics:
+   internal: true
+
+   # Only a subset of possible parameters is mentioned here. You can review and use all configuration values 
+   # as documented here:
+   # https://github.com/bitnami/charts/blob/master/bitnami/mysql/values.yaml
+
+   image:
+     # registry: docker.io
+     # repository: bitnami/mysql
+     # tag: 8.0.27-debian-10-r8
+
+   nameOverride: "mysqlmetrics"
+   fullnameOverride: "mysqlmetrics"
+
+   primary:
+      persistence:
+         enabled: true
+         existingClaim: apigw-mysql-metrics
 
    auth: 
-      rootPassword: "uPHW785qOJ"
+      database: "metrics"
+      # If not set a password is randomly generated
+      # Please note: You need to provide the generated password to upgrade the release
+      rootPassword: "changeme"
+      username: "report"
+      # If not set a password is randomly generated
+      # Please note: You need to provide the generated password to upgrade the release
+      password: "changeme"
+      # An existing secret must contain the keys mysql-root-password / mysql-password
+      existingSecret: ""
 
-   external: false
+   initdbScriptsConfigMap: metrics
 
    nodeSelector: {}
    tolerations: []
    affinity: {}
 
-
-   host: "externalUri"
-   name: mysql-aga
-   ssl: false
-   imageName: "mysql"
-   buildTag: "5.7.26"
-   replicaCount: 1
-   dbName: "analytics"
-   adminUser: "report"
-   adminPasswd: "changeme"
-   rootPasswd: "changeme"
-   quotaStorage: 10
-   port: 3306
-
 ##################################################################################################################################
-#   ANALYTICS/METRICS DATABASE
+#   INTERNAL API-Portal DATABASE
 ##################################################################################################################################
-mysqlportal:
-   enabled: false
+mysqlapiportal:
+   internal: false
 
-   persistence:
-      enabled: true
-      existingClaim: apigw-mysql-portal
+   # Only a subset of possible parameters is mentioned here. You can review and use all configuration values 
+   # as documented here:
+   # https://github.com/bitnami/charts/blob/master/bitnami/mysql/values.yaml
 
-   external: true
-   name: "mysql-portal"
-   imageName: "mysql"
-   buildTag: "5.7.26"
-   replicaCount: 1
-   dbName: "portal"
-   adminUser: "portal"
-   adminPasswd: "changeme"
-   quotaStorage: 10
-   port: 3306
+   nameOverride: "mysqlapiportal"
+   fullnameOverride: "mysqlapiportal"
+
+   primary:
+      persistence:
+         enabled: true
+         existingClaim: apigw-mysql-apiportal
+
+   auth: 
+      database: "apiportal"
+      # If not set a password is randomly generated
+      # Please note: You need to provide the generated password to upgrade the release
+      rootPassword: "changeme"
+      username: "report"
+      # If not set a password is randomly generated
+      # Please note: You need to provide the generated password to upgrade the release
+      password: "changeme"
+      # An existing secret must contain the keys mysql-root-password / mysql-password
+      existingSecret: ""
+
+   securityContext: {}
+
+   nodeSelector: {}
+   tolerations: []
+   affinity: {}
 
 oauth:
    enabled: false
