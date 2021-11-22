@@ -1,0 +1,145 @@
+global:
+  imagePullSecrets:
+  - name: axway-demo-registry
+
+  domainName: "axway-apim-on-eks.de"
+  dockerRepository: "ghcr.io/cwiechmann/axway-api-management-automated"
+  imageTag: "77-20210830-1-8224e79"
+
+##################################################################################################################################
+#   A D M I N - N O D E M A N A G E R
+##################################################################################################################################
+anm:
+   enabled: true
+   ingress:
+      enabled: true
+      annotations: 
+        # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/guide/ingress/annotations
+        kubernetes.io/ingress.class: alb
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/target-type: ip
+        alb.ingress.kubernetes.io/group.name: axway-apim
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+        alb.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        # 302 is also accepted, as Kibana is performing a redirect
+        alb.ingress.kubernetes.io/success-codes: 200,302
+
+##################################################################################################################################
+#   API MANAGER
+##################################################################################################################################
+apimgr:
+   enabled: true
+   imageTag: 77-20210830-v1-1161c0c
+   ingress:
+      enabled: true
+      annotations: 
+        # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/guide/ingress/annotations
+        kubernetes.io/ingress.class: alb
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/target-type: ip
+        alb.ingress.kubernetes.io/group.name: axway-apim
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+        alb.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        # 302 is also accepted, as Kibana is performing a redirect
+        alb.ingress.kubernetes.io/success-codes: 200,302
+
+##################################################################################################################################
+#   API TRAFFIC
+##################################################################################################################################
+apitraffic:
+   enabled: true
+   imageTag: 77-20210830-v1-1161c0c
+   ingress:
+      enabled: true
+      name: traffic
+      annotations: 
+        # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/guide/ingress/annotations
+        kubernetes.io/ingress.class: alb
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/target-type: ip
+        alb.ingress.kubernetes.io/group.name: axway-apim
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+        alb.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        # Healthcheck works by default, but causes with a lot of error 404 requests in Traffic-Monitor
+        alb.ingress.kubernetes.io/success-codes: 200,404
+        # It's recommended to expose a Healthcheck API
+        # alb.ingress.kubernetes.io/healthcheck-path: /healthcheck
+        # alb.ingress.kubernetes.io/success-codes: 200
+
+##################################################################################################################################
+#   API PORTAL
+##################################################################################################################################
+apiportal:
+   enabled: true
+   image: portal
+   imageTag: 7.7-20210830
+   dockerRepository: docker-registry.demo.axway.com/other-demo
+   ingress:
+      enabled: true
+      name: portal
+      annotations: 
+        # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/guide/ingress/annotations
+        kubernetes.io/ingress.class: alb
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/target-type: ip
+        alb.ingress.kubernetes.io/group.name: axway-apim
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+        alb.ingress.kubernetes.io/backend-protocol: "HTTPS"
+
+   redis:
+      enabled: true
+      internal: true
+
+##################################################################################################################################
+#   INTERNAL CASSANDRA DATABASE
+##################################################################################################################################
+cassandra:
+   internal: true
+
+##################################################################################################################################
+#   INTERNAL ANALYTICS/METRICS DATABASE
+##################################################################################################################################
+mysqlmetrics:
+   internal: true
+
+##################################################################################################################################
+#   INTERNAL API-Portal DATABASE
+##################################################################################################################################
+mysqlapiportal:
+   internal: true
+
+##################################################################################################################################
+#   AMPLIFY AGENTS
+##################################################################################################################################
+
+agents:
+   central:
+      clientId: DOSA_02ea38d..................b17df8f
+      organizationId: 230.........343
+      environment: my-v7-environment
+      privateKey: |
+         -----BEGIN PRIVATE KEY-----
+         MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCy6I5t5R0qKHWR
+         UN7Cgzz2raYhdZzQKWktVRvNnAVaJKrmK981nNIWqB8enooRTDVFEp7XazAZGDVN
+         .....
+         .........
+         .....
+         UHIriuIHpSr6yz1Foataxpo=
+         -----END PRIVATE KEY-----
+      publicKey: |
+         -----BEGIN PUBLIC KEY-----
+         MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsuiObeUdKih1kVDewoM8
+         9q2mIXWc0ClpLVUbzZwFWiSq5ivfNZzSFqgfHp6KEUw1RRKe12swGRg1TWr5DBs/
+         .....
+         .........
+         .....
+         ClLsxTTMKk0EqOgjnNY/rlNUplgb7tnfHsEhBbtYWzQFhBQQ+sv8nK/DUljXYP9z
+         GwIDAQAB
+         -----END PUBLIC KEY-----
+   discovery:
+      enabled: true
+      agentName: "2312"
+      apimanager:
+         username: apiadmin
+         password: highly-secure
+         insecureSSL: "true"
