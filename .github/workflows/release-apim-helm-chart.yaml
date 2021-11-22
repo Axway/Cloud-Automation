@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: /tmp/amplify-apim-${{ env.RELEASE_VERSION }}.tgz
+        asset_path: /tmp/axway-apim-${{ env.RELEASE_VERSION }}.tgz
         asset_name: helm-chart-axway-apim-${{ env.RELEASE_VERSION }}.tgz
         asset_content_type: application/gzip
       env:
