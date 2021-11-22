@@ -12,7 +12,7 @@ jobs:
   release-helm-chart:
     defaults:
       run:
-        working-directory: 'APIM/Helmchart/amplify-apim-7.7'
+        working-directory: 'APIM/Helmchart'
     name: Release Axway-APIM Helm chart
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: /tmp/amplify-apim-7.7-${{ env.RELEASE_VERSION }}.tgz
+        asset_path: /tmp/amplify-apim-${{ env.RELEASE_VERSION }}.tgz
         asset_name: helm-chart-axway-apim-${{ env.RELEASE_VERSION }}.tgz
         asset_content_type: application/gzip
       env:
