@@ -1,0 +1,168 @@
+{{- if .Values.agents.discovery.enabled -}}
+
+{{- $apimgrName := include "apimgr.name" . -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "discoveryAgent.name" . }}
+  labels: {{- include "discoveryAgent.labels" . | nindent 4 }}
+  annotations:
+    {{- range $key, $value := .Values.agents.discovery.deploymentAnnotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.agents.discovery.replicas }}
+  selector:
+    matchLabels:
+      {{- include "discoveryAgent.selectorLabels" . | nindent 6 }}
+  strategy:
+{{ toYaml .Values.agents.updateStrategy | indent 4 }}
+  template:
+    metadata:
+      name: "{{ template "discoveryAgent.name" . }}"
+      labels: 
+        {{- include "discoveryAgent.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- range $key, $value := .Values.agents.discovery.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+{{- if .Values.agents.priorityClassName }}
+      priorityClassName: {{ .Values.agents.priorityClassName }}
+{{- end }}
+      securityContext:
+{{ toYaml .Values.agents.podSecurityContext | indent 8 }}
+      {{- if .Values.agents.serviceAccount }}
+      serviceAccount: {{ .Values.agents.serviceAccount }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.agents.discovery.terminationGracePeriod }}
+      volumes:
+      - name: agents-secret
+        secret:
+          secretName: {{ template "discoveryAgent.name" . }}
+        {{- range .Values.agents.discovery.secretMounts }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+        {{- end }}
+        {{- if .Values.agents.discovery.extraVolumes }}
+{{ toYaml ( .Values.agents.discovery.extraVolumes ) | indent 8 }}
+        {{- end }}
+      
+      {{- with .Values.agents.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.agents.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.agents.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.global.imagePullSecrets | indent 6 }}
+      {{- end }}
+      initContainers:
+      - name: init-apimgmt
+        image: busybox:1.33
+        command: ['sh', '-c', 'until nc -w 3 -v {{ template "apimgr.name" . }} 8075; do echo waiting for apimgr; sleep 2; done;']
+      {{- if .Values.agents.discovery.extraInitContainers }}
+{{ tpl .Values.agents.discovery.extraInitContainers . | indent 6 }}
+      {{- end }}
+      containers:
+      - name: "{{ template "discoveryAgent.name" . }}"
+      {{- if .Values.agents.discovery.args }}
+        args:
+{{ toYaml .Values.agents.discovery.args | indent 8 }}
+      {{- end }}
+      {{- if .Values.agents.discovery.command }}
+        command:
+{{ toYaml .Values.agents.discovery.command | indent 8 }}
+      {{- end }}
+        securityContext:
+{{ toYaml .Values.agents.securityContext | indent 10 }}
+        image: {{ .Values.agents.dockerRepository }}/{{ .Values.agents.discovery.image }}:{{ .Values.agents.discovery.imageTag }}
+        imagePullPolicy: {{ template "imagePullPolicy" . }}
+        livenessProbe:
+{{ toYaml .Values.agents.discovery.livenessProbe | indent 10 }}
+        readinessProbe:
+{{ toYaml .Values.agents.discovery.readinessProbe | indent 10 }}
+        ports:
+        {{- range $key, $value := .Values.agents.discovery.containerPorts }}
+        - name: {{ $key }}
+          containerPort: {{ $value }}
+        {{- end }}
+        {{- if .Values.agents.discovery.extraPorts }}
+{{- toYaml .Values.agents.discovery.extraPorts | nindent 8 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.agents.discovery.resources | indent 10 }}
+        env:
+        - name: CENTRAL_AUTH_CLIENTID
+          value: {{ required "Missing .Values.agents.central.clientId" .Values.agents.central.clientId | quote }}
+        - name: CENTRAL_ORGANIZATIONID
+          value: {{ required "Missing .Values.agents.central.organizationId" .Values.agents.central.organizationId | quote }}
+        - name: CENTRAL_ENVIRONMENT
+          value: {{ required "Missing .Values.agents.central.environment" .Values.agents.central.environment | quote }}
+        - name: CENTRAL_AUTH_PRIVATEKEY
+          value: {{ default "/opt/keys/private_key.pem" .Values.agents.central.privateKeyLocation | quote }}
+        - name: CENTRAL_AUTH_PUBLICKEY
+          value: {{ default "/opt/keys/public_key.pem" .Values.agents.central.publicKeyLocation | quote }}
+        - name: CENTRAL_AGENTNAME
+          value: {{ required "Missing .Values.agents.discovery.agentName" .Values.agents.discovery.agentName | quote }}
+        - name: APIMANAGER_HOST
+          value: {{ default $apimgrName .Values.agents.discovery.apimanager.host | quote }}
+        - name: APIMANAGER_PORT
+          value: {{ default "8075" .Values.agents.discovery.apimanager.port | quote }}
+        - name: APIMANAGER_AUTH_USERNAME
+          value: {{ required "Missing .Values.agents.discovery.apimanager.username" .Values.agents.discovery.apimanager.username | quote }}
+        - name: APIMANAGER_AUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "discoveryAgentSecretName" . }}
+              key: apimgr-auth-password
+        - name: APIMANAGER_SSL_INSECURESKIPVERIFY
+          value: {{ default "false" .Values.agents.discovery.apimanager.insecureSSL | quote }}
+        - name: LOG_LEVEL
+          value: {{ default "info" .Values.agents.discovery.logLevel | quote }}
+        - name: LOG_OUTPUT
+          value: {{ default "stdout" .Values.agents.discovery.logOutput | quote }}
+        - name: LOG_PATH
+          value: {{ default "logs" .Values.agents.discovery.logPath | quote }}
+        {{- if .Values.agents.discovery.extraEnvs }}
+{{ toYaml .Values.agents.discovery.extraEnvs | indent 8 }}
+        {{- end }}
+        {{- if .Values.agents.discovery.envFrom }}
+        envFrom:
+{{ toYaml .Values.agents.discovery.envFrom | indent 8 }}
+        {{- end }}
+        volumeMounts:
+          - name: agents-secret
+            mountPath: /opt/keys/private_key.pem
+            subPath: private_key.pem
+          - name: agents-secret
+            mountPath: /opt/keys/public_key.pem
+            subPath: public_key.pem
+          {{- range .Values.agents.discovery.secretMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .path }}
+            {{- if .subPath }}
+            subPath: {{ .subPath }}
+            {{- end }}
+          {{- end }}
+        {{- if .Values.agents.discovery.extraVolumeMounts }}
+{{ toYaml (.Values.agents.discovery.extraVolumeMounts ) | indent 8 }}
+        {{- end }}
+        {{- if .Values.agents.discovery.lifecycle }}
+        lifecycle:
+{{ toYaml .Values.agents.discovery.lifecycle | indent 10 }}
+        {{- end }}
+        {{- if .Values.agents.discovery.extraContainers }}
+{{ toYaml .Values.agents.discovery.extraContainers | indent 6 }}
+        {{- end }}
+
+{{- end }}

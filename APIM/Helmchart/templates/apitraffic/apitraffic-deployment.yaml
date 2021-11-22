@@ -55,7 +55,7 @@ spec:
         configMap:
           name: jvmxml
           items:
-            - key: apimgr-jvmxml
+            - key: apitraffic-jvmxml
               path: jvm.xml
       {{- end }}
       {{- range .Values.apitraffic.secretMounts }}
@@ -94,8 +94,8 @@ spec:
       - name: init-anm
         image: busybox:1.33
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "anm.name" . }} {{ .Values.anm.service.port }}; do echo waiting for anm; sleep 2; done;']
-      {{- if .Values.extraInitContainers }}
-{{ tpl .Values.extraInitContainers . | indent 6 }}
+      {{- if .Values.apitraffic.extraInitContainers }}
+{{ tpl .Values.apitraffic.extraInitContainers . | indent 6 }}
       {{- end }}
       containers:
       - name: "{{ template "apitraffic.name" . }}"
@@ -127,17 +127,19 @@ spec:
 {{ toYaml .Values.apitraffic.resources | indent 10 }}
         env: 
         - name: EMT_ANM_HOSTS
+        {{- if .Values.apitraffic.config.emtAnmHosts }}
+          value: {{ .Values.apitraffic.config.emtAnmHosts | quote }}
+        {{- else }}
           value: {{ template "anm.name" . }}:{{ required "Admin Node-Manager port is missing" .Values.anm.containerPorts.anm }}
-        - name: EMT_HEAP_SIZE_MB
-          value: {{ .Values.apitraffic.EMT_HEAP_SIZE_MB | quote }}
-        - name: EMT_TRACE_LEVEL
-          value: {{ .Values.apitraffic.EMT_TRACE_LEVEL | quote }}
-        - name: EMT_TOPOLOGY_LOG_ENABLED
-          value: {{ .Values.apitraffic.EMT_TOPOLOGY_LOG_ENABLED | quote }}
-        - name: EMT_TOPOLOGY_TTL
-          value: {{ .Values.apitraffic.EMT_TOPOLOGY_TTL | quote }}
+        {{- end }}
         - name: EMT_DEPLOYMENT_ENABLED
-          value: {{ .Values.anm.EMT_DEPLOYMENT_ENABLED | quote }}
+          value: {{ default "false" .Values.apitraffic.config.emtDeploymentEnabled | quote }}
+        - name: EMT_HEAP_SIZE_MB
+          value: {{ default "1024" .Values.apitraffic.config.emtHeapSize | quote }}
+        - name: EMT_TRACE_LEVEL
+          value: {{ default "INFO" .Values.apitraffic.config.emtTraceLevel | quote }}
+        - name: EMT_PARENT_HOST
+          value: {{ default "api-gateway" .Values.apitraffic.config.emtParentHost | quote }}
 
         - name: CASS_HOST
           value: "{{ template "cassandra.name" . }}"

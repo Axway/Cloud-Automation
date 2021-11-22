@@ -91,8 +91,8 @@ spec:
       - name: init-anm
         image: busybox:1.33
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "anm.name" . }} {{ .Values.anm.service.port }}; do echo waiting for anm; sleep 2; done;']      
-      {{- if .Values.extraInitContainers }}
-{{ tpl .Values.extraInitContainers . | indent 6 }}
+      {{- if .Values.apimgr.extraInitContainers }}
+{{ tpl .Values.apimgr.extraInitContainers . | indent 6 }}
       {{- end }}
       containers:
       - name: "{{ template "apimgr.name" . }}"
@@ -124,18 +124,19 @@ spec:
 {{ toYaml .Values.apimgr.resources | indent 10 }}
         env:
         - name: EMT_ANM_HOSTS
+        {{- if .Values.apimgr.config.emtAnmHosts }}
+          value: {{ .Values.apimgr.config.emtAnmHosts | quote }}
+        {{- else }}
           value: {{ template "anm.name" . }}:{{ required "Admin Node-Manager port is missing" .Values.anm.containerPorts.anm }}
-        - name: EMT_HEAP_SIZE_MB
-          value: {{ .Values.apimgr.EMT_HEAP_SIZE_MB | quote }}
-        - name: EMT_TRACE_LEVEL
-          value: {{ .Values.apimgr.EMT_TRACE_LEVEL | quote }}
-        - name: EMT_TOPOLOGY_LOG_ENABLED
-          value: {{ .Values.apimgr.EMT_TOPOLOGY_LOG_ENABLED | quote }}
-        - name: EMT_TOPOLOGY_TTL
-          value: {{ .Values.apimgr.EMT_TOPOLOGY_TTL | quote }}
+        {{- end }}
         - name: EMT_DEPLOYMENT_ENABLED
-          value: {{ .Values.anm.EMT_DEPLOYMENT_ENABLED | quote }}
-
+          value: {{ default "false" .Values.apimgr.config.emtDeploymentEnabled | quote }}
+        - name: EMT_HEAP_SIZE_MB
+          value: {{ default "1024" .Values.apimgr.config.emtHeapSize | quote }}
+        - name: EMT_TRACE_LEVEL
+          value: {{ default "INFO" .Values.apimgr.config.emtTraceLevel | quote }}
+        - name: EMT_PARENT_HOST
+          value: {{ default "api-manager" .Values.apimgr.config.emtParentHost | quote }}
         - name: CASS_HOST
           value: "{{ template "cassandra.name" . }}"
         - name: CASS_PORT

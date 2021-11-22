@@ -3,10 +3,10 @@
 {{- end -}}
 
 {{- define "licenseSecretName" -}}
-{{- if .Values.global.licenseSecretName  -}}
-{{ .Values.global.licenseSecretName }}
+{{- if .Values.global.existingLicenseSecret  -}}
+{{ .Values.global.existingLicenseSecret }}
 {{- else if .Values.global.license -}}
-{{ default "axway-apim-license" .Values.global.licenseSecretName }}
+{{ default "axway-apim-license" .Values.global.existingLicenseSecret }}
 {{- else -}}
 {{ "" }}
 {{- end -}}

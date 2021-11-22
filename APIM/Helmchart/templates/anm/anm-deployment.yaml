@@ -85,8 +85,8 @@ spec:
         image: busybox:1.33
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "mysqlmetrics.name" . }} {{ .Values.mysqlmetrics.primary.service.port }}; do echo waiting for mysql; sleep 2; done;']
       {{- end }}
-      {{- if .Values.extraInitContainers }}
-{{ tpl .Values.extraInitContainers . | indent 6 }}
+      {{- if .Values.anm.extraInitContainers }}
+{{ tpl .Values.anm.extraInitContainers . | indent 6 }}
       {{- end }}
       containers:
       - name: "{{ template "anm.name" . }}"
@@ -123,25 +123,23 @@ spec:
 {{ toYaml .Values.anm.resources | indent 10 }}
         env:
         - name: EMT_TOPOLOGY_TTL
-          value: {{ .Values.anm.EMT_TOPOLOGY_TTL | quote }}
-        - name: EMT_HEAP_SIZE_MB
-          value: {{ .Values.anm.EMT_HEAP_SIZE_MB | quote }}
-        - name: EMT_TRACE_LEVEL
-          value: {{ .Values.anm.EMT_TRACE_LEVEL | quote }}
+          value: {{ default "120" .Values.anm.config.emtTopologyTtl | quote }}
         - name: EMT_DEPLOYMENT_ENABLED
-          value: {{ .Values.anm.EMT_DEPLOYMENT_ENABLED | quote }}
+          value: {{ default "false" .Values.anm.config.emtDeploymentEnabled | quote }}
         - name: EMT_TOPOLOGY_LOG_DEST
-          value: {{ .Values.anm.EMT_TOPOLOGY_LOG_DEST | quote }}
+          value: {{ default "1" .Values.anm.config.emtTopologyLogDest | quote }}
         - name: EMT_TOPOLOGY_LOG_DIR
-          value: {{ .Values.anm.EMT_TOPOLOGY_LOG_DIR | quote }}
+          value: {{ default "/opt/Axway/apigateway/logs" .Values.anm.config.emtTopologyLogDir | quote }}
         - name: EMT_TOPOLOGY_LOG_ENABLED
-          value: {{ .Values.anm.EMT_TOPOLOGY_LOG_ENABLED | quote }}
+          value: {{ default "false" .Values.anm.config.emtTopologyLogEnabled | quote }}
         - name: EMT_TOPOLOGY_LOG_INTERVAL
-          value: {{ .Values.anm.EMT_TOPOLOGY_LOG_INTERVAL | quote }}
+          value: {{ default "60" .Values.anm.config.emtTopologyLogInterval | quote }}
+        - name: EMT_HEAP_SIZE_MB
+          value: {{ default "1024" .Values.anm.config.emtHeapSize | quote }}
+        - name: EMT_TRACE_LEVEL
+          value: {{ default "INFO" .Values.anm.config.emtTraceLevel | quote }}
         - name: EMT_PARENT_HOST
-          value: {{ .Values.anm.EMT_PARENT_HOST | default "" | quote }}
-        - name: EMT_POLL_INTERVAL
-          value: {{ .Values.anm.EMT_POLL_INTERVAL | quote }}
+          value: {{ default "anm" .Values.anm.config.emtParentHost | quote }}
 {{- if .Values.mysqlmetrics.internal }}
         - name: METRICS_DB_URL
           value: "jdbc:mysql://{{ template "mysqlmetrics.name" . }}:{{ .Values.mysqlmetrics.primary.service.port }}/{{ .Values.mysqlmetrics.auth.database }}?useSSL={{ .Values.mysqlmetrics.ssl }}"

@@ -43,3 +43,10 @@ dependencies:
       - bitnami/mysql
     version: 8.x.x
     condition: mysqlapiportal.internal
+  - name: redis
+    alias: apiportalredis
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami/redis
+    version: 15.x.x
+    condition: apiportal.redis.internal

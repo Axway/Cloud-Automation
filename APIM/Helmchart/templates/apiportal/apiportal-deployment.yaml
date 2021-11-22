@@ -2,6 +2,7 @@
 
 {{- $imagePullPolicy := include "imagePullPolicy" . -}}
 {{- $check := include "validateDockerRepo" . -}}
+{{- $apimgrName := include "apimgr.name" . -}}
 
 apiVersion: apps/v1
 kind: Deployment
@@ -96,8 +97,8 @@ spec:
       - name: init-apimgmt
         image: busybox:1.33
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "apimgr.name" . }} 8075; do echo waiting for apimgr; sleep 2; done;']
-      {{- if .Values.extraInitContainers }}
-{{ tpl .Values.extraInitContainers . | indent 6 }}
+      {{- if .Values.apiportal.extraInitContainers }}
+{{ tpl .Values.apiportal.extraInitContainers . | indent 6 }}
       {{- end }}
       containers:
       - name: "{{ template "apiportal.name" . }}"
@@ -145,15 +146,113 @@ spec:
 {{- else if .Values.externalApiportalDB.env }}
 {{ toYaml .Values.externalApiportalDB.env | nindent 8 }}
 {{- end }}
-{{ if .Values.apiportal.config.master.enabled }}
         - name: APIMANAGER_CONFIGURED
           value: "1"
         - name: APIMANAGER_NAME
-          value: {{ .Values.apiportal.config.master.name | quote }}
+          value: {{ default "master" .Values.apiportal.config.master.name | quote }}
         - name: APIMANAGER_HOST
-          value: {{ template "apimgr.name" }}
+          value: {{ default $apimgrName .Values.apiportal.config.master.host | quote }}
         - name: APIMANAGER_PORT
-          value: "8075"
+          value: {{ default "8075" .Values.apiportal.config.master.host | quote }}
+{{ if .Values.apiportal.config.tryIt }}
+        - name: TRYIT_METHODS_CONFIGURED
+          value: "1"
+        - name: TRYIT_METHODS_ENABLE_GET
+          value: {{ default "1" .Values.apiportal.config.tryIt.enabledGet | quote }}
+        - name: TRYIT_METHODS_ENABLE_POST
+          value: {{ default "1" .Values.apiportal.config.tryIt.enabledPost | quote }}
+        - name: TRYIT_METHODS_ENABLE_PUT
+          value: {{ default "1" .Values.apiportal.config.tryIt.enabledPut | quote }}
+        - name: TRYIT_METHODS_ENABLE_DELETE
+          value: {{ default "1" .Values.apiportal.config.tryIt.enabledDelete | quote }}
+        - name: TRYIT_METHODS_ENABLE_PATCH
+          value: {{ default "1" .Values.apiportal.config.tryIt.enabledPatch | quote }}
+        - name: TRYIT_METHODS_ENABLE_HEAD
+          value: {{ default "1" .Values.apiportal.config.tryIt.enabledHead | quote }}
+        - name: TRYIT_METHODS_ENABLE_OPTIONS
+          value: {{ default "1" .Values.apiportal.config.tryIt.enabledOptions | quote }}
+{{- end }}
+{{ if .Values.apiportal.config.redirectAfterLogin }}
+        - name: REDIRECT_AFTER_LOGIN_CONFIGURED
+          value: "1"
+        - name: REDIRECT_AFTER_LOGIN_URL
+          value: {{ default "/api-catalog" .Values.apiportal.config.redirectAfterLogin.url | quote }}
+{{- end }}
+{{ if .Values.apiportal.config.informationSource }}
+        - name: API_INFORMATION_SOURCE_CONFIGURED
+          value: "1"
+        - name: API_INFORMATION_SOURCE_NAME
+          value: {{ default "summary" .Values.apiportal.config.informationSource.name | quote }}
+{{- end }}
+{{ if .Values.apiportal.config.monitoringRange }}
+        - name: MONITORING_MONTH_RANGE_CONFIGURED
+          value: "1"
+        - name: MONITORING_MONTH_RANGE_VALUE
+          value: {{ default "2" .Values.apiportal.config.monitoringRange.value | quote }}
+{{- end }}
+{{ if .Values.apiportal.config.sessionTimeout }}
+        - name: ABSOLUTE_SESSION_TIMEOUT_CONFIGURED
+          value: "1"
+        - name: ABSOLUTE_SESSION_TIMEOUT_HOURS
+          value: {{ default "24" .Values.apiportal.config.sessionTimeout.timehoutHours | quote }}
+{{- end }}
+{{ if .Values.apiportal.config.clamAv }}
+        - name: CLAMAV_CONFIGURED
+          value: "1"
+        - name: CLAMAV_ON
+          value: "1"
+        - name: CLAMAV_HOST
+          value: {{ default "" .Values.apiportal.config.clamAv.host | quote }}
+        - name: CLAMAV_PORT
+          value: {{ default 3310 .Values.apiportal.config.clamAv.port | quote }}
+{{- end }}
+{{ if .Values.apiportal.config.loginProtection }}
+        - name: LOGIN_PROTECTION_CONFIGURED
+          value: "1"
+        - name: LOGIN_PROTECTION_ON
+          value: "1"
+        - name: LOGIN_PROTECTION_ATTEMPTS_BEFORE_LOCK
+          value: {{ default "3" .Values.apiportal.config.loginProtection.attemptsBeforeLock | quote }}
+        - name: LOGIN_PROTECTION_ATTEMPTS_BEFORE_RECAPCHA
+          value: {{ default "3" .Values.apiportal.config.loginProtection.attemptsBeforeRecapcha | quote }}
+        - name: LOGIN_PROTECTION_LOCK_DURATION_SEC
+          value: {{ default "600" .Values.apiportal.config.loginProtection.lockDurationSec | quote }}
+        - name: LOGIN_PROTECTION_LOCK_IP
+          value: {{ default "" .Values.apiportal.config.loginProtection.lockIp | quote }}          
+{{- end }}
+{{ if .Values.apiportal.config.sso }}
+        - name: SSO_CONFIGURED
+          value: "1"
+        - name: SSO_ON
+          value: "1"
+        - name: SSO_PATH
+          value: {{ default "" .Values.apiportal.config.sso.path | quote }}
+        - name: SSO_ENTITY_ID
+          value: {{ default "" .Values.apiportal.config.sso.entityId | quote }}
+        - name: SSO_WHITELIST
+          value: {{ default "" .Values.apiportal.config.sso.whitelist | quote }}
+{{- end }}
+{{- if .Values.apiportal.config.whitelist }}
+        - name: OAUTH_WHITELIST_CONFIGURED
+          value: {{ if .Values.apiportal.config.whitelist.oauthWhitelist }}"1"{{- else }}"0"{{- end }}
+        - name: API_WHITELIST_CONFIGURED
+          value: {{ if .Values.apiportal.config.whitelist.apiWhitelist }}"1"{{- else }}"0"{{- end }}
+        - name: OAUTH_WHITELIST
+          value: {{ default "" .Values.apiportal.config.whitelist.oauthWhitelist | quote }}
+        - name: API_WHITELIST
+          value: {{ default "" .Values.apiportal.config.whitelist.apiWhitelist | quote }}
+{{- end }}
+{{- if .Values.apiportal.redis.enabled }}
+        - name: REDIS_CONFIGURED
+          value: "1"
+        - name: REDIS_ON
+          value: "1"
+        - name: REDIS_HOST
+          value: {{ default "" .Values.apiportal.redis.host | quote }}
+        - name: REDIS_PORT
+          value: {{ default "6379" .Values.apiportal.redis.port | quote }}
+        - name: REDIS_CACHE_TIMEOUT_SEC
+          value: {{ default "600" .Values.apiportal.redis.cacheTimeout | quote }}
 {{- end }}
 {{ if .Values.apiportal.config.ssl.enabled }}
         - name: APACHE_SSL_ON

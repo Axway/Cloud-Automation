@@ -1,7 +1,5 @@
-# Default values for apimgr-ext-cass.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
+# Axway API-Management Helm-Chart values file.
+# To use the helmet chart, create your own values.<customer>. and use it for installation as suggested in the readme.
 
 global:
    # ImagePullSecrets made available to all Deployments/StateFullSets
@@ -12,6 +10,7 @@ global:
 
    # Setup the docker repository used to pull images for anm, apimgr & traffic
    # Example: docker-registry.demo.axway.com/other-demo
+   # You can override the docker-registry used for anm, api-manager & api-traffic
    dockerRepository: ""
    # Setup the image tag (e.g. 7.7-20210530)
    # You can override the image tag used for anm, api-manager & api-traffic
@@ -19,6 +18,7 @@ global:
 
    updateStrategy: "RollingUpdate"
 
+   # The domain name used by allComponents as default
    domainName: ""
 
    # AZURE, OPENSHIFT, MINIKUBE
@@ -38,16 +38,9 @@ global:
       # # SIGNATURE: 8eee280ede1a7fd94b91130c78da44f403f8bd9f927bc96bfd6a2a94839c049b
       # # SIGNATURE: 096e86bb928c5865c77596de3814f116b9b3f4923441ac0cb8e7189f9c0f5971
 
-   # If the necessary API-Gateway license is included as a Secret define the name of the secret.
-   # If you use your own secret, you can specify the name of the  secret here, which contains the license Base64 encoded. 
-   # If you specified a license above no need to set a secret name as it defaults to axway-apim-license
-   licenseSecretName: 
-
-   createSecrets: true
-
-   initImageTag: "busybox:1.33"
-   
-   editor: "Axway"
+   # If you want to use your own secret, specify the name of the secret here, 
+   # which contains the license Base64 encoded with key license
+   existingLicenseSecret: 
 
 ##################################################################################################################################
 #   A D M I N - N O D E M A N A G E R
@@ -88,16 +81,19 @@ anm:
       #  - secretName: chart-example-tls
       #    hosts:
       #      - chart-example.local
+
+   # Configuration is based on environment variables as desribed here:
    # https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_installation/apigw_containers/container_env_variables/index.html#environment-variables-reference
-   EMT_DEPLOYMENT_ENABLED: false
-   EMT_TOPOLOGY_LOG_DEST: 1
-   EMT_TOPOLOGY_LOG_DIR: "/opt/Axway/apigateway/logs"
-   EMT_TOPOLOGY_LOG_ENABLED: false
-   EMT_TOPOLOGY_LOG_INTERVAL: 60
-   EMT_HEAP_SIZE_MB: 1024
-   EMT_TRACE_LEVEL: "INFO"
-   EMT_POLL_INTERVAL: 30
-   EMT_TOPOLOGY_TTL: 500
+   config: {}
+      # emtTopologyTtl: 120
+      # emtDeploymentEnabled: false
+      # emtTopologyLogDest: 1
+      # emtTopologyLogDir: "/opt/Axway/apigateway/logs"
+      # emtTopologyLogEnabled: false
+      # emtTopologyLogInterval: 60
+      # emtHeapSize: 1024
+      # emtTraceLevel: INFO
+      # emtParentHost: "anm"
 
    # Allows you to add any environment variables
    extraEnvs: []
@@ -221,15 +217,16 @@ apimgr:
          enabled: true
          host: manager
 
-   EMT_DEPLOYMENT_ENABLED: false
-   EMT_TOPOLOGY_LOG_DEST: 1
-   EMT_TOPOLOGY_LOG_DIR: "/opt/Axway/apigateway/logs"
-   EMT_TOPOLOGY_LOG_ENABLED: false
-   EMT_TOPOLOGY_LOG_INTERVAL: 60
-   EMT_HEAP_SIZE_MB: 1024
-   EMT_TRACE_LEVEL: "INFO"
-   EMT_POLL_INTERVAL: 30
-   EMT_TOPOLOGY_TTL: 500
+   # Configuration is based on environment variables as desribed here:
+   # https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_installation/apigw_containers/container_env_variables/index.html#environment-variables-reference
+   config: {}
+      # Comma separated list of hosts:port
+      # emtAnmHosts: 
+      # emtPollInterval: 30
+      # emtDeploymentEnabled: false
+      # emtHeapSize: 1024
+      # emtTraceLevel: INFO
+      # emtParentHost: "api-manager"
 
    # Allows you to add any environment variables
    extraEnvs: []
@@ -350,16 +347,6 @@ apitraffic:
    imageTag: ""
    nameOverride: ""
 
-   EMT_DEPLOYMENT_ENABLED: false
-   EMT_TOPOLOGY_LOG_DEST: 1
-   EMT_TOPOLOGY_LOG_DIR: "/opt/Axway/apigateway/logs"
-   EMT_TOPOLOGY_LOG_ENABLED: false
-   EMT_TOPOLOGY_LOG_INTERVAL: 60
-   EMT_HEAP_SIZE_MB: 1024
-   EMT_TRACE_LEVEL: "INFO"
-   EMT_POLL_INTERVAL: 30
-   EMT_TOPOLOGY_TTL: 500
-
    # Allows you to add any environment variables
    extraEnvs: []
    # - name: MY_ENVIRONMENT_VAR
@@ -391,7 +378,7 @@ apitraffic:
         targetPort: 8089
         nodePort: ""
         ingress: 
-          enabled: true
+          enabled: false
           host: oauth
       - name: tls
         port: 8081
@@ -408,6 +395,17 @@ apitraffic:
         ingress: 
          enabled: false
          host: plain
+
+   # Configuration is based on environment variables as desribed here:
+   # https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_installation/apigw_containers/container_env_variables/index.html#environment-variables-reference
+   config: {}
+      # Comma separated list of hosts:port
+      # emtAnmHosts: 
+      # emtPollInterval: 30
+      # emtDeploymentEnabled: false
+      # emtHeapSize: 1024
+      # emtTraceLevel: INFO
+      # emtParentHost: "api-gateway"
 
    ingress:
       enabled: true
@@ -523,9 +521,9 @@ apitraffic:
 apiportal:
    enabled: true
    replicas: 1
-   image: "apim-ptl"
+   image: "my-api-portal-image"
    imageTag: ""
-   # overwrites the globals.dockerRepository
+   # Option to overwrite the globals.dockerRepository
    dockerRepository: ""
    containerPorts:
       apiportal: 443
@@ -541,16 +539,55 @@ apiportal:
 
    config: 
       # Enable if you would like to pre-configure the API-Manager service in API-Portal
-      master: 
-         enabled: true
-         name: "Master"
+      master: {}
+         # name: "Master"
+         # host: "my-api-manager-host"
+         # port: "8082"
       ssl:
          enabled: true
          generateCertificates: true
          # Use an existing secret object for the required certificates. 
          # Certificate and Key must be stored with keys: apiportal.crt and apiportal.key: 
          existingSecret: ""
+      tryIt:
+         # enabledGet: true
+         # enabledPost: true
+         # enabledPut: true
+         # enabledDelete: true
+         # enabledPatch: true
+         # enabledHead: true
+         # enabledOptions: false
+      redirectAfterLogin:
+         # url: "/home"
+      informationSource:
+         # name: "summary" # Must be summary or description
+      monitoringRange:
+         # value: "2" # is an integer, which range is 2 to 6
+      sessionTimeout:
+         # timehoutHours: "24"
+      clamAv:
+         # host: ""
+         # port: ""
+      loginProtection: 
+         # attemptsBeforeLock: "3"
+         # attemptsBeforeRecapcha: "3"
+         # lockDurationSec: "600"
+         # lockIp: ""
+      sso:
+         # path: ""
+         # entityId: ""
+         # whitelist: ""
+      whitelist:
+         # enabled: true
+         # oauthWhitelist: ""
+         # apiWhitelist: ""
    
+   redis:
+      enabled: false
+      internal: false
+      host: "apiportal-redis-headless"
+      port: "6379"
+      cacheTimeout: "600"
 
    # Allows you to add any environment variables
    extraEnvs: []
@@ -673,6 +710,97 @@ apiportal:
    #   command: ['do', 'something']
 
 ##################################################################################################################################
+#   AMPLIFY AGENTS
+##################################################################################################################################
+
+agents:
+   dockerRepository: "axway.jfrog.io/ampc-public-docker-release/agent"
+   # You may use an existing secret that contains all required secure information with the following keys:
+   # private_key.pem - They private key used for the Amplify-Central communication
+   # public_key.pem - They public key used for the Amplify-Central communication
+   # apimgr-auth-password - Password used to authenticate with the API-Manager
+   # If set, this secret is automatically mounted
+   existingSecret: 
+   central:
+      clientId: 
+      # You may provide the private-key in your local values
+      privateKey: [] # |
+         # -----BEGIN PRIVATE KEY-----
+         # MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCy6I5t5R0qKHWR
+         # UN7Cgzz2raYhdZzQKWktVRvNnAVaJKrmK981nNIWqB8enooRTDVFEp7XazAZGDVN
+         # ....
+      # You may provide the public-key in your local values
+      publicKey: [] # |
+         # -----BEGIN PUBLIC KEY-----
+         # MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsuiObeUdKih1kVDewoM8
+         # 9q2mIXWc0ClpLVUbzZwFWiSq5ivfNZzSFqgfHp6KEUw1RRKe12swGRg1TWr5DBs/
+         # ....
+      organizationId: 
+      environment: 
+      # Defaults to /opt/keys/private_key.pem which matches to the mounted secret
+      privateKeyLocation: 
+      # Defaults to /opt/keys/public_key.pem which matches to the mounted secret
+      publicKeyLocation: 
+
+   # ----------- Discovery agent -------------
+   discovery:
+      enabled: true
+      replicas: 1
+      image: "v7-discovery-agent"
+      imageTag: "1.1.6"
+      # command: [ "sh", "-c", "tail -f /dev/null" ]
+
+      # Configuration of the discovery agent
+      agentName: 
+      apimanager: 
+         username: 
+         password:
+         port:
+         host:
+         insecureSSL: "false"
+      logLevel: info
+      logOutput: stdout
+      logPath: logs
+
+      readinessProbe:
+         httpGet:
+            httpHeaders:
+               - name: k8sprobe
+                 value: readiness.discoveryAgent
+            path: /status
+            port: 8989
+            scheme: HTTP
+         initialDelaySeconds: 20
+         periodSeconds: 10
+         successThreshold: 1
+         timeoutSeconds: 1
+
+      livenessProbe: 
+         httpGet:
+            httpHeaders:
+               - name: k8sprobe
+                 value: liveness.discoveryAgent
+            path: /status
+            port: 8989
+            scheme: HTTP
+         initialDelaySeconds: 30
+         periodSeconds: 30
+         successThreshold: 1
+         timeoutSeconds: 1
+
+      labels: {}
+      podAnnotations: {}
+
+   # ----------- Traceability agent -------------
+   # TBD
+
+   updateStrategy: {}
+
+   podSecurityContext:
+      runAsUser: 1000
+      fsGroup: 1000
+
+##################################################################################################################################
 #   PVCs
 ##################################################################################################################################
 
@@ -755,7 +883,7 @@ cassandra:
      # You need to configure Cassandra authentication with ${environment.CASS_USERNAME} using Policy-Studio
      user: cassandra
      # You need to configure Cassandra authentication with ${environment.CASS_PASS} using Policy-Studio
-     # When not providing a password, it must be provided during Helm release upgrades
+     # Please note: When not providing a password or secret, it must be provided during Helm release upgrades
      password: "changeme"
      # Use an existing secret object for dbUser.user password (will ignore dbUser.password)
      # Password must be stored using key: cassandra-password
@@ -780,7 +908,7 @@ cassandra:
      size: 8Gi
 
    metrics:
-     # @param metrics.enabled Start a side-car prometheus exporter
+     # Start a side-car prometheus exporter
      enabled: false
 
 
@@ -869,7 +997,7 @@ mysqlmetrics:
 #   INTERNAL API-Portal DATABASE
 ##################################################################################################################################
 mysqlapiportal:
-   internal: false
+   internal: true
 
    # Only a subset of possible parameters is mentioned here. You can review and use all configuration values 
    # as documented here:
@@ -901,12 +1029,16 @@ mysqlapiportal:
    tolerations: []
    affinity: {}
 
-oauth:
-   enabled: false
-   name: "oauth"
-   ingressName: "oauth"
-   trafficPort: 8089
-   certInSecret: false
+##################################################################################################################################
+#   INTERNAL REDIS DATABASE
+##################################################################################################################################
+apiportalredis:
+   nameOverride: "apiportal-redis"
+   fullnameOverride: "apiportal-redis"
+   architecture: "standalone"
+   auth:
+      # Redis with AuthN is not supported by the API-Portal
+      enabled: false
 
 ##################################################################################################################################
 #   BASE - IMAGE for OpenShift only
