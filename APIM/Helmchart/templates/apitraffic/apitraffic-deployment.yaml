@@ -39,29 +39,32 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.apitraffic.terminationGracePeriod }}
       volumes:
-      - name: events
-        persistentVolumeClaim:
-          claimName: apigw-events
-      - name: opentraffic
-        persistentVolumeClaim:
-          claimName: apigw-opentraffic
+        - name: events
+          persistentVolumeClaim:
+            claimName: apigw-events
+        - name: opentraffic
+          persistentVolumeClaim:
+            claimName: apigw-opentraffic
+        - name: trace
+          persistentVolumeClaim:
+            claimName: apigw-trace
 {{- if $licenseSecret }}
-      - name: license
-        secret:
-          secretName: {{ $licenseSecret }}
+        - name: license
+          secret:
+            secretName: {{ $licenseSecret }}
 {{- end }}
       {{- if .Values.apitraffic.jvm.enabled }}
-      - name: apitraffic-jvmxml
-        configMap:
-          name: jvmxml
-          items:
-            - key: apitraffic-jvmxml
-              path: jvm.xml
+        - name: apitraffic-jvmxml
+          configMap:
+            name: jvmxml
+            items:
+              - key: apitraffic-jvmxml
+                path: jvm.xml
       {{- end }}
       {{- range .Values.apitraffic.secretMounts }}
-      - name: {{ .name }}
-        secret:
-          secretName: {{ .secretName }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
       {{- end }}
       {{- if .Values.apitraffic.extraVolumes }}
 {{ toYaml ( .Values.apitraffic.extraVolumes ) | indent 8 }}
@@ -193,6 +196,8 @@ spec:
           mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apitraffic.volumeMountsPaths.events | quote }}
         - name: opentraffic
           mountPath: {{ default "/opt/Axway/apigateway/logs/opentraffic" .Values.apitraffic.volumeMountsPaths.opentraffic | quote }}
+        - name: trace
+          mountPath: {{ default "/opt/Axway/apigateway/groups/emt-group/emt-service/trace" .Values.apitraffic.volumeMountsPaths.trace | quote }}
         {{- if .Values.apitraffic.extraVolumeMounts }}
 {{ toYaml (.Values.apitraffic.extraVolumeMounts ) | indent 8 }}
         {{- end }}

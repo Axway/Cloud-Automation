@@ -46,6 +46,9 @@ spec:
         - name: events
           persistentVolumeClaim:
             claimName: apigw-events
+        - name: audit
+          persistentVolumeClaim:
+            claimName: apigw-audit
         {{- if .Values.anm.jvm.enabled }}
         - name: anm-jvmxml
           configMap:
@@ -163,6 +166,8 @@ spec:
         volumeMounts:
           - name: events
             mountPath: {{ default "/opt/Axway/apigateway/events" .Values.anm.volumeMountsPaths.events | quote }}
+          - name: audit
+            mountPath: {{ default "/opt/Axway/apigateway/logs" .Values.anm.volumeMountsPaths.audit | quote }}
           {{- if .Values.anm.jvm.enabled }}
           - name: anm-jvmxml
             mountPath: "/opt/Axway/apigateway/conf/jvm.xml"

@@ -18,6 +18,26 @@ metadata:
 spec:
 {{ toYaml .Values.pvcs.opentrafficVolumeClaim | indent 2 }}
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apigw-trace
+  namespace: {{ .Release.Namespace | quote }}
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.traceVolumeClaim | indent 2 }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apigw-audit
+  namespace: {{ .Release.Namespace | quote }}
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.auditVolumeClaim | indent 2 }}
+---
 {{- if and .Values.mysqlmetrics.internal .Values.mysqlmetrics.primary.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim

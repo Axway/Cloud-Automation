@@ -817,6 +817,18 @@ pvcs:
          requests:
             storage: 10Gi
 
+   traceVolumeClaim:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+         requests:
+            storage: 30Gi
+
+   auditVolumeClaim:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+         requests:
+            storage: 1Gi
+
    metricsDbVolumeClaim:
       accessModes: [ "ReadWriteOnce" ]
       resources:

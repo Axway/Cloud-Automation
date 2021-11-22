@@ -40,26 +40,26 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.apimgr.terminationGracePeriod }}
       volumes:
 {{- if $licenseSecret }}
-      - name: license
-        secret:
-          secretName: {{ $licenseSecret }}
+        - name: license
+          secret:
+            secretName: {{ $licenseSecret }}
 {{- end }}
         {{- range .Values.apimgr.secretMounts }}
-      - name: {{ .name }}
-        secret:
-          secretName: {{ .secretName }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
         {{- end }}
       {{- if .Values.apimgr.jvm.enabled }}
-      - name: apimgr-jvmxml
-        configMap:
-          name: jvmxml
-          items:
-            - key: apimgr-jvmxml
-              path: jvm.xml
+        - name: apimgr-jvmxml
+          configMap:
+            name: jvmxml
+            items:
+              - key: apimgr-jvmxml
+                path: jvm.xml
       {{- end }}
-      - name: events
-        persistentVolumeClaim:
-          claimName: apigw-events
+        - name: events
+          persistentVolumeClaim:
+            claimName: apigw-events
       {{- if .Values.apimgr.extraVolumes }}
 {{ toYaml ( .Values.apimgr.extraVolumes ) | indent 8 }}
       {{- end }}
