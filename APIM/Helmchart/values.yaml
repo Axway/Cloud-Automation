@@ -181,9 +181,9 @@ anm:
    args: 
    - /opt/Axway/apigateway/posix/bin/start-emt-nodemanager
 
-   # Set jvm.enabled false if you prefer to include (bake in) you jvm.xml using a mergeDir option
-   # Or overwrite the config according to your needs.
+   # Configure JVM settings
    jvm: 
+      # Set to false if you prefer to include (bake in) your jvm.xml using the mergeDir option
       enabled: true
       config: |
          <ConfigurationFragment>
@@ -326,9 +326,9 @@ apimgr:
          maxUnavailable: 25%
       type: RollingUpdate
 
-   # Set jvm.enabled false if you prefer to include (bake in) you jvm.xml using a mergeDir option
-   # Or overwrite the config according to your needs.
+   # Configure JVM settings
    jvm: 
+      # Set to false if you prefer to include (bake in) your jvm.xml using the mergeDir option
       enabled: true
       config: |
          <ConfigurationFragment>
@@ -504,9 +504,9 @@ apitraffic:
    #   image: busybox
    #   command: ['do', 'something']
 
-   # Set jvm.enabled false if you prefer to include (bake in) you jvm.xml using a mergeDir option
-   # Or overwrite the config according to your needs.
+   # Configure JVM settings
    jvm: 
+      # Set to false if you prefer to include (bake in) your jvm.xml using the mergeDir option
       enabled: true
       config: |
          <ConfigurationFragment>
