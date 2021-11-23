@@ -58,8 +58,12 @@ spec:
                 path: jvm.xml
       {{- end }}
         - name: events
+{{- if .Values.pvcs.events.enabled }}
           persistentVolumeClaim:
             claimName: apigw-events
+{{- else }}
+          emptyDir: {}
+{{- end }}
       {{- if .Values.apimgr.extraVolumes }}
 {{ toYaml ( .Values.apimgr.extraVolumes ) | indent 8 }}
       {{- end }}

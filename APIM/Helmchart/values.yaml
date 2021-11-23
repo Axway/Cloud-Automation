@@ -173,10 +173,10 @@ anm:
    resources:
       requests:
          cpu: "100m"
-         memory: "1536Mi"
+         memory: "500Mi"
       limits:
-         cpu: "1000m"
-         memory: "1536Mi"
+         cpu: "500m"
+         memory: "1Gi"
 
    args: 
    - /opt/Axway/apigateway/posix/bin/start-emt-nodemanager
@@ -309,11 +309,11 @@ apimgr:
 
    resources:
       requests:
-         cpu: "100m"
-         memory: "1536Mi"
+         cpu: "200m"
+         memory: "750Mi"
       limits:
-         cpu: "1000m"
-         memory: "1536Mi"
+         cpu: "500m"
+         memory: "1Gi"
 
    lifecycle:
       preStop:
@@ -622,6 +622,7 @@ apiportal:
       runAsUser: 1048
       fsGroup: 1048
 
+   # If enabled required PVCs for the API-Portal are created
    persistence: 
       enabled: true
 
@@ -805,29 +806,49 @@ agents:
 ##################################################################################################################################
 
 pvcs:
-   eventsVolumeClaim:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-         requests:
-            storage: 10Gi
+   # Events is used by ANM, APIMGR and APITRAFFIC
+   events:
+      # If disabled an emptyDir volume is used instead
+      # Useful if you stream log information to an external logging system
+      enabled: true
+      eventsVolumeClaim:
+         accessModes: [ "ReadWriteOnce" ]
+         resources:
+            requests:
+               storage: 10Gi
 
-   opentrafficVolumeClaim:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-         requests:
-            storage: 10Gi
+   # OpenTraffic is used by APIMGR and APITRAFFIC
+   opentraffic:
+      # If disabled an emptyDir volume is used instead
+      # Useful if you stream log information to an external logging system
+      enabled: true
+      opentrafficVolumeClaim:
+         accessModes: [ "ReadWriteOnce" ]
+         resources:
+            requests:
+               storage: 10Gi
 
-   traceVolumeClaim:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-         requests:
-            storage: 30Gi
+   # Trace is used by APIMGR and APITRAFFIC
+   trace:
+      # If disabled an emptyDir volume is used instead
+      # Useful if you stream log information to an external logging system
+      enabled: true
+      traceVolumeClaim:
+         accessModes: [ "ReadWriteOnce" ]
+         resources:
+            requests:
+               storage: 30Gi
 
-   auditVolumeClaim:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-         requests:
-            storage: 1Gi
+   # Trace is used by ANM
+   audit:
+      # If disabled an emptyDir volume is used instead
+      # Useful if you stream log information to an external logging system
+      enabled: false
+      auditVolumeClaim:
+         accessModes: [ "ReadWriteOnce" ]
+         resources:
+            requests:
+               storage: 1Gi
 
    metricsDbVolumeClaim:
       accessModes: [ "ReadWriteOnce" ]

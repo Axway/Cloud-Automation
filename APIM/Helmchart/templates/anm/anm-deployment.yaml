@@ -44,11 +44,19 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.anm.terminationGracePeriod }}
       volumes:
         - name: events
+{{- if .Values.pvcs.events.enabled }}
           persistentVolumeClaim:
             claimName: apigw-events
+{{- else }}
+          emptyDir: {}
+{{- end }}
         - name: audit
+{{- if .Values.pvcs.audit.enabled }}
           persistentVolumeClaim:
             claimName: apigw-audit
+{{- else }}
+          emptyDir: {}
+{{- end }}
         {{- if .Values.anm.jvm.enabled }}
         - name: anm-jvmxml
           configMap:

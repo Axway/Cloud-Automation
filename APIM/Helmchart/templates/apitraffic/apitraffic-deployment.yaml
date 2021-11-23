@@ -40,14 +40,26 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.apitraffic.terminationGracePeriod }}
       volumes:
         - name: events
+{{- if .Values.pvcs.events.enabled }}
           persistentVolumeClaim:
             claimName: apigw-events
+{{- else }}
+          emptyDir: {}
+{{- end }}
         - name: opentraffic
+{{- if .Values.pvcs.opentraffic.enabled }}
           persistentVolumeClaim:
             claimName: apigw-opentraffic
+{{- else }}
+          emptyDir: {}
+{{- end }}
         - name: trace
+{{- if .Values.pvcs.trace.enabled }}
           persistentVolumeClaim:
             claimName: apigw-trace
+{{- else }}
+          emptyDir: {}
+{{- end }}
 {{- if $licenseSecret }}
         - name: license
           secret:

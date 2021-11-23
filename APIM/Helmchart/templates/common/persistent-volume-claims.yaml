@@ -1,3 +1,4 @@
+{{- if .Values.pvcs.events.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -6,7 +7,10 @@ metadata:
   annotations:
     helm.sh/resource-policy: "keep"
 spec:
-{{ toYaml .Values.pvcs.eventsVolumeClaim | indent 2 }}
+{{ toYaml .Values.pvcs.events.eventsVolumeClaim | indent 2 }}
+{{- end}}
+
+{{- if .Values.pvcs.opentraffic.enabled }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -16,7 +20,10 @@ metadata:
   annotations:
     helm.sh/resource-policy: "keep"
 spec:
-{{ toYaml .Values.pvcs.opentrafficVolumeClaim | indent 2 }}
+{{ toYaml .Values.pvcs.opentraffic.opentrafficVolumeClaim | indent 2 }}
+{{- end}}
+
+{{- if .Values.pvcs.trace.enabled }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -26,7 +33,10 @@ metadata:
   annotations:
     helm.sh/resource-policy: "keep"
 spec:
-{{ toYaml .Values.pvcs.traceVolumeClaim | indent 2 }}
+{{ toYaml .Values.pvcs.trace.traceVolumeClaim | indent 2 }}
+{{- end}}
+
+{{- if .Values.pvcs.audit.enabled }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -36,7 +46,8 @@ metadata:
   annotations:
     helm.sh/resource-policy: "keep"
 spec:
-{{ toYaml .Values.pvcs.auditVolumeClaim | indent 2 }}
+{{ toYaml .Values.pvcs.audit.auditVolumeClaim | indent 2 }}
+{{- end}}
 ---
 {{- if and .Values.mysqlmetrics.internal .Values.mysqlmetrics.primary.persistence.enabled }}
 apiVersion: v1
