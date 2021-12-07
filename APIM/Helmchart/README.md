@@ -18,29 +18,29 @@ This helmchart requires the following capabilities on the Kubernetes cluster:
 
 ## Installation
 
-The helmet chart provided is as much as possible independent to the target reengineering, 
-like AWS-EKS, Google GKE, OpenShift, etc. You control the specific deployment to match 
-your environment using your local-values.yml file.
+The Helm-Chart provided is as much as possible independent to the target platform, like AWS-EKS, Google GKE, 
+OpenShift, etc. You control the specific deployment to match your environment using your local-values.yml file.
 
-### AWS-EKS Deployment example
+Modify the sample file according to your environment and version control your `local-values.yaml` in your version management system to make the process repeatable.  
 
-To deploy the solution on an AWS-EKS cluster you can use the following sample local-values.yaml as a 
-starting point, which of course needs to be customized according to your environment.  
-
-Please load the example local-values.yaml:
-```
-wget -O local-values.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/aws/aws-eks-example-values.yaml
-```
-Modify the sample file according to your environment and version your local-values.yaml in your version management system.
-
-Our recommendation is to deploy one service at a time. In other words, disable everything except the admin node manager and install the chart. Check that the admin node manager is running and then proceed with other services.
+Our recommendation is to deploy one service at a time. In other words, disable everything except the Admin-Node-Nanager and install the chart. Check that the Admin-Node-Nanager is running and then proceed, enable other services.
 
 ```
 helm install -n apim -f myvalues.yaml axway-apim https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.0.0/helm-chart-axway-apim-2.0.0.tgz
 ```
 
-After the admin node manager runs, they can upgrade the helmet chart for more services respectively:
+After the Admin-Node-Manager runs, you can upgrade the Helm-Chart for more services respectively:
 
 ```
 helm upgrade -n apim -f myvalues.yaml axway-apim https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.0.0/helm-chart-axway-apim-2.0.0.tgz
 ```
+
+### AWS-EKS Deployment example
+
+To deploy the solution on an AWS-EKS cluster you can use the following sample `local-values.yaml` as a starting point, which of course needs to be customized according to your environment.  
+
+Please load the example local-values.yaml:
+```
+wget -O local-values.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/aws/aws-eks-example-values.yaml
+```
+
