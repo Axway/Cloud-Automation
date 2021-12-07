@@ -54,7 +54,7 @@ You watch the following video to see a demonstration about the AWS-EKS deploymen
 [![2. API-Manager - Axway API-Management on AWS-EKS with HELM](https://img.youtube.com/vi/xey4wR76CvU/0.jpg)](https://youtu.be/xey4wR76CvU)  
 
 ### API-Gateways
-[![3. API-Gateway - Axway API-Management on AWS-EKS with HELM](https://img.youtube.com/vi/Eiawr_2XpOM/0.jpg)](https://youtu.be/Eiawr_2XpOM)  
+[![3. API-Gateway - Axway API-Management on AWS-EKS with HELM](https://img.youtube.com/vi/UOo-A5vQPSg/0.jpg)](https://youtu.be/UOo-A5vQPSg)  
 
 ### API-Portal
 [![4. API-Portal - Axway API-Management on AWS-EKS with HELM](https://img.youtube.com/vi/-RHBkLMNRnc/0.jpg)](https://youtu.be/-RHBkLMNRnc)  
