@@ -21,7 +21,7 @@ This helmchart requires the following capabilities on the Kubernetes cluster:
 The Helm-Chart provided is as much as possible independent to the target platform, like AWS-EKS, Google GKE, 
 OpenShift, etc. You control the specific deployment to match your environment using your local-values.yml file.
 
-Modify the sample file according to your environment and version control your `local-values.yaml` in your version management system to make the process repeatable.  
+Modify the sample file according to your environment and version control your `local-values.yaml` in your version management system to make the process repeatable. Review the base [values.yaml](values.yaml) to see the complete list of variables including their documentation. You can overwrite/set every variable to control your deployment.  
 
 Our recommendation is to deploy one service at a time. In other words, disable everything except the Admin-Node-Nanager and install the chart. Check that the Admin-Node-Nanager is running and then proceed, enable other services.
 
