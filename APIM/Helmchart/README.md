@@ -17,3 +17,13 @@ This helmchart requires the following capabilities on the Kubernetes cluster:
 - A container registry with API-Gateway and API-Portal images
 
 ## Documentation TBD.
+
+### AWS-EKS Deployment example
+
+```
+wget https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/aws/aws-eks-example-values.yaml
+```
+
+```
+helm install -n apim -f myvalues.yaml axway-apim https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.0.0/helm-chart-axway-apim-2.0.0.tgz
+```
