@@ -44,7 +44,7 @@ Please load the example local-values.yaml:
 wget -O local-values.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/aws/aws-eks-example-values.yaml
 ```
 
-You watch the following video to see a demonstration about the AWS-EKS deployment:  
+Watch the following videos to see a demonstration on an AWS-EKS deployment:  
 ### Admin-Node-Manager
 
 [![1. ANM - Axway API-Management on AWS-EKS with HELM](https://img.youtube.com/vi/nOqs06JsrDo/0.jpg)](https://youtu.be/nOqs06JsrDo)  
