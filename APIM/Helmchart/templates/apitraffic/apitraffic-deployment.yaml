@@ -60,6 +60,13 @@ spec:
 {{- else }}
           emptyDir: {}
 {{- end }}
+        - name: audit
+{{- if .Values.pvcs.audit.enabled }}
+          persistentVolumeClaim:
+            claimName: audit
+{{- else }}
+          emptyDir: {}
+{{- end }}
 {{- if $licenseSecret }}
         - name: license
           secret:
