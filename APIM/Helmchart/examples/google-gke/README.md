@@ -4,10 +4,12 @@ Here you can find information on how to deploy Axway API-Management solution on 
 
 ## Prerequisites
 
+Even though this documentation tries to explain the deployment as best as possible, a solid understanding of Kubernetes, the Google Cloud Platform, name resolution and of course Helm is absolutely necessary for the installation.  
+
 - A Kubernetes cluster configured in Google Cloud
   - At least 2 nodes (e.g. e2-medium)
   - If you plan to deploy the Elastic-Solution please configure at least 3 Nodes (e.g. e2-standard-4)
-  - a created namespace (e.g. apim) 
+  - Create a namespace (e.g. apim) 
 - `kubectl` points to configured Kubernetes cluster
 - Helm is installed and configured
 
@@ -31,39 +33,54 @@ Google does not support updating DNS records via ingress resources, so you must 
 Here is an example using [Google-Domains](https://domains.google.com), each pointing to the belonging created Google load balancer:  
 ![Google-Domains](imgs/google-domains-dns-entries.png)  
 
-#### Configure Backend-Configurations
+#### Certificates
 
-You may skip this topic, if you are using a different Ingress-Controller, other than the default Google Ingress Controller (`kubernetes.io/ingress.class: "gce"`) that does not support extensive configuration via Ingress annotations. Instead, Google BackendConfig CRDs must be created and linked to the belonging service using an annotation.  
-Alternatively, you can also use [NGINX](https://cloud.google.com/community/tutorials/nginx-ingress-gke), which offers significantly more configuration options.  
+The services, such as the API manager, API traffic, etc. are offered by the load balancers via HTTPS. You can provide the necessary certificates yourself in the GCP, store them as your own secret and reference them, or use Google-Managed certificates. 
+In the example, [Google-Managed certificates](https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs) are used for each service. You can create these using the sample YAML file.
 
-Since this documentation refers to the standard GKE Ingress Controller (https://cloud.google.com/kubernetes-engine/docs/concepts/ingress), here is the note that corresponding BackendConfigs must be created. These generate health checks suitable for the correspondingly deployed services.
+```
+kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-managed-certificates.yaml
+```
 
-You can use our example to create the [Google BackendConfigs](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress#direct_hc) custom resource definitions:
+It may take a while until the certificates are available. Until then, you cannot connect to the HTTPS-based load balancer. 
+Therefore, check if the status of the corresponding certificate bound to the load balancer is Active. You can find this under Google Cloud Platform --> Networks services --> Load balancing --> Pick a Load Balancer --> Click on the certificate
+
+Here is an example of a valid active certificate:  
+![Active certificate](imgs/active-certificate-example.png)  
+
+#### Ingress controller
+
+According to the Ingress controller used in your environment appropriate annotations/configuration must be set to configure LoadBalancers based on the created Ingress-Resources. Our Helm chart is flexible to accept all kind of required configurations, such a custom annotations. However, which annotations to use for which Ingress controller is not part of this documentation. Please refer to the documentation of your Ingress-Controller, such as [NGINX](https://cloud.google.com/community/tutorials/nginx-ingress-gke) for more information.  
+
+You may skip this topic, if you are using a custom Ingress-Controller, other than the default Google Ingress Controller (`kubernetes.io/ingress.class: "gce"`), which does not support extensive configuration via Ingress annotations. 
+
+The standard [Google GKE ingress controller](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress) (`kubernetes.io/ingress.class: "gce"`) requires Backend- and, if necessary, FrontendConfigs CRDs for configuration of certain aspects, like the Healthcheck. These BackendConfigs are linked to the corresponding services via an annotation. With the following command you can create the necessary BackendConfigs, which are already referenced in the provided sample `google-gke-example-values.yaml` below.
+
 ```
 kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-backend-configs.yaml
 ```
 
 ### Installation
 
-For the installation of our helmet chart they have to create their own local-values.yaml. Use our Google Cloud GKE example as a base:
+For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our Google Cloud GKE example as a base:
 ```
 wget -o local-values-gke.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-gke-example-values.yaml
 ```
 
-Now adjust the `local-values-gke.yaml` file according to your needs and version control it in your version control system to make upgrade easy at a later time or integrate it into your CI/CD-Pipeline. You can overwrite all parameters of the base [`values.yaml`](../../values.yaml), therefore our recommendation is to check it for appropriate configuration parameters inlcuding their documentation.
+Now adjust the downloaded `local-values-gke.yaml` file according to your needs and version control it to make later upgrades safe and easy or to integrate it properly into your CI/CD-Pipeline.  
+You can overwrite all parameters of the base [`values.yaml`](../../values.yaml), therefore our recommendation is to check it for appropriate configuration parameters inlcuding their documentation.
 
-To start the installation, use now the following command:
+To finally start the deployment into your Kubernetes Cluster using Helm, use now the following command:
 ```
 helm install axway-apim -n apim -f .\local-values-gke.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.0.0/helm-chart-axway-apim-2.0.0.tgz
 ```
 
 Now check if the resources, such as pods, ingresses, services, etc. are created and correct any problems that occur.
-
 ```
 kubectl -n apim pods get -w
 ```
 
-For reference, here is another screenshot of the Google Cloud Management UI to illustrate the target state:
+Since it can be helpful to know the target state, here's a set of screenshots of the Google cloud management interface illustration all different resources that were created during the deployment:  
 
 #### Services & Pods
 
@@ -78,6 +95,9 @@ For reference, here is another screenshot of the Google Cloud Management UI to i
 ![Load-Balancers](imgs/gke-load-balancers.png)  
 
 #### Storage
+
+In the sample values file provided, persistent volumes for API Gateway Events, OpenTraffic, Audit and Traces are disabled and an emptyDir volume is used. If you are using the Elastic solution this is fine as the log information is then streamed to Elasticsearch via Filebeat. 
+Otherwise, you need to disable the PVCs and configure them according to the environment.
 
 ![Storage](imgs/gke-pvcs-storage.png)  
 
