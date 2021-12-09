@@ -1,0 +1,44 @@
+# Google-BackendConfigs are required to perform custom Health-Checks, as many things 
+# cannot be configured using Ingress-Annotations.
+# The BackendConfig are linked to the service with an annotation:
+# anm|apitraffic|...
+#  ...
+#  service: 
+#    ...
+#    annotations:
+#      cloud.google.com/backend-config: '{"default": "apimgr-backend-config"}'
+# Finally they become a HealthCheck and can be reviewed here:
+# GCloud --> Compute engine --> Health checks
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: anm-backend-config
+spec:
+  healthCheck:
+    checkIntervalSec: 15
+    port: 8090
+    requestPath: /login/
+    type: HTTPS
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: apimgr-backend-config
+spec:
+  healthCheck:
+    checkIntervalSec: 15
+    port: 8075
+    requestPath: /
+    type: HTTPS
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: apitraffic-backend-config
+spec:
+  healthCheck:
+    checkIntervalSec: 15
+    port: 8080
+    requestPath: /healthcheck
+    type: HTTP

@@ -1,0 +1,164 @@
+global:
+  imagePullSecrets:
+  - name: axway-demo-registry
+
+  domainName: "axway-apim-on-gke.com"
+  dockerRepository: "ghcr.io/cwiechmann/axway-api-management-automated"
+  imageTag: "77-20211130-1-eed8beb"
+
+##################################################################################################################################
+#   A D M I N - N O D E M A N A G E R
+##################################################################################################################################
+anm:
+  enabled: true
+  ingress:
+    enabled: true
+    annotations:
+      # If you are using Google-Managed certificates, make sure the state of your certificate is active, otherwise the Load-Balancer
+      # communication fails
+      networking.gke.io/managed-certificates: anm-managed-certificate
+      # Disabled HTTP as it leads to an additional Public-IP causing the following error later:
+      # Error syncing to GCP: error running load balancer syncing routine: loadbalancer 1esc4l6d-apim-axway-elk-apim4elastic-kibana-1ss2c0fg does not exist: googleapi: Error 403: QUOTA_EXCEEDED - Quota 'IN_USE_ADDRESSES' exceeded. Limit: 8.0 globally. 
+      kubernetes.io/ingress.allow-http: "false"
+      # If the class annotation is not specified it defaults to "gce".
+      # If you use the standard Ingress Controller class gce, you get a separate Load-Balancers for each service. 
+      # Alternatively, you can also use NGINX. 
+      # See: https://cloud.google.com/community/tutorials/nginx-ingress-gke
+      kubernetes.io/ingress.class: "gce"
+  service: 
+    annotations:
+      # Required to switch the Backend to HTTPS
+      # See GCloud --> Network services --> Load-Balancing --> Backend --> Protocol
+      cloud.google.com/app-protocols: '{"http":"HTTPS"}'
+      # Use the special healthcheck for Admin-Node-Manager. See GCloud --> Compute engine --> Health checks
+      cloud.google.com/backend-config: '{"default": "anm-backend-config"}'
+  
+  backendConfig: 
+    healthCheck:
+      checkIntervalSec: 15
+      port: 8090
+      type: HTTPS
+      requestPath: /login/
+
+  config: 
+    emtTraceLevel: INFO
+
+##################################################################################################################################
+#   API MANAGER
+##################################################################################################################################    
+
+apimgr:
+  enabled: true
+  imageTag: 77-20211130-v1-eed8beb
+  ingress:
+    enabled: true
+    annotations:
+      # If you are using Google-Managed certificates, make sure the state of your certificate is active, otherwise the Load-Balancer
+      # communication fails
+      networking.gke.io/managed-certificates: manager-managed-certificate
+      # Disabled HTTP as it leads to an additional Public-IP causing the following error later:
+      # Error syncing to GCP: error running load balancer syncing routine: loadbalancer 1esc4l6d-apim-axway-elk-apim4elastic-kibana-1ss2c0fg does not exist: googleapi: Error 403: QUOTA_EXCEEDED - Quota 'IN_USE_ADDRESSES' exceeded. Limit: 8.0 globally. 
+      kubernetes.io/ingress.allow-http: "false"
+      # If the class annotation is not specified it defaults to "gce".
+      # If you use the standard Ingress Controller class gce, you get a separate Load-Balancers for each service. 
+      # Alternatively, you can also use NGINX. 
+      # See: https://cloud.google.com/community/tutorials/nginx-ingress-gke
+      kubernetes.io/ingress.class: "gce"
+  service: 
+    annotations:
+      # Required to switch the Backend to HTTPS
+      # See GCloud --> Network services --> Load-Balancing --> Backend --> Protocol
+      cloud.google.com/app-protocols: '{"manager":"HTTPS"}'
+      # Use the special healthcheck for the API-Manager. See GCloud --> Compute engine --> Health checks
+      cloud.google.com/backend-config: '{"default": "apimgr-backend-config"}'
+
+##################################################################################################################################
+#   API TRAFFIC
+##################################################################################################################################
+
+apitraffic:
+  enabled: true
+  imageTag: 77-20211130-v1-eed8beb
+  ingress:
+    enabled: true
+    annotations:
+      # If you are using Google-Managed certificates, make sure the state of your certificate is active, otherwise the Load-Balancer
+      # communication fails
+      networking.gke.io/managed-certificates: apitraffic-managed-certificate
+      # Disabled HTTP as it leads to an additional Public-IP causing the following error later:
+      # Error syncing to GCP: error running load balancer syncing routine: loadbalancer 1esc4l6d-apim-axway-elk-apim4elastic-kibana-1ss2c0fg does not exist: googleapi: Error 403: QUOTA_EXCEEDED - Quota 'IN_USE_ADDRESSES' exceeded. Limit: 8.0 globally. 
+      kubernetes.io/ingress.allow-http: "false"
+      # If the class annotation is not specified it defaults to "gce".
+      # If you use the standard Ingress Controller class gce, you get a separate Load-Balancers for each service. 
+      # Alternatively, you can also use NGINX. 
+      # See: https://cloud.google.com/community/tutorials/nginx-ingress-gke
+      kubernetes.io/ingress.class: "gce"
+  service: 
+    annotations:
+      # Tells GCloud for each named service the protocol to use
+      # See GCloud --> Network services --> Load-Balancing --> Backend --> Protocol
+      cloud.google.com/app-protocols: '{"traffic": "HTTPS", "oauth": "HTTPS", "tls": "HTTPS", "plain":"HTTP"}'
+      # Use the special healthcheck for API-Traffic. See GCloud --> Compute engine --> Health checks
+      cloud.google.com/backend-config: '{"default": "apitraffic-backend-config"}'
+
+  backendConfig: 
+    healthCheck:
+      checkIntervalSec: 15
+      port: 8080
+      type: HTTP
+      requestPath: /healthcheck
+
+##################################################################################################################################
+#   API-Portal
+##################################################################################################################################
+apiportal:
+  enabled: true
+  image: portal
+  imageTag: 7.7-20210830
+  dockerRepository: docker-registry.demo.axway.com/other-demo
+  ingress:
+    enabled: true
+    # Using portal instead of apiportal as the ingress resource name
+    name: portal
+    annotations:
+      # If you are using Google-Managed certificates, make sure the state of your certificate is active, otherwise the Load-Balancer
+      # communication fails
+      networking.gke.io/managed-certificates: apiportal-managed-certificate
+      # Disabled HTTP as it leads to an additional Public-IP causing the following error later:
+      # Error syncing to GCP: error running load balancer syncing routine: loadbalancer 1esc4l6d-apim-axway-elk-apim4elastic-kibana-1ss2c0fg does not exist: googleapi: Error 403: QUOTA_EXCEEDED - Quota 'IN_USE_ADDRESSES' exceeded. Limit: 8.0 globally. 
+      kubernetes.io/ingress.allow-http: "false"
+      # If the class annotation is not specified it defaults to "gce".
+      # If you use the standard Ingress Controller class gce, you get a separate Load-Balancers for each service. 
+      # Alternatively, you can also use NGINX. 
+      # See: https://cloud.google.com/community/tutorials/nginx-ingress-gke
+      kubernetes.io/ingress.class: "gce"
+  service: 
+    annotations:
+      # Required to switch the Backend to HTTPS
+      # See GCloud --> Network services --> Load-Balancing --> Backend --> Protocol
+      cloud.google.com/app-protocols: '{"http":"HTTPS"}'
+
+##################################################################################################################################
+#   AMPLIFY AGENTS
+##################################################################################################################################
+agents:
+   discovery:
+      enabled: false
+
+##################################################################################################################################
+#   PVCs
+##################################################################################################################################
+
+# Disabling persistence and using emptyDir{} as logs are supposed to be streamed externally anyway
+pvcs:
+   events:
+      enabled: false
+
+   opentraffic:
+      enabled: false
+
+   trace:
+      enabled: false
+
+   audit:
+      enabled: false

@@ -1,0 +1,43 @@
+# Before requesting the managed certificates, make sure that the domain is set up. 
+# See GCloud --> Network services --> Cloud Domains
+
+# Important note:
+# Each time you modify the domains, without changing the name of the managed certificate and apply 
+# the object via kubectl, a new certificate is created and the old one is replaced.
+# During this time, the load balancer does not offer HTTPS and you have a downtime.
+# Therefore, it is better to use your own certificates or dedicated managed certificates per service.
+# 
+# If you still want to change the domains, then register the certificate with a new name and reference 
+# it with the ingress resource.
+
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: anm-managed-certificate
+spec:
+  domains:
+    - anm.axway-apim-on-gke.com
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: manager-managed-certificate
+spec:
+  domains:
+    - manager.axway-apim-on-gke.com
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: apitraffic-managed-certificate
+spec:
+  domains:
+    - traffic.axway-apim-on-gke.com
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: apiportal-managed-certificate
+spec:
+  domains:
+    - portal.axway-apim-on-gke.com
