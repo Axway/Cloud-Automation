@@ -71,7 +71,8 @@ apitraffic:
 
 ### Installation
 
-For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our Google Cloud GKE example as a base:
+For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our Google Cloud GKE [example](google-gke-example-values.yaml) as a base. Use the following command to get a local copy:  
+
 ```
 wget -o local-values-gke.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-gke-example-values.yaml
 ```
