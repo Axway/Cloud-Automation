@@ -90,6 +90,8 @@ Now check if the resources, such as pods, ingresses, services, etc. are created 
 kubectl -n apim pods get -w
 ```
 
+## Example screenshots
+
 Since it can be helpful to know the target state, here's a set of screenshots of the Google cloud management interface illustration all different resources that were created during the deployment:  
 
 #### Services & Pods
