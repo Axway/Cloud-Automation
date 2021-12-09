@@ -45,25 +45,25 @@ kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master
 
 ### Installation
 
-For the installation of our helmet chart they have to create their own local-values.yaml. Use our Google Cloud GKE example as a base:
+For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our Google Cloud GKE example as a base:
 ```
 wget -o local-values-gke.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-gke-example-values.yaml
 ```
 
-Now adjust the `local-values-gke.yaml` file according to your needs and version control it in your version control system to make upgrade easy at a later time or integrate it into your CI/CD-Pipeline. You can overwrite all parameters of the base [`values.yaml`](../../values.yaml), therefore our recommendation is to check it for appropriate configuration parameters inlcuding their documentation.
+Now adjust the downloaded `local-values-gke.yaml` file according to your needs and version control it to make later upgrades safe and easy or to integrate it properly into your CI/CD-Pipeline.  
+You can overwrite all parameters of the base [`values.yaml`](../../values.yaml), therefore our recommendation is to check it for appropriate configuration parameters inlcuding their documentation.
 
-To start the installation, use now the following command:
+To finally start the deployment into your Kubernetes Cluster using Helm, use now the following command:
 ```
 helm install axway-apim -n apim -f .\local-values-gke.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.0.0/helm-chart-axway-apim-2.0.0.tgz
 ```
 
 Now check if the resources, such as pods, ingresses, services, etc. are created and correct any problems that occur.
-
 ```
 kubectl -n apim pods get -w
 ```
 
-Since it can be helpful to know the target state, here's another set of screenshots of the Google cloud management interface:
+Since it can be helpful to know the target state, here's a set of screenshots of the Google cloud management interface illustration all different resources that were created during the deployment:  
 
 #### Services & Pods
 
