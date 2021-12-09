@@ -42,6 +42,12 @@ In the example, [Google-Managed certificates](https://cloud.google.com/kubernete
 kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-managed-certificates.yaml
 ```
 
+It may take a while until the certificates are available. Until then, you cannot connect to the HTTPS-based load balancer. 
+Therefore, check if the status of the corresponding certificate bound to the load balancer is Active. You can find this under Google Cloud Platform --> Networks services --> Load balancing --> Pick a Load Balancer --> Click on the certificate
+
+Here is an example of a valid active certificate:  
+![Active certificate](imgs/active-certificate-example.png)  
+
 #### Ingress controller
 
 According to the Ingress controller used in your environment appropriate annotations/configuration must be set to configure LoadBalancers based on the created Ingress-Resources. Our Helm chart is flexible to accept all kind of required configurations, such a custom annotations. However, which annotations to use for which Ingress controller is not part of this documentation. Please refer to the documentation of your Ingress-Controller, such as [NGINX](https://cloud.google.com/community/tutorials/nginx-ingress-gke) for more information.  
