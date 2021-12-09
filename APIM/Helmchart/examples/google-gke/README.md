@@ -62,7 +62,11 @@ kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master
 
 This is example annotation pointing a service to a backend configuration object:
 ```
-cloud.google.com/backend-config: '{"default": "apitraffic-backend-config"}'
+apitraffic:
+  ...
+  service:
+    ...
+    cloud.google.com/backend-config: '{"default": "apitraffic-backend-config"}'
 ```
 
 ### Installation
