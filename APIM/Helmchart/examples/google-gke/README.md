@@ -60,6 +60,11 @@ The standard [Google GKE ingress controller](https://cloud.google.com/kubernetes
 kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-backend-configs.yaml
 ```
 
+This is example annotation pointing a service to a backend configuration object:
+```
+cloud.google.com/backend-config: '{"default": "apitraffic-backend-config"}'
+```
+
 ### Installation
 
 For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our Google Cloud GKE example as a base:
