@@ -63,7 +63,7 @@ Now check if the resources, such as pods, ingresses, services, etc. are created 
 kubectl -n apim pods get -w
 ```
 
-For reference, here is another screenshot of the Google Cloud Management UI to illustrate the target state:
+Since it can be helpful to know the target state, here's another set of screenshots of the Google cloud management interface:
 
 #### Services & Pods
 
@@ -78,6 +78,9 @@ For reference, here is another screenshot of the Google Cloud Management UI to i
 ![Load-Balancers](imgs/gke-load-balancers.png)  
 
 #### Storage
+
+In the sample values file provided, persistent volumes for API Gateway Events, OpenTraffic, Audit and Traces are disabled and an emptyDir volume is used. If you are using the Elastic solution this is fine as the log information is then streamed to Elasticsearch via Filebeat. 
+Otherwise, you need to disable the PVCs and configure them according to the environment.
 
 ![Storage](imgs/gke-pvcs-storage.png)  
 
