@@ -44,10 +44,11 @@ kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master
 
 #### Ingress controller
 
-According to the Ingress controller used, such as [NGINX](https://cloud.google.com/kubernetes-engine/docs/how-to/custom-ingress-controller), appropriate annotations/configuration must be set. Our Helm chart is flexible to accept all kind of configurations, such a custom annotation, but which annotations to use for which Ingress controller is not part of this documentation. Please refer to the documentation of your Ingress-Controller, such as [NGINX](https://cloud.google.com/community/tutorials/nginx-ingress-gke).  
-You may skip this topic, if you are using a different Ingress-Controller, other than the default Google Ingress Controller (`kubernetes.io/ingress.class: "gce"`). that does not support extensive configuration via Ingress annotations. 
+According to the Ingress controller used in your environment appropriate annotations/configuration must be set to configure LoadBalancers based on the created Ingress-Resources. Our Helm chart is flexible to accept all kind of required configurations, such a custom annotations. However, which annotations to use for which Ingress controller is not part of this documentation. Please refer to the documentation of your Ingress-Controller, such as [NGINX](https://cloud.google.com/community/tutorials/nginx-ingress-gke) for more information.  
 
-The standard [Google GKE ingress controller](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress) (`kubernetes.io/ingress.class: "gce"`) requires Backend- and, if necessary, FrontendConfigs CRDs for configuration, which are linked to the corresponding services via an annotation. With the following command you can create the necessary BackendConfigs, which are already referenced in the provided sample `google-gke-example-values.yaml` below.
+You may skip this topic, if you are using a custom Ingress-Controller, other than the default Google Ingress Controller (`kubernetes.io/ingress.class: "gce"`), which does not support extensive configuration via Ingress annotations. 
+
+The standard [Google GKE ingress controller](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress) (`kubernetes.io/ingress.class: "gce"`) requires Backend- and, if necessary, FrontendConfigs CRDs for configuration of certain aspects, like the Healthcheck. These BackendConfigs are linked to the corresponding services via an annotation. With the following command you can create the necessary BackendConfigs, which are already referenced in the provided sample `google-gke-example-values.yaml` below.
 
 ```
 kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-backend-configs.yaml
