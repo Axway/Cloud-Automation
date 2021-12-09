@@ -4,7 +4,7 @@ Here you can find information on how to deploy Axway API-Management solution on 
 
 ## Prerequisites
 
-Even though this documentation tries to explain the deployment as best as possible, a solid understanding of Kubernetes, the Google Cloud Platform, name resolution and of course Helm is absolutely necessary for the installation.  
+Even though this documentation tries to explain the deployment as best as possible, a solid understanding of Kubernetes, the Google Cloud Platform, Internet-Naming-Service and of course Helm is absolutely necessary for the installation.  
 
 - A Kubernetes cluster configured in Google Cloud
   - At least 2 nodes (e.g. e2-medium)
