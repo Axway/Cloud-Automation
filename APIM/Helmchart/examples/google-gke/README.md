@@ -4,10 +4,12 @@ Here you can find information on how to deploy Axway API-Management solution on 
 
 ## Prerequisites
 
+Even though this documentation tries to explain the deployment as best as possible, a solid understanding of Kubernetes, the Google Cloud Platform, name resolution and of course Helm is absolutely necessary for the installation.  
+
 - A Kubernetes cluster configured in Google Cloud
   - At least 2 nodes (e.g. e2-medium)
   - If you plan to deploy the Elastic-Solution please configure at least 3 Nodes (e.g. e2-standard-4)
-  - a created namespace (e.g. apim) 
+  - Create a namespace (e.g. apim) 
 - `kubectl` points to configured Kubernetes cluster
 - Helm is installed and configured
 
@@ -31,10 +33,19 @@ Google does not support updating DNS records via ingress resources, so you must 
 Here is an example using [Google-Domains](https://domains.google.com), each pointing to the belonging created Google load balancer:  
 ![Google-Domains](imgs/google-domains-dns-entries.png)  
 
-#### Configure Backend-Configurations
+#### Certificates
+
+The services, such as the API manager, API traffic, etc. are offered by the load balancers via HTTPS. You can provide the necessary certificates yourself in the GCP, store them as your own secret and reference them, or use Google-Managed certificates. 
+In the example, [Google-Managed certificates](https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs) are used for each service. You can create these using the sample YAML file.
+
+```
+kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-managed-certificates.yaml
+```
+
+#### Ingress controller
 
 You may skip this topic, if you are using a different Ingress-Controller, other than the default Google Ingress Controller (`kubernetes.io/ingress.class: "gce"`) that does not support extensive configuration via Ingress annotations. Instead, Google BackendConfig CRDs must be created and linked to the belonging service using an annotation.  
-Alternatively, you can also use [NGINX](https://cloud.google.com/community/tutorials/nginx-ingress-gke), which offers significantly more configuration options.  
+You can also use a [custom ingress controller](https://cloud.google.com/kubernetes-engine/docs/how-to/custom-ingress-controller), which may offer more flexible configuration options, which as NGINX.
 
 Since this documentation refers to the standard GKE Ingress Controller (https://cloud.google.com/kubernetes-engine/docs/concepts/ingress), here is the note that corresponding BackendConfigs must be created. These generate health checks suitable for the correspondingly deployed services.
 
