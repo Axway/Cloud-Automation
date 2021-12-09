@@ -44,12 +44,12 @@ kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master
 
 #### Ingress controller
 
-You may skip this topic, if you are using a different Ingress-Controller, other than the default Google Ingress Controller (`kubernetes.io/ingress.class: "gce"`) that does not support extensive configuration via Ingress annotations. Instead, Google BackendConfig CRDs must be created and linked to the belonging service using an annotation.  
-You can also use a [custom ingress controller](https://cloud.google.com/kubernetes-engine/docs/how-to/custom-ingress-controller), which may offer more flexible configuration options, which as NGINX.
+According to the Ingress controller used, such as [NGINX](https://cloud.google.com/kubernetes-engine/docs/how-to/custom-ingress-controller), the appropriate annotations must be set.  
+Our Helm chart is prepared for this, but which annotations to use for which Ingress controller is not part of this documentation.  
+You may skip this topic, if you are using a different Ingress-Controller, other than the default Google Ingress Controller (`kubernetes.io/ingress.class: "gce"`) that does not support extensive configuration via Ingress annotations. 
 
-Since this documentation refers to the standard GKE Ingress Controller (https://cloud.google.com/kubernetes-engine/docs/concepts/ingress), here is the note that corresponding BackendConfigs must be created. These generate health checks suitable for the correspondingly deployed services.
+As we refer here to the standard [Google GKE ingress controller](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress) (`kubernetes.io/ingress.class: "gce"`), which makes it unfortunately necessary to create [BackendConfig CRDs](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress#direct_hc) that configure the required health checks. You may use our example to create the required [Google BackendConfigs](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress#direct_hc) custom resource definitions:
 
-You can use our example to create the [Google BackendConfigs](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress#direct_hc) custom resource definitions:
 ```
 kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-backend-configs.yaml
 ```
