@@ -5,6 +5,8 @@ kind: Service
 metadata:
   name: {{ template "apitraffic.name" . }}
   labels: {{- include "apitraffic.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.apitraffic.service.annotations | indent 4 }}
 spec:
   type: {{ .Values.apitraffic.service.type }}
 {{- if .Values.apitraffic.service.loadBalancerIP }}

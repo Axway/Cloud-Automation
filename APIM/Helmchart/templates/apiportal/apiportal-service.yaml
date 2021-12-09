@@ -5,6 +5,8 @@ kind: Service
 metadata:
   name: {{ template "apiportal.name" . }}
   labels: {{- include "apiportal.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.apiportal.service.annotations | indent 4 }}
 spec:
   type: {{ .Values.apiportal.service.type }}
 {{- if .Values.apiportal.service.loadBalancerIP }}

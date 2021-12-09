@@ -3,10 +3,8 @@
 
 {{- $apitrafficName := include "apitraffic.name" . -}}
 {{- $domainName := include "domain.name" . -}}
-{{ $hasIngressV1 := "false" }}
-{{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-  {{ $hasIngressV1 := true }}
-{{ end }}
+
+{{ $hasIngressV1 := ternary "true" "false" (.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress") -}}
 
 {{- if eq $hasIngressV1 "true" }}
 apiVersion: networking.k8s.io/v1

@@ -5,6 +5,8 @@ kind: Service
 metadata:
   name: {{ template "anm.name" . }}
   labels: {{- include "anm.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.anm.service.annotations | indent 4 }}
 spec:
   type: {{ .Values.anm.service.type }}
 {{- if .Values.anm.service.loadBalancerIP }}

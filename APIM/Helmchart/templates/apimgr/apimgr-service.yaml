@@ -5,6 +5,8 @@ kind: Service
 metadata:
   name: {{ template "apimgr.name" . }}
   labels: {{- include "apimgr.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.apimgr.service.annotations | indent 4 }}
 spec:
   type: {{ .Values.apimgr.service.type }}
 {{- if .Values.apimgr.service.loadBalancerIP }}
