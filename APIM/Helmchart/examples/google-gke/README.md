@@ -15,6 +15,10 @@ Here you can find information on how to deploy Axway API-Management solution on 
 
 The installation on Google Kubernetes engine (GKE) is divided into some preparations and the actual installation of the solution using the HELM chart.
 
+You may watch the following video to see a demonstration of the deployment to Google Kubernetes Engine:  
+
+[![Google GKE Deployment Demo](https://img.youtube.com/vi/dcXKBfeV3Jw/0.jpg)](https://youtu.be/dcXKBfeV3Jw)  
+
 ### Preparations
 
 #### Domain- and DNS-Setup
