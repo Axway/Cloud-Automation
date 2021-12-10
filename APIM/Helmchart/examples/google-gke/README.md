@@ -21,7 +21,7 @@ The installation on Google Kubernetes engine (GKE) is divided into some preparat
 
 #### Domain- and DNS-Setup
 
-To ultimately make the solution available, some ingress resources are created for the specified domains (e.g., anm.axway-apim-customer.com) and Google Load-Balancers are created based on them.  
+To ultimately make the solution available, a number of ingress resources are created for the specified domain(s) (e.g., anm.axway-apim-customer.com) and Google Load-Balancers are created based on them.  
 
 If you want to use one or more new domains, then you should register them accordingly in advance. 
 You have different possibilities up to the local `/etc/hosts` or you use the Google Cloud Platform --> Networks services --> [Cloud Domains](https://cloud.google.com/domains/docs/register-domain). 
@@ -29,8 +29,7 @@ You have different possibilities up to the local `/etc/hosts` or you use the Goo
 Here is an example of a registered domain using Cloud domains and Google-Domains as the name service:  
 ![Google Cloud-Domains](imgs/google-cloud-domains.png)  
 
-Google does not support updating DNS records via ingress resources, so you must maintain the DNS records yourself.
-Here is an example using [Google-Domains](https://domains.google.com), each pointing to the belonging created Google load balancer:  
+Google does not support dynamic update of DNS records via ingress resources, so you must maintain the DNS records yourself. Here is an example using [Google-Domains](https://domains.google.com), each pointing to the belonging created Google load balancer:  
 ![Google-Domains](imgs/google-domains-dns-entries.png)  
 
 #### Certificates
