@@ -36,7 +36,7 @@ The services, such as the API manager, API traffic, etc. are offered by the load
 In the example, [Google-Managed certificates](https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs) are used for each service. You can create these using the sample YAML file.
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-managed-certificates.yaml
+kubectl apply -n apim -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-managed-certificates.yaml
 ```
 
 It may take a while until the certificates are available. Until then, you cannot connect to the HTTPS-based load balancer. 
@@ -54,7 +54,7 @@ You may skip this topic, if you are using a custom Ingress-Controller, other tha
 The standard [Google GKE ingress controller](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress) (`kubernetes.io/ingress.class: "gce"`) requires Backend- and, if necessary, FrontendConfigs CRDs for configuration of certain aspects, like the Healthcheck. These BackendConfigs are linked to the corresponding services via an annotation. With the following command you can create the necessary BackendConfigs, which are already referenced in the provided sample `google-gke-example-values.yaml` below.
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-backend-configs.yaml
+kubectl apply -n apim -f https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/google-gke/google-backend-configs.yaml
 ```
 
 This is example annotation pointing a service to a backend configuration object:
