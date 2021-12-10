@@ -68,7 +68,7 @@ apitraffic:
     cloud.google.com/backend-config: '{"default": "apitraffic-backend-config"}'
 ```
 
-### Installation
+### Helm install
 
 For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our Google Cloud GKE [example](google-gke-example-values.yaml) as a base. Use the following command to get a local copy:  
 
