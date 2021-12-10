@@ -85,6 +85,17 @@ helm install axway-apim -n apim -f .\local-values-gke.yaml https://github.com/Ax
 Now check if the resources, such as pods, ingresses, services, etc. are created and correct any problems that occur.
 ```
 kubectl -n apim pods get -w
+NAME                                    READY   STATUS    RESTARTS   AGE
+apimgr-6868c4695f-42q9f                 1/1     Running   0          5m46s
+axway-apim-anm-59b85f46f4-p2lf5         1/1     Running   0          5m46s
+axway-apim-apiportal-59c86c5bc7-5kv99   0/1     Running   0          5m46s
+cassandra-0                             1/1     Running   0          5m46s
+mocked-apis-599d7b646c-tm9t8            1/1     Running   0          26h
+mysqlapiportal-0                        1/1     Running   0          5m46s
+mysqlmetrics-0                          1/1     Running   0          5m46s
+traffic-5b9b56887b-f8lcm                1/1     Running   0          5m45s
+traffic-5b9b56887b-tl66k                1/1     Running   0          5m46s
+axway-apim-apiportal-59c86c5bc7-5kv99   1/1     Running   0          5m54s
 ```
 
 ## Example screenshots
