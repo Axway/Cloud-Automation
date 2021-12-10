@@ -2,59 +2,37 @@
 
 ## Introduction
 
-Helmcharts are compatible with Axway Amplify API Management 7.7. 
-
-This helmchart uses Helm V3 and is compliant a minimal Kubernetes version of 1.11.
+This Helmchart can be used to deploy the Axway API management solution on a Kubernetes environment. It is not tied to any dedicated version, i.e. you can deploy any version >=7.7 (e.g. 7.7.20210830) by configuring the corresponding ImageTag. 
+Axway does not provide pre-built images as of today, so you have to build them yourself in advance, store them in your container registry and reference them accordingly in your local-values.
 
 ## Prerequisite
 
-This helmchart requires the following capabilities on the Kubernetes cluster:
-- A minimal kubernetes version 1.11
-- An nginx ingress-controller like nginx or Azure Application Gateway.
-- A storage class with in RWM.
-- A storage class with in RWO.
-- A total resources of 6vcpu and 8Go memory spread on 2 nodes.
+This Helmchart requires the following capabilities on the Kubernetes cluster:
+
+- A minimal Kubernetes version 1.11
+- `kubectl` installed and configured to your Kubernetes cluster
+- Helm is installed and configured
+- A configured Ingress-Controller depending on your platform
+- If persistence is enabled 
+  - A storage class with in RWM.
+  - A storage class with in RWO.
+- A total resources of minimal 6vcpu and 8Go memory spread on 2 nodes.
 - A container registry with API-Gateway and API-Portal images
+  - To learn more how to build API-Gateway Docker-Image [click here](https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_installation/apigw_containers/docker_script_baseimage/index.html)
+  - To learn more how to build/use the API-Portal Docker image [click here](https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_installation/apiportal_docker/index.html)
 
-## Installation
+Even though this documentation tries to explain the deployment as best as possible, a solid understanding of your Kubernetes-Distribution, your underlying platform, Internet-Naming-Service and of course Helm is absolutely necessary for the installation.  
 
-The Helm-Chart provided is as much as possible independent to the target platform, like AWS-EKS, Google GKE, 
-OpenShift, etc. You control the specific deployment to match your environment using your local-values.yml file.
+## Examples
 
-Modify the sample file according to your environment and version control your `local-values.yaml` in your version management system to make the process repeatable. Review the base [values.yaml](values.yaml) to see the complete list of variables including their documentation. You can overwrite/set every variable to control your deployment.  
+The Helm chart provided is highly configuable and independent of the Kubernetes distribution with a few exceptions. With that, you can use it to deploy the solution on a plain Kubernetes, AWS Elastic Kubernetes service, Google GKE, etc., by providing a properly configured local-values.yaml file to the Helm process.     
 
-Our recommendation is to deploy one service at a time. In other words, disable everything except the Admin-Node-Nanager and install the chart. Check that the Admin-Node-Nanager is running and then proceed, enable other services.
+As a kick-starter, we have already provided sample values files including documentation for some environments. 
 
-```
-helm install -n apim -f myvalues.yaml axway-apim https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.0.0/helm-chart-axway-apim-2.0.0.tgz
-```
+| Distribution                             | Helm-Chart version  | Comment                                        | 
+| :---                                     | :---                | :---                                           |
+| [AWS-EKS](examples/aws-eks)              | >= v2.0.0           |                                                |
+| [Google GKE](examples/google-gke)        | >= v2.1.0           |                                                |
+| [OpenShift](examples/openshift)          | >= v2.x.x           | To be validated with refactored Helm-Chart     |
 
-After the Admin-Node-Manager runs, you can upgrade the Helm-Chart for more services respectively:
-
-```
-helm upgrade -n apim -f myvalues.yaml axway-apim https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.0.0/helm-chart-axway-apim-2.0.0.tgz
-```
-
-### AWS-EKS Deployment example
-
-To deploy the solution on an AWS-EKS cluster you can use the following sample `local-values.yaml` as a starting point, which of course needs to be customized according to your environment.  
-
-Please load the example local-values.yaml:
-```
-wget -O local-values.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/aws/aws-eks-example-values.yaml
-```
-
-Watch the following videos to see a demonstration on an AWS-EKS deployment:  
-### Admin-Node-Manager
-
-[![1. ANM - Axway API-Management on AWS-EKS with HELM](https://img.youtube.com/vi/nOqs06JsrDo/0.jpg)](https://youtu.be/nOqs06JsrDo)  
-
-### API-Manager
-
-[![2. API-Manager - Axway API-Management on AWS-EKS with HELM](https://img.youtube.com/vi/xey4wR76CvU/0.jpg)](https://youtu.be/xey4wR76CvU)  
-
-### API-Gateways
-[![3. API-Gateway - Axway API-Management on AWS-EKS with HELM](https://img.youtube.com/vi/UOo-A5vQPSg/0.jpg)](https://youtu.be/UOo-A5vQPSg)  
-
-### API-Portal
-[![4. API-Portal - Axway API-Management on AWS-EKS with HELM](https://img.youtube.com/vi/-RHBkLMNRnc/0.jpg)](https://youtu.be/-RHBkLMNRnc)  
+The list is not to say that the Helm chart cannot be used for other Kubernetes distributions, but just a list of the current provided example values and documentation.

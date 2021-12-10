@@ -1,16 +1,14 @@
 # Google Kubernetes Engine deployment
 
-Here you can find information on how to deploy Axway API-Management solution on Google Kubernetes engine using our Helmchart. 
+Here you can find information on how to deploy Axway API-Management solution on Google Kubernetes Engine (GKE) using our Helmchart. 
 
-## Prerequisites
-
-Even though this documentation tries to explain the deployment as best as possible, a solid understanding of Kubernetes, the Google Cloud Platform, Internet-Naming-Service and of course Helm is absolutely necessary for the installation.  
+## Additional GKE Prerequisites
 
 - A Kubernetes cluster configured in Google Cloud
   - At least 2 nodes (e.g. e2-medium)
   - If you plan to deploy the Elastic-Solution please configure at least 3 Nodes (e.g. e2-standard-4)
   - Create a namespace (e.g. apim) 
-- `kubectl` points to configured Kubernetes cluster
+- `kubectl` configured and points to configured Kubernetes cluster
 - Helm is installed and configured
 
 ## Installation
