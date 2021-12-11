@@ -17,7 +17,7 @@ The installation on Google Kubernetes engine (GKE) is divided into some preparat
 
 You may watch the following video to see a demonstration of the deployment to Google Kubernetes Engine:  
 
-[![Google GKE Deployment Demo](https://img.youtube.com/vi/dcXKBfeV3Jw/0.jpg)](https://youtu.be/dcXKBfeV3Jw)  
+[![Google GKE Deployment Demo](https://img.youtube.com/vi/rtaaTc008Ig/0.jpg)](https://youtu.be/rtaaTc008Ig)  
 
 ### Preparations
 
