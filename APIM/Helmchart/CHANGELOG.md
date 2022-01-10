@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased] 
 ### Fixed
 - warning: cannot overwrite table with non table for license (map[]) [#18](https://github.com/Axway/Cloud-Automation/issues/18)
+- Cassandra Health-Check fails, if using external Cassandra-Service [#20](https://github.com/Axway/Cloud-Automation/issues/20)
 
 ## [2.1.0] 2021-12-10
 ### Added

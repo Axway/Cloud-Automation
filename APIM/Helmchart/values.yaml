@@ -922,6 +922,10 @@ cassandra:
      # Password must be stored using key: cassandra-password
      existingSecret: ""
 
+   service:
+     # Port is required here when using an external C* service
+     port: 9042
+
    cluster: 
      # Name of the cluster - You cannot change this later
      name: "axway-apim-management"
