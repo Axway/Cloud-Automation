@@ -35,6 +35,13 @@ API-Portal ImagePullPolicy
 {{- end }}
 
 {{/*
+API-Portal ImageTag
+*/}}
+{{- define "apiportalImageTag" -}}
+{{- if .Values.apiportal.imageTag }}{{ .Values.apiportal.imageTag }}{{- else }}{{ .Values.global.imageTag }}{{- end }}
+{{- end }}
+
+{{/*
 Labels for the API-Portal certificate secret
 */}}
 {{- define "certificates.name" -}}

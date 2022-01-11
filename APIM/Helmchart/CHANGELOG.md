@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased] 
+### Added
+- Support to use global the ImageTag & Docker-Repo variables for the API-Portal [#21](https://github.com/Axway/Cloud-Automation/issues/21)
+
 ### Fixed
 - warning: cannot overwrite table with non table for license (map[]) [#18](https://github.com/Axway/Cloud-Automation/issues/18)
 - Cassandra Health-Check fails, if using external Cassandra-Service [#20](https://github.com/Axway/Cloud-Automation/issues/20)

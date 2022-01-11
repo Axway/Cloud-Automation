@@ -1,5 +1,6 @@
 {{- if .Values.apiportal.enabled -}}
 
+{{- $imageTag := include "apiportalImageTag" . -}}
 {{- $imagePullPolicy := include "imagePullPolicy" . -}}
 {{- $check := include "validateDockerRepo" . -}}
 {{- $apimgrName := include "apimgr.name" . -}}
@@ -112,7 +113,7 @@ spec:
       {{- end }}
         securityContext:
 {{ toYaml .Values.apiportal.securityContext | indent 10 }}
-        image: {{ template "apiportalDockerRepository" . }}/{{ required "apiportal.image is required" .Values.apiportal.image }}:{{ required "apiportal.imageTag is required" .Values.apiportal.imageTag }}
+        image: {{ template "apiportalDockerRepository" . }}/{{ required "apiportal.image is required" .Values.apiportal.image }}:{{ $imageTag }}
         imagePullPolicy: {{ $imagePullPolicy }}
         livenessProbe:
 {{ toYaml .Values.apiportal.livenessProbe | indent 10 }}
