@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] 
+## [2.2.0] 2022-01-11
 ### Added
 - Support to use global the ImageTag & Docker-Repo variables for the API-Portal [#21](https://github.com/Axway/Cloud-Automation/issues/21)
 
