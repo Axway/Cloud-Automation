@@ -35,7 +35,7 @@ API-Manager name - Short by default as it look nicer in the ANM-Topology view
 API-Traffic name - Short by default as it look nicer in the ANM-Topology view
 */}}
 {{- define "apitraffic.name" -}}
-{{- if .Values.apimgr.nameOverride -}}
+{{- if .Values.apitraffic.nameOverride -}}
 {{ .Values.apitraffic.nameOverride }}
 {{- else -}}
 {{- "traffic" -}}
