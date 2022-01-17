@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 - API-Portal certificate no longer generated if API-Portal is disabled
 - apitraffic.name was not defined correctly in call cases
 
+### Changed
+- ConfigMap jvmxml now created using the Helm-.Release.Name
+
 ## [2.2.0] 2022-01-11
 
 ### Added

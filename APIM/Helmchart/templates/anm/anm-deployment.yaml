@@ -60,7 +60,7 @@ spec:
         {{- if .Values.anm.jvm.enabled }}
         - name: anm-jvmxml
           configMap:
-            name: jvmxml
+            name: {{ .Release.Name }}-jvmxml
             items:
               - key: anm-jvmxml
                 path: jvm.xml

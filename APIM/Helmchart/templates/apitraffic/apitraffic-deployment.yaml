@@ -75,7 +75,7 @@ spec:
       {{- if .Values.apitraffic.jvm.enabled }}
         - name: apitraffic-jvmxml
           configMap:
-            name: jvmxml
+            name: {{ .Release.Name }}-jvmxml
             items:
               - key: apitraffic-jvmxml
                 path: jvm.xml

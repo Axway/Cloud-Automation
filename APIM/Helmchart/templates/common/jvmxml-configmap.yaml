@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-   name: jvmxml
+   name: {{ .Release.Name }}-jvmxml
    namespace: {{ .Release.Namespace | quote }}
 data:
 {{- if .Values.anm.jvm.enabled }}

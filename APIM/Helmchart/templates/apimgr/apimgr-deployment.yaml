@@ -52,7 +52,7 @@ spec:
       {{- if .Values.apimgr.jvm.enabled }}
         - name: apimgr-jvmxml
           configMap:
-            name: jvmxml
+            name: {{ .Release.Name }}-jvmxml
             items:
               - key: apimgr-jvmxml
                 path: jvm.xml
