@@ -408,6 +408,9 @@ apitraffic:
       # emtParentHost: "api-gateway"
 
    ingress:
+      # Please note: Only basic ingress settings are configured here. 
+      # The individual ingress resources are configured for the individual service ports. 
+      # See for example: service.ports.oauth.ingress....
       enabled: true
       name: api
       annotations: {}
@@ -422,6 +425,7 @@ apitraffic:
       #  - secretName: chart-example-tls
       #    hosts:
       #      - chart-example.local
+      # 
 
    # Defines where to mount required standard volumes such as events, opentraffic, etc. into the container
    volumeMountsPaths:
