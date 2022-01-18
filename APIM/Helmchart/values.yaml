@@ -393,8 +393,8 @@ apitraffic:
         nodePort: ""
         # Ingress is currently not supported for HTTP-Connections - Would required another Ingress with additional annotations
         ingress: 
-         enabled: false
-         host: plain
+          enabled: false
+          host: plain
 
    # Configuration is based on environment variables as desribed here:
    # https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_installation/apigw_containers/container_env_variables/index.html#environment-variables-reference
@@ -408,11 +408,10 @@ apitraffic:
       # emtParentHost: "api-gateway"
 
    ingress:
+      enabled: true
       # Please note: Only basic ingress settings are configured here. 
       # The individual ingress resources are configured for the individual service ports. 
       # See for example: service.ports.oauth.ingress....
-      enabled: true
-      name: api
       annotations: {}
          # kubernetes.io/ingress.class: azure/application-gateway
          # appgw.ingress.kubernetes.io/backend-protocol: https
@@ -621,10 +620,6 @@ apiportal:
       #      - chart-example.local
 
    securityContext: {}
-
-   podSecurityContext:
-      runAsUser: 1048
-      fsGroup: 1048
 
    # If enabled required PVCs for the API-Portal are created
    persistence: 
