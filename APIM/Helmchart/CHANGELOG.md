@@ -2,7 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.3.0] 2022-01-21
+
 ### Fixed
 - API-Portal certificate no longer generated if API-Portal is disabled
 - variable `apitraffic.name` was not defined correctly in all cases
@@ -10,9 +11,15 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - ConfigMap jvmxml now created using the Helm-`.Release.Name`, which allows to deploy the Helm-Chart x-time into the same namespace
 - Updated dependencies
-  - bitnami/common 1.10.1 --> 1.10.3
-  - mysql/mysql 8.8.12 --> 8.8.21
-  - redis/redis 15.5.5 --> 15.7.5
+  - bitnami/common 1.10.1 --> 1.10.4
+  - mysql/mysql 8.8.12 --> 8.8.23
+  - redis/redis 15.5.5 --> 15.7.6
+- API-Traffic default livenessProbe changed 
+  - period changed from 10 to 30 seconds
+  - timeoutSeconds changed from 5 to 15 seconds (to avoid unwanted POD-Restarts)
+- API-Manager default livenessProbe changed
+  - period changed from 10 to 30 seconds
+  - timeoutSeconds changed from 5 to 15 seconds (to avoid unwanted POD-Restarts)
 
 ## [2.2.0] 2022-01-11
 

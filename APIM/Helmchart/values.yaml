@@ -302,8 +302,8 @@ apimgr:
            value: liveness.apimgr
          scheme: HTTPS
       initialDelaySeconds: 300
-      periodSeconds: 10
-      timeoutSeconds: 5
+      periodSeconds: 30
+      timeoutSeconds: 15
       failureThreshold: 3
       successThreshold: 1
 
@@ -483,8 +483,8 @@ apitraffic:
            value: liveness.apimgr
          scheme: HTTP
       initialDelaySeconds: 300
-      periodSeconds: 10
-      timeoutSeconds: 5
+      periodSeconds: 30
+      timeoutSeconds: 15
       failureThreshold: 3
       successThreshold: 1
 
