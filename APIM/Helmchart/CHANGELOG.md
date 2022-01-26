@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- API-Portal database PVC now requests 2GB diskspace instead of 1GB
+
 ## [2.3.0] 2022-01-21
 
 ### Fixed
