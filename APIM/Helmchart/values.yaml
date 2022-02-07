@@ -27,7 +27,7 @@ global:
    # into the API Gateway PODs. 
    # Alternatively, you can use your own secret and reference it via licenseSecretName below.
    # Or you can build the image with the license included.
-   license: 
+   # license: |
       # FIPS=1
       # SalesForce Connector=1
       # ServiceNow Connector=1
