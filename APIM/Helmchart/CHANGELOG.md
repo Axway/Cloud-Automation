@@ -2,10 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.3.1] 2022-02-14
 
 ### Changed
 - API-Portal database PVC now requests 2GB diskspace instead of 1GB
+- Updated Helm-Chart dependencies
+  - bitnami/common 1.10.1 --> 1.11.1
 
 ### Fixed
 - Corrected indentation for ANM extraVolumeMounts
@@ -18,7 +20,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - ConfigMap jvmxml now created using the Helm-`.Release.Name`, which allows to deploy the Helm-Chart x-time into the same namespace
-- Updated dependencies
+- Updated Helm-Chart dependencies
   - bitnami/common 1.10.1 --> 1.10.4
   - mysql/mysql 8.8.12 --> 8.8.23
   - redis/redis 15.5.5 --> 15.7.6
