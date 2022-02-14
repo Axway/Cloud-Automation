@@ -104,9 +104,15 @@ anm:
 
    # Allows you to add any config files
    extraVolumes: []
+   # - name: axway-apigateway-admin-users
+   #   secret:
+   #     secretName: axway-apigateway-admin-users
    # - name: extras
    #   emptyDir: {}
    extraVolumeMounts: []
+   # - name: axway-apigateway-admin-users
+   #   mountPath: mountPath: /opt/Axway/apigateway/conf/adminUsers.json
+   #   subPath: adminUsers.json
    # - name: extras
    #   mountPath: /usr/share/extras
    #   readOnly: true

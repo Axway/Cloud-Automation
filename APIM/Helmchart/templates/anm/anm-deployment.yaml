@@ -189,7 +189,7 @@ spec:
             {{- end }}
           {{- end }}
         {{- if .Values.anm.extraVolumeMounts }}
-{{ toYaml (.Values.anm.extraVolumeMounts ) | indent 8 }}
+{{ toYaml (.Values.anm.extraVolumeMounts ) | indent 10 }}
         {{- end }}
         {{- if .Values.anm.lifecycle }}
         lifecycle:

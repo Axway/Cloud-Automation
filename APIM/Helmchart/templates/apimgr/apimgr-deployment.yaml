@@ -180,19 +180,19 @@ spec:
         {{- end }}
         volumeMounts:
         {{- if .Values.apimgr.jvm.enabled }}
-        - name: apimgr-jvmxml
-          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
-          subPath: jvm.xml
+          - name: apimgr-jvmxml
+            mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
+            subPath: jvm.xml
         {{- end }}
 {{- if $licenseSecret }}
-        - name: license
-          mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
-          subPath: license
+          - name: license
+            mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
+            subPath: license
 {{- end }}
-        - name: events
-          mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apimgr.volumeMountsPaths.events | quote }}
+          - name: events
+            mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apimgr.volumeMountsPaths.events | quote }}
         {{- if .Values.apimgr.extraVolumeMounts }}
-{{ toYaml (.Values.apimgr.extraVolumeMounts ) | indent 8 }}
+{{ toYaml (.Values.apimgr.extraVolumeMounts ) | indent 10 }}
         {{- end }}
         {{- if .Values.apimgr.lifecycle }}
         lifecycle:

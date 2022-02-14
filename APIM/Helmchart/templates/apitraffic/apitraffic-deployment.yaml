@@ -202,23 +202,23 @@ spec:
         {{- end }}
         volumeMounts:
         {{- if .Values.apitraffic.jvm.enabled }}
-        - name: apitraffic-jvmxml
-          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
-          subPath: jvm.xml
+          - name: apitraffic-jvmxml
+            mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
+            subPath: jvm.xml
         {{- end }}
 {{- if $licenseSecret }}
-        - name: license
-          mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
-          subPath: license
+          - name: license
+            mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
+            subPath: license
 {{- end }}
-        - name: events
-          mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apitraffic.volumeMountsPaths.events | quote }}
-        - name: opentraffic
-          mountPath: {{ default "/opt/Axway/apigateway/logs/opentraffic" .Values.apitraffic.volumeMountsPaths.opentraffic | quote }}
-        - name: trace
-          mountPath: {{ default "/opt/Axway/apigateway/groups/emt-group/emt-service/trace" .Values.apitraffic.volumeMountsPaths.trace | quote }}
+          - name: events
+            mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apitraffic.volumeMountsPaths.events | quote }}
+          - name: opentraffic
+            mountPath: {{ default "/opt/Axway/apigateway/logs/opentraffic" .Values.apitraffic.volumeMountsPaths.opentraffic | quote }}
+          - name: trace
+            mountPath: {{ default "/opt/Axway/apigateway/groups/emt-group/emt-service/trace" .Values.apitraffic.volumeMountsPaths.trace | quote }}
         {{- if .Values.apitraffic.extraVolumeMounts }}
-{{ toYaml (.Values.apitraffic.extraVolumeMounts ) | indent 8 }}
+{{ toYaml (.Values.apitraffic.extraVolumeMounts ) | indent 10 }}
         {{- end }}
         {{- if .Values.apitraffic.lifecycle }}
         lifecycle:
