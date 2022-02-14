@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - API-Portal database PVC now requests 2GB diskspace instead of 1GB
 
+### Fixed
+- Corrected indentation for ANM extraVolumeMounts
+
 ## [2.3.0] 2022-01-21
 
 ### Fixed
