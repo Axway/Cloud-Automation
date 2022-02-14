@@ -547,6 +547,7 @@ apiportal:
          # host: "my-api-manager-host"
          # port: "8082"
       ssl:
+         # If you disable SSL for the API-Portal, please make sure to adjust the probes accordingly to use HTTP.
          enabled: true
          generateCertificates: true
          # Use an existing secret object for the required certificates. 
