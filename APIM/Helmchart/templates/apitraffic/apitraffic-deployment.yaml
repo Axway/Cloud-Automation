@@ -108,14 +108,20 @@ spec:
       - name: init-cassandra
         image: busybox:1.33
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "cassandra.name" . }} {{ .Values.cassandra.service.port }}; do echo waiting for cassandra-0; sleep 2; done;']
+        resources:
+{{ toYaml .Values.apitraffic.initResources | indent 10 }}
       {{- if .Values.mysqlmetrics.internal }}
       - name: init-mysql
         image: busybox:1.33
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "mysqlmetrics.name" . }} {{ .Values.mysqlmetrics.primary.service.port }}; do echo waiting for mysql; sleep 2; done;']
+        resources:
+{{ toYaml .Values.apitraffic.initResources | indent 10 }}
       {{- end }}
       - name: init-anm
         image: busybox:1.33
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "anm.name" . }} {{ .Values.anm.service.port }}; do echo waiting for anm; sleep 2; done;']
+        resources:
+{{ toYaml .Values.apitraffic.initResources | indent 10 }}
       {{- if .Values.apitraffic.extraInitContainers }}
 {{ tpl .Values.apitraffic.extraInitContainers . | indent 6 }}
       {{- end }}

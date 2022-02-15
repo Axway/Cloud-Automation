@@ -184,6 +184,15 @@ anm:
          cpu: "500m"
          memory: "1Gi"
 
+   # Resources for all Admin-Node-Manager Init-Containers
+   initResources: {}
+   #   requests:
+   #      cpu: "25m"
+   #      memory: "80Mi"
+   #   limits:
+   #      cpu: "25m"
+   #      memory: "80Mi"
+
    args: 
    - /opt/Axway/apigateway/posix/bin/start-emt-nodemanager
 
@@ -320,6 +329,15 @@ apimgr:
       limits:
          cpu: "500m"
          memory: "1Gi"
+
+   # Resources for all API-Manager Init-Containers
+   initResources: {}
+   #   requests:
+   #      cpu: "25m"
+   #      memory: "80Mi"
+   #   limits:
+   #      cpu: "25m"
+   #      memory: "80Mi"
 
    lifecycle:
       preStop:
@@ -462,6 +480,15 @@ apitraffic:
       limits:
          cpu: "1000m"
          memory: "1536Mi"
+
+   # Resources for all API-Traffic (API-Gateway) Init-Containers
+   initResources: {}
+   #   requests:
+   #      cpu: "25m"
+   #      memory: "80Mi"
+   #   limits:
+   #      cpu: "25m"
+   #      memory: "80Mi"
 
    podSecurityContext:
       runAsUser: 1000
@@ -703,6 +730,15 @@ apiportal:
       limits:
          cpu: "500m"
          memory: "1000Mi"
+
+   # Resources for all API-Portal Init-Containers
+   initResources: {}
+   #   requests:
+   #      cpu: "25m"
+   #      memory: "80Mi"
+   #   limits:
+   #      cpu: "25m"
+   #      memory: "80Mi"
 
    args: []
    # - /do/some/other/stuff

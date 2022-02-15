@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.0] 2022-02-15
+
+### Added
+- Add the option to configure initResources for ANM, API-Mgr, API-Traffic and API-Portal
+
 ## [2.3.1] 2022-02-14
 
 ### Changed
