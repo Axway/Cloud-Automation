@@ -2,10 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.5.0] 2022-02-18
+
+### Added
+- The option to configure the sessionAffinity for ANM, API-Mgr, API-Traffic and API-Portal services
+
+### Changed
+- The default sessionAffinity for API-Traffic changed from ClientIP to None
+- Updated Helm-Chart dependencies
+  - bitnami/mysql 8.8.23 --> 8.8.24
+
 ## [2.4.0] 2022-02-15
 
 ### Added
-- Add the option to configure initResources for ANM, API-Mgr, API-Traffic and API-Portal
+- The option to configure initResources for ANM, API-Mgr, API-Traffic and API-Portal
 
 ## [2.3.1] 2022-02-14
 

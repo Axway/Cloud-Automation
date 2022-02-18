@@ -7,12 +7,12 @@ dependencies:
   version: 7.7.3
 - name: mysql
   repository: https://charts.bitnami.com/bitnami
-  version: 8.8.23
+  version: 8.8.24
 - name: mysql
   repository: https://charts.bitnami.com/bitnami
-  version: 8.8.23
+  version: 8.8.24
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 15.7.6
-digest: sha256:705a798483da8174a13b2852f54f74a5e8e566988d08d8c27152ec911566b263
-generated: "2022-02-14T13:41:39.2492101+01:00"
+digest: sha256:17a0bc932a15665421145b279b4b2e32c9d8fcf81207b5db652f1e54cee171a8
+generated: "2022-02-18T11:01:41.5278+01:00"

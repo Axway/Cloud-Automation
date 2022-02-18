@@ -56,6 +56,7 @@ anm:
    service:
       type: "ClusterIP"
       loadBalancerIP: ""
+      sessionAffinity: "None"
       port: 8090
       nodePort: ""
       labels: {}
@@ -221,6 +222,7 @@ apimgr:
    service:
       type: "ClusterIP"
       loadBalancerIP: ""
+      # sessionAffinity: "None"
       labels: {}
       annotations: {}
       ports:
@@ -386,6 +388,7 @@ apitraffic:
    # Service and Ingress configuration for the API-Traffic PoD
    service:
       type: "ClusterIP"
+      # sessionAffinity: "ClientIP"
       loadBalancerIP: ""
       labels: {}
       annotations: {}
@@ -568,6 +571,7 @@ apiportal:
    service:
       type: "ClusterIP"
       loadBalancerIP: ""
+      # sessionAffinity: "None"
       port: 443
       nodePort: ""
       labels: {}

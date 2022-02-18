@@ -26,6 +26,5 @@ spec:
     targetPort: {{ .Values.apiportal.containerPorts.apiportal }}
   selector:
     {{- include "apiportal.selectorLabels" . | nindent 4 }}
-  sessionAffinity: ClientIP
-  
+  sessionAffinity: {{ default "ClientIP" .Values.apiportal.service.sessionAffinity }}
 {{- end }}

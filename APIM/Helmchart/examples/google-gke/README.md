@@ -83,7 +83,7 @@ You can overwrite all parameters of the base [`values.yaml`](../../values.yaml),
 
 To finally start the deployment into your Kubernetes Cluster using Helm, use now the following command:
 ```
-helm install axway-apim -n apim -f .\local-values-gke.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.4.0/helm-chart-axway-apim-2.4.0.tgz
+helm install axway-apim -n apim -f .\local-values-gke.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.5.0/helm-chart-axway-apim-2.5.0.tgz
 ```
 
 Now check if the resources, such as pods, ingresses, services, etc. are created and correct any problems that occur.

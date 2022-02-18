@@ -28,6 +28,5 @@ spec:
   {{- end }}
   selector:
     {{- include "apitraffic.selectorLabels" . | nindent 4 }}
-  sessionAffinity: ClientIP
-
+  sessionAffinity: {{ default "None" .Values.apitraffic.service.sessionAffinity }}
 {{- end }}

@@ -28,6 +28,5 @@ spec:
   {{- end }}
   selector:
     {{- include "apimgr.selectorLabels" . | nindent 4 }}
-  sessionAffinity: ClientIP
-
+  sessionAffinity: {{ default "ClientIP" .Values.apimgr.service.sessionAffinity }}
 {{- end }}
