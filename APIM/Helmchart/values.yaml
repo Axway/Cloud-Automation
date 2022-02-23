@@ -152,7 +152,7 @@ anm:
          path: /login
          port: anm
          scheme: HTTPS
-      initialDelaySeconds: 10
+      initialDelaySeconds: 60
       periodSeconds: 5
       successThreshold: 1
       timeoutSeconds: 1
@@ -165,7 +165,7 @@ anm:
          path: /login
          port: anm
          scheme: HTTPS
-      initialDelaySeconds: 60
+      initialDelaySeconds: 120
       periodSeconds: 60
       timeoutSeconds: 5
       failureThreshold: 3
@@ -305,7 +305,7 @@ apimgr:
          path: /
          port: manager
          scheme: HTTPS
-      initialDelaySeconds: 30
+      initialDelaySeconds: 60
       periodSeconds: 5
       successThreshold: 1
       timeoutSeconds: 1
@@ -319,7 +319,7 @@ apimgr:
            value: liveness.apimgr
          scheme: HTTPS
       initialDelaySeconds: 300
-      periodSeconds: 30
+      periodSeconds: 60
       timeoutSeconds: 15
       failureThreshold: 3
       successThreshold: 1

@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Support the Axway Amplify Discovery- and Traceability-Agents
 
+### Changed
+- Slightly adjusted standard Readiness and Liveness-Probes
+- Updated Helm-Chart dependencies
+  - bitnami/mysql 8.8.24 --> 8.8.25
+
 ## [2.5.0] 2022-02-18
 
 ### Added
