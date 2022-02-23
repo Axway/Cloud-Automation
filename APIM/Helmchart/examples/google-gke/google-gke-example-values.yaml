@@ -108,6 +108,60 @@ apitraffic:
       type: HTTP
       requestPath: /healthcheck
 
+  # If you want to include the Amplify agent or Filebeat for Elasticsearch integration as a side-car. 
+  # Make sure that you use the latest images.
+  # extraContainers:
+  #   - name: filebeat
+  #     image: docker.elastic.co/beats/filebeat:7.16.3
+  #     envFrom:
+  #       - configMapRef:
+  #           name: axway-elk-apim4elastic-filebeat-env-config
+  #       - secretRef:
+  #           name: axway-elk-apim4elastic-filebeat-secret
+  #     volumeMounts:
+  #       - name: filebeat-config
+  #         mountPath: /usr/share/filebeat/filebeat.yml
+  #         subPath: filebeat.yml
+  #       - name: certificates
+  #         mountPath: /usr/share/filebeat/config/certificates
+  #       - name: opentraffic
+  #         mountPath: /var/opentraffic
+  #       - name: trace
+  #         mountPath: /var/trace/
+  #       - name: events
+  #         mountPath: /var/events/
+  #       - name: audit
+  #         mountPath: /var/audit/
+  #   - name: traceability
+  #     image: axway.jfrog.io/ampc-public-docker-release/agent/v7-traceability-agent:1.1.11
+  #     envFrom:
+  #       - configMapRef:
+  #           name: axway-apim-traceability-config
+  #       - secretRef:
+  #           name: axway-apim-amplify-agents-secret
+  #     volumeMounts:
+  #       - name: agents-secret
+  #         mountPath: /opt/keys/private_key.pem
+  #         subPath: private_key.pem
+  #       - name: agents-secret
+  #         mountPath: /opt/keys/public_key.pem
+  #         subPath: public_key.pem
+  #       - name: opentraffic
+  #         mountPath: /opentraffic
+  #       - name: events
+  #         mountPath: /events/
+
+  # extraVolumes:
+  #   - name: filebeat-config
+  #     configMap:
+  #       name: axway-elk-apim4elastic-filebeat-config
+  #   - name: certificates
+  #     secret:
+  #       secretName: axway-elk-apim4elastic-certificates
+  #   - name: agents-secret
+  #     secret:
+  #       secretName: axway-apim-amplify-agents-secret
+
 ##################################################################################################################################
 #   API-Portal
 ##################################################################################################################################
