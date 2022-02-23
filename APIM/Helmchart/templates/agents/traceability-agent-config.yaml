@@ -1,0 +1,70 @@
+{{- if or (.Values.agents.traceability.createTraceabilityConfig) (.Values.agents.traceability.enabled) }}
+
+{{- $apimgrName := include "apimgr.name" . -}}
+{{- $anmName := include "anm.name" . -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "traceabilityAgent.name" . }}-config
+  labels:
+    app: "{{ template "traceabilityAgent.name" . }}"
+    chart: "{{ .Chart.Name }}"
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+data: 
+  CENTRAL_AUTH_CLIENTID: {{ required "Missing .Values.agents.central.clientId" .Values.agents.central.clientId | quote }}
+  CENTRAL_ORGANIZATIONID: {{ required "Missing .Values.agents.central.organizationId" .Values.agents.central.organizationId | quote }}
+  CENTRAL_ENVIRONMENT: {{ required "Missing .Values.agents.central.environment" .Values.agents.central.environment | quote }}
+  CENTRAL_AUTH_PRIVATEKEY: {{ default "/opt/keys/private_key.pem" .Values.agents.central.privateKeyLocation | quote }}
+  CENTRAL_AUTH_PUBLICKEY: {{ default "/opt/keys/public_key.pem" .Values.agents.central.publicKeyLocation | quote }}
+  CENTRAL_AGENTNAME: {{ required "Missing .Values.agents.traceability.config.agentName" .Values.agents.traceability.config.agentName | quote }}
+  CENTRAL_DEPLOYMENT: {{ default "US" .Values.agents.central.deployment | quote }}
+  CENTRAL_URL: {{ .Values.agents.central.url | quote }}
+  CENTRAL_PROXYURL: {{ .Values.agents.central.proxyUrl | quote }}
+  CENTRAL_TEAM: {{ .Values.agents.central.team | quote }}
+  CENTRAL_MODE: {{ .Values.agents.central.mode | quote }}
+  CENTRAL_VERSIONCHECKER: {{ .Values.agents.central.versionChecker | quote }}
+
+  APIMANAGER_HOST: {{ default $apimgrName .Values.agents.apimanager.host | quote }}
+  APIMANAGER_PORT: {{ default "8075" .Values.agents.apimanager.port | quote }}
+  APIMANAGER_AUTH_USERNAME: {{ required "Missing .Values.agents.apimanager.username" .Values.agents.apimanager.username | quote }}
+  APIMANAGER_SSL_INSECURESKIPVERIFY: {{ default "false" .Values.agents.apimanager.insecureSSL | quote }}
+  APIGATEWAY_HOST: {{ default $anmName .Values.agents.apigateway.host | quote }}
+  APIGATEWAY_PORT: {{ default "8090" .Values.agents.apigateway.port | quote }}
+  APIGATEWAY_AUTH_USERNAME: {{ required "Missing .Values.agents.apigateway.username" .Values.agents.apigateway.username | quote }}
+  APIGATEWAY_SSL_INSECURESKIPVERIFY: {{ default "false" .Values.agents.apigateway.insecureSSL | quote }}
+  APIGATEWAY_HEALTHCHECKURI: {{ default "login" .Values.agents.apigateway.healthcheckUri | quote }}
+  APIGATEWAY_HEALTHCHECKPORT: {{ default "8090" .Values.agents.apigateway.healthcheckPort | quote }}
+  APIGATEWAY_HEALTHCHECKPROTOCOL: {{ default "https" .Values.agents.apigateway.healthcheckProtocol | quote }}
+  LOG_LEVEL: {{ default "info" .Values.agents.traceability.config.logLevel | quote }}
+  LOG_OUTPUT: {{ default "stdout" .Values.agents.traceability.config.logOutput | quote }}
+  LOG_FILE_PATH: {{ default "logs" .Values.agents.traceability.config.logFilePath | quote }}  
+
+  EVENT_LOG_INPUT: {{ default "true" .Values.agents.traceability.config.eventLogInput | quote }}
+  EVENT_LOG_PATHS: {{ default "/events/DefaultGroup_traffic-*.log" .Values.agents.traceability.config.eventLogPaths | quote }}
+  OPENTRAFFIC_LOG_INPUT: {{ default "false" .Values.agents.traceability.config.openTrafficInput | quote }}
+  OPENTRAFFIC_LOG_PATHS: {{ default "/opentraffic/DefaultGroup_traffic-*.log" .Values.agents.traceability.config.openTrafficPaths | quote }}
+
+  TRACEABILITY_REDACTION_PATH_SHOW: {{ .Values.agents.traceability.config.redactionPathShow | quote }}
+  TRACEABILITY_REDACTION_QUERYARGUMENT_SHOW: {{ .Values.agents.traceability.config.redactionQueryArgumentShow | quote }}
+  TRACEABILITY_REDACTION_QUERYARGUMENT_SANITIZE: {{ .Values.agents.traceability.config.redactionQueryArgumentSanitize | quote }}
+  TRACEABILITY_REDACTION_REQUESTHEADER_SHOW: {{ .Values.agents.traceability.config.redactionRequestHeaderShow | quote }}
+  TRACEABILITY_REDACTION_REQUESTHEADER_SANITIZE: {{ .Values.agents.traceability.config.redactionRequestHeaderSanitize | quote }}
+  TRACEABILITY_REDACTION_RESPONSEHEADER_SHOW: {{ .Values.agents.traceability.config.redactionResponseHeaderShow | quote }}
+  TRACEABILITY_REDACTION_RESPONSEHEADER_SANITIZE: {{ .Values.agents.traceability.config.redactionResponseHeaderSanitize | quote }}
+  TRACEABILITY_REDACTION_JMSPROPERTIES_SHOW: {{ .Values.agents.traceability.config.redactionJmsPropertiesShow | quote }}
+  TRACEABILITY_REDACTION_JMSPROPERTIES_SANITIZE: {{ .Values.agents.traceability.config.redactionJmsPropertiesSanitize | quote }}
+  TRACEABILITY_REDACTION_MASKING_CHARACTERS: {{ .Values.agents.traceability.config.redactionMaskingCharacters | quote }}
+
+  TRACEABILITY_SAMPLING_PERCENTAGE: {{ .Values.agents.traceability.config.samplingPercentage | quote }}
+  TRACEABILITY_SAMPLING_PER_API: {{ .Values.agents.traceability.config.samplingPerApi | quote }}
+
+  TRACEABILITY_EXCEPTION_LIST: {{ .Values.agents.traceability.config.exceptionList | quote }}
+  TRACEABILITY_HOST: {{ .Values.agents.traceability.config.host | quote }}
+  TRACEABILITY_PROTOCOL: {{ .Values.agents.traceability.config.protocol | quote }}
+  TRACEABILITY_PROXYURL: {{ .Values.agents.traceability.config.proxyUrl | quote }}
+  TRACEABILITY_PROXYURL: {{ .Values.agents.traceability.config.proxyUrl | quote }}
+  TRACEABILITY_COMPRESSIONLEVEL: {{ default "3" .Values.agents.traceability.config.compressionLevel | quote }}
+  CENTRAL_USAGEREPORTING_INTERVAL: {{ default "15" .Values.agents.traceability.config.usageReportingInterval | quote }}
+{{- end }}

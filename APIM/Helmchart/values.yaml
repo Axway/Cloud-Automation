@@ -768,7 +768,10 @@ agents:
    # apimgr-auth-password - Password used to authenticate with the API-Manager
    # If set, this secret is automatically mounted
    existingSecret: 
+   
    central:
+      # The client identifier associated to the Service Account created in Amplify Central. 
+      # Locate this at Amplify Central > Access > Service Accounts > client Id.
       clientId: 
       # You may provide the private-key in your local values
       privateKey: [] # |
@@ -782,32 +785,126 @@ agents:
          # MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsuiObeUdKih1kVDewoM8
          # 9q2mIXWc0ClpLVUbzZwFWiSq5ivfNZzSFqgfHp6KEUw1RRKe12swGRg1TWr5DBs/
          # ....
+      # The Organization ID from Amplify Central. Locate this at Platform > User > Organization
       organizationId: 
+      # Name of the Amplify Central environment where API will be hosted.
       environment: 
       # Defaults to /opt/keys/private_key.pem which matches to the mounted secret
       privateKeyLocation: 
       # Defaults to /opt/keys/public_key.pem which matches to the mounted secret
       publicKeyLocation: 
+      # Controls the Amplify central region, which must be either US or EU
+      deployment: "US"
+      # The URL to the Amplify Central instance being used for Agents 
+      url: ""
+      # The URL for the proxy for Amplify Central <http://username:password@hostname:port>. If empty, no proxy is defined.
+      proxyUrl: ""
+      # Set to assign an owner of all API resources in the CENTRAL_ENVRIONMENT to that team. 
+      # When blank (default), the agent will attempt to match API Manager organizations to existing teams. 
+      # When no match is found, the API resources will not be assigned an owner. 
+      # Catalog items will be assigned to the same team, or default team when blank.
+      team: ""
+      # Method to send endpoints back to Central.
+      # publishToEnvironment = API Service
+      # publishToEnvironmentAndCatalog = API Service and Catalog asset)
+      mode: "publishToEnvironmentAndCatalog"
+      # Set to false to turn off the Agent job that checks if the running agent is the latest available (default: true).
+      versionChecker: "true"
 
-   # ----------- Discovery agent -------------
+   apimanager: 
+      username: "apiadmin"
+      password: 
+      port:
+      host:
+      insecureSSL: "false"
+   # Required connection for the ANM
+   apigateway:
+      username: "admin"
+      password: 
+      # The ANM host. (defaults to the ANM-Service name)
+      host:
+      # The ANM port. (defaults to 8090)
+      port:
+      # The uri (without a leading /) for the internal healthcheck (defaults to login)
+      healthcheckUri: 
+      # The protocol for the internal healthcheck (defaults to https)
+      healthcheckProtocol: 
+      # The port used for the healthcheck (default to 8090)
+      healthcheckPort: 
+
+   # --------------------------------------------
+   # ------------ Discovery agent ---------------
+   # --------------------------------------------
    discovery:
-      enabled: true
+      enabled: false
+      # The number of replicas for the discovery agent (very unlikely more than 1 is required)
       replicas: 1
       image: "v7-discovery-agent"
-      imageTag: "1.1.6"
+      imageTag: "1.1.11"
       # command: [ "sh", "-c", "tail -f /dev/null" ]
 
-      # Configuration of the discovery agent
-      agentName: 
-      apimanager: 
-         username: 
-         password:
-         port:
-         host:
-         insecureSSL: "false"
-      logLevel: info
-      logOutput: stdout
-      logPath: logs
+      config: 
+         # The agent name of this agent on Amplify Central. The agent must have been configed on Central before
+         agentName: 
+         # Possible levels info, debug, warn, trace and error
+         logLevel: info
+         # The output for the log lines (stdout, file, both). When set to both for the Traceability Agent, only the file output will appear.
+         logOutput: stdout
+         # The path (relative or absolute) to save logs files, if output type file or both.
+         logFilePath: logs
+         # When creating a subscription on Amplify Central, setting this value to true will enable a selection in the App name 
+         # dropdown for ‘Create an application.’ This allows the user to either select from an existing API Manager application, or to create a 
+         # new application in API Manager. The new application in API Manager will be given the name of the subscription ID from Amplify Central. 
+         # A value of false will cause ‘Create an application’ to not be shown in the dropdown. (default value: true).
+         allowApplicationAutoCreation: 
+         # The mode for approving subscriptions on Amplify Central (manual, auto, webhook; default = manual).
+         subscriptionsApprovalMode: 
+         # The url for a subscription approval webhook (if any). CENTRAL_SUBSCRIPTIONS_APPROVAL_MODE must be set to “webhook” for webhooks to be invoked.
+         subscriptionsNotificationsWebhookUrl: 
+         # The headers to pass to the subscription approval webhook (if any). For example, “Header=contentType,Value=application/json”.
+         subscriptionsNotificationsWebhookHeaders: 
+         # The authentication secret to pass to the subscription approval webhook (if any).
+         subscriptionsNotificationsWebhookAuthSecret: 
+         # The url for a subscription approval webhook (if any). CENTRAL_SUBSCRIPTIONS_APPROVAL_MODE must be set to “webhook” for webhooks to be invoked.
+         subscriptionsApprovalWebhookUrl:
+         # The headers to pass to the subscription approval webhook (if any). For example, “Header=contentType,Value=application/json”.
+         subscriptionsApprovalWebhookHeaders:
+         # The authentication secret to pass to the subscription approval webhook (if any).
+         subscriptionsApprovalWebhookAuthSecret: 
+         # The SMTP server that will send email notifications.
+         subscriptionsNotificationsSmtpHost: 
+         # The SMTP port to communicate to the SMTP server over.
+         subscriptionsNotificationsSmtpPort:
+         # The authentication type based on the email server. You may have to refer to the email server properties and specifications. This value defaults to NONE.
+         subscriptionsNotificationsSmtpAuthType:
+         # The username used to authenticate to the SMTP server, if necessary.
+         subscriptionsNotificationsSmtpUsername:
+         # The password used to authenticate to the SMTP server, if necessary.
+         subscriptionsNotificationsSmtpPassword: 
+         # The email address that will be listed in the from field.
+         subscriptionsNotificationsSmtpFromAddress: 
+         # The subject of email sent for Subscribe events.
+         subscriptionsNotificationsSmtpSubscribeSubject: 
+         # The body of the email for Subscribe events.
+         subscriptionsNotificationsSmtpSubscribeBody:
+         # The body of the email for Subscribe events when the API is secured using an OAUTH token.
+         subscriptionsNotificationsSmtpSubscribeOAuth: 
+         # The body of the email for Subscribe events when the API is secured using an APIKEY.
+         subscriptionsNotificationsSmtpSubscribeAPIKeys:
+         # The subject of email sent for Unsubscribe events.
+         subscriptionsNotificationsSmtpUnsubscribeSubject: 
+         # The body of the email for Unsubscribe events.
+         subscriptionsNotificationsSmtpUnsubscribeBody:
+         # The subject of email sent for Failed to Subscribe events.
+         subscriptionsNotificationsSmtpSubscribeFailedSubject:
+         # The body of the email for Failed to Subscribe events.
+         subscriptionsNotificationsSmtpSubscribeFailedBody: 
+         # The subject of email sent for Failed to Unsubscribe events.
+         subscriptionsNotificationsSmtpUnsubscribeFailedSubject:
+         # The body of the email for Failed to Unsubscribe events.
+         subscriptionsNotificationsSmtpUnsubscribeFailedBody:
+         # Set to false to skip adding the environment name to the title and description of the API.
+         appendEnvironmentToTitle: 
 
       readinessProbe:
          httpGet:
@@ -818,9 +915,9 @@ agents:
             port: 8989
             scheme: HTTP
          initialDelaySeconds: 20
-         periodSeconds: 10
+         periodSeconds: 20
          successThreshold: 1
-         timeoutSeconds: 1
+         timeoutSeconds: 3
 
       livenessProbe: 
          httpGet:
@@ -830,22 +927,171 @@ agents:
             path: /status
             port: 8989
             scheme: HTTP
-         initialDelaySeconds: 30
-         periodSeconds: 30
+         initialDelaySeconds: 60
+         periodSeconds: 120
          successThreshold: 1
-         timeoutSeconds: 1
+         timeoutSeconds: 3
 
       labels: {}
       podAnnotations: {}
 
+      resources: {}
+         # requests:
+         #    cpu: "100m"
+         #    memory: "200Mi"
+         # limits:
+         #    cpu: "500m"
+         #    memory: "500Mi"
+
+   # --------------------------------------------
    # ----------- Traceability agent -------------
-   # TBD
+   # --------------------------------------------
+   traceability:
+      # If enabled a dedicated deployment for the Traceability is created. 
+      # Alternatively you may instead reate the configMap only using the toggle below to run the Traceability agent as a side-car
+      enabled: false
+      # If you want to run the traceability agent as a sidecar to your API-Traffic pods, then set the following flag 
+      # to true create only the necessary ConfigMap, instead of a separate deployment. 
+      # The ConfigMap then contains all the necessary environment variables for the traceability agent.
+      # This is required/useful is your API-Gateway are writing to an emptyDir volume.
+      # Check the examples how to setup an apitraffic-sidecar for Traceability agent
+      createTraceabilityConfig: false
+      # The number of replicas. Only applied, traceability.enabled: true
+      replicas: 1
+      image: "v7-traceability-agent"
+      imageTag: "1.1.11"
+      # command: [ "sh", "-c", "tail -f /dev/null" ]
+
+      # A selection of the most important parameters for the traceability agent that are used 
+      # to create the ConfigMap which is referenced below by envFrom
+      config: 
+         eventLogInput: true
+         eventLogPaths: /events/DefaultGroup_traffic-*.log
+         # Used to disable/enable the OpenTraffic log input for the Traceability Agent
+         # Please note: This is required if you want to send Request- and Response-Header information
+         openTrafficInput: true
+         # The paths, comma separated, to the open traffic logs that need to be watched
+         openTrafficPaths: /opentraffic/DefaultGroup_traffic-*.log
+         # The required agent name of this agent on Amplify Central. The agent must have been configed on Central before
+         agentName: 
+         # Possible levels info, debug, warn, trace and error
+         logLevel: info
+         # The output for the log lines (stdout, file, both). When set to both for the Traceability Agent, only the file output will appear.
+         logOutput: stdout
+         # The path (relative or absolute) to save logs files, if output type file or both.
+         logFilePath: logs
+         # Determines what portions of a transactions PATH to send to Amplify Central. 
+         # By default, the entire path is redacted. Example: [{keyMatch:".*"}] to send all paths.
+         redactionPathShow: ""
+         # Determines what Query Arguments to send to Amplify Central. 
+         # By default, all query parameters are redacted. Example: [{keyMatch:".*"}] to send all query parameters.
+         redactionQueryArgumentShow: ""
+         # Determines what portions of a Query Argument value to sanitize. 
+         # Sanitize query parameter tenantId to mask the ten first characters or less [{keyMatch:"tenantId",valueMatch:"^.{0,10}"}]
+         redactionQueryArgumentSanitize: ""
+         # Determines what Request Header Keys to send to Amplify Central. By default, all request headers are redacted. 
+         # Example: [{keyMatch:"Accept.*"}, {keyMatch:"Connection"}] to send all Accept* and the Connection request header.
+         redactionRequestHeaderShow: ""
+         # Determines what portions of a Request Header value to sanitize. 
+         # Sanitize Authorization request header to mask the ten first characters or less [{keyMatch:"Authorization",valueMatch:"^.{0,10}"}]
+         redactionRequestHeaderSanitize: ""
+         # Determines what Response Header Keys to send to Amplify Central. By default, all response headers are redacted. 
+         # Example: [{keyMatch:".*"}] to send all response headers.
+         redactionResponseHeaderShow: ""
+         # Determines what portions of a Response Header value to sanitize. 
+         # Example: [{keyMatch:"apiKey",valueMatch:".{0,10}$"}] to sanitize the apiKey request header to mask the last ten characters or less.
+         redactionResponseHeaderSanitize: ""
+         # Determines what JMS Properties to send to Amplify Central. By default, all JMS properties are redacted.
+         # Example: [{keyMatch:".*"}] to send all JMS properties.
+         redactionJmsPropertiesShow: ""
+         # Determines what portions of a JMS Property value to sanitize.
+         # Example: [{keyMatch:"jmsProviderURL",valueMatch:".{0,10}$"}] to sanitize the jmsProviderURL property to mask the last ten characters or less.
+         redactionJmsPropertiesSanitize: ""
+         # Determines what characters are displayed as the sanitized response header values on Amplify
+         redactionMaskingCharacters: ""
+         # How often should the agent send aggregated usage metrics to the platform
+         usageReportingInterval: "15"
+
+         # The percentage of all transactions that are sent to Amplify. A value of 0 reports no traffic
+         samplingPercentage: "10"
+         # When true, the percentage of API transactions sent will be based on each API ID in the transaction
+         samplingPerApi: true
+
+         # Protocol (https or tcp) to be used for communicating with ingestion service
+         protocol: "tcp"
+         # The socks5 or http URL of the proxy server for ingestion service. If empty, no proxy is defined.
+         proxyUrl: ""
+         # The gzip compression level for the output event
+         compressionLevel: 3
+         # The host name and port of the ingestion service to forward the transaction log entries
+         host: ""
+
+      extraEnvs: []
+      #   - name: MY_ENVIRONMENT_VAR
+      #     value: the_value_goes_here
+
+      # When traceability.enabled: true, the following injects the environment variables 
+      # from the ConfigMaps and Secrets into the traceability container. 
+      # Specify your own ConfigMaps or Secrets if you don't provide Configuration and 
+      # Secrets as part of this values.yaml.
+      envFrom: 
+      - configMapRef:
+        name: axway-apim-traceability-config
+      # Injects usernames, passwords, certificates and keys
+      - secretRef:
+        name: axway-apim-amplify-agents-secret
+
+      readinessProbe:
+         httpGet:
+            httpHeaders:
+               - name: k8sprobe
+                 value: readiness.traceabilityAgent
+            path: /status
+            port: 8989
+            scheme: HTTP
+         initialDelaySeconds: 10
+         periodSeconds: 20
+         successThreshold: 1
+         timeoutSeconds: 3
+
+      livenessProbe: 
+         httpGet:
+            httpHeaders:
+               - name: k8sprobe
+                 value: liveness.traceabilityAgent
+            path: /status
+            port: 8989
+            scheme: HTTP
+         initialDelaySeconds: 60
+         periodSeconds: 120
+         successThreshold: 1
+         timeoutSeconds: 3
+
+      labels: {}
+      podAnnotations: {}
+
+      resources: {}
+         # requests:
+         #    cpu: "100m"
+         #    memory: "200Mi"
+         # limits:
+         #    cpu: "500m"
+         #    memory: "500Mi"
 
    updateStrategy: {}
 
    podSecurityContext:
       runAsUser: 1000
       fsGroup: 1000
+
+   # Resources for all Agents containers (Discovery and Traceability)
+   initResources: {}
+   #   requests:
+   #      cpu: "25m"
+   #      memory: "80Mi"
+   #   limits:
+   #      cpu: "25m"
+   #      memory: "80Mi"
 
 ##################################################################################################################################
 #   PVCs

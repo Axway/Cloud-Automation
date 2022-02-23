@@ -40,7 +40,7 @@ spec:
       volumes:
       - name: agents-secret
         secret:
-          secretName: {{ template "discoveryAgent.name" . }}
+          secretName: {{ template "agentSecretName" . }}
         {{- range .Values.agents.discovery.secretMounts }}
         - name: {{ .name }}
           secret:
@@ -70,6 +70,8 @@ spec:
       - name: init-apimgmt
         image: busybox:1.33
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "apimgr.name" . }} 8075; do echo waiting for apimgr; sleep 2; done;']
+        resources:
+{{ toYaml .Values.agents.initResources | indent 10 }}
       {{- if .Values.agents.discovery.extraInitContainers }}
 {{ tpl .Values.agents.discovery.extraInitContainers . | indent 6 }}
       {{- end }}
@@ -113,26 +115,88 @@ spec:
         - name: CENTRAL_AUTH_PUBLICKEY
           value: {{ default "/opt/keys/public_key.pem" .Values.agents.central.publicKeyLocation | quote }}
         - name: CENTRAL_AGENTNAME
-          value: {{ required "Missing .Values.agents.discovery.agentName" .Values.agents.discovery.agentName | quote }}
+          value: {{ required "Missing .Values.agents.discovery.config.agentName" .Values.agents.discovery.config.agentName | quote }}
+        - name: CENTRAL_APPENDENVIRONMENTTOTITLE
+          value: {{ default "true" .Values.agents.discovery.config.appendEnvironmentToTitle | quote }}
+        - name: CENTRAL_DEPLOYMENT
+          value: {{ .Values.agents.central.deployment | quote }}
+        - name: CENTRAL_URL
+          value: {{ .Values.agents.central.url | quote }}
+        - name: CENTRAL_PROXYURL
+          value: {{ .Values.agents.central.proxyUrl | quote }}
+        - name: CENTRAL_TEAM
+          value: {{ .Values.agents.central.team | quote }}
+        - name: CENTRAL_MODE
+          value: {{ .Values.agents.central.mode | quote }}
+        - name: CENTRAL_VERSIONCHECKER
+          value: {{ .Values.agents.central.versionChecker | quote }}
+          
         - name: APIMANAGER_HOST
-          value: {{ default $apimgrName .Values.agents.discovery.apimanager.host | quote }}
+          value: {{ default $apimgrName .Values.agents.apimanager.host | quote }}
         - name: APIMANAGER_PORT
-          value: {{ default "8075" .Values.agents.discovery.apimanager.port | quote }}
+          value: {{ default "8075" .Values.agents.apimanager.port | quote }}
         - name: APIMANAGER_AUTH_USERNAME
-          value: {{ required "Missing .Values.agents.discovery.apimanager.username" .Values.agents.discovery.apimanager.username | quote }}
+          value: {{ required "Missing .Values.agents.apimanager.username" .Values.agents.apimanager.username | quote }}
         - name: APIMANAGER_AUTH_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "discoveryAgentSecretName" . }}
-              key: apimgr-auth-password
+              name: {{ template "agentSecretName" . }}
+              key: APIMANAGER_AUTH_PASSWORD
         - name: APIMANAGER_SSL_INSECURESKIPVERIFY
-          value: {{ default "false" .Values.agents.discovery.apimanager.insecureSSL | quote }}
+          value: {{ default "false" .Values.agents.apimanager.insecureSSL | quote }}
         - name: LOG_LEVEL
-          value: {{ default "info" .Values.agents.discovery.logLevel | quote }}
+          value: {{ default "info" .Values.agents.discovery.config.logLevel | quote }}
         - name: LOG_OUTPUT
-          value: {{ default "stdout" .Values.agents.discovery.logOutput | quote }}
-        - name: LOG_PATH
-          value: {{ default "logs" .Values.agents.discovery.logPath | quote }}
+          value: {{ default "stdout" .Values.agents.discovery.config.logOutput | quote }}
+        - name: LOG_FILE_PATH
+          value: {{ default "logs" .Values.agents.discovery.config.logFilePath | quote }}
+        - name: APIMANAGER_ALLOWAPPLICATIONAUTOCREATION
+          value: {{ default "true" .Values.agents.discovery.config.allowApplicationAutoCreation | quote }}
+        - name: CENTRAL_SUBSCRIPTIONS_APPROVAL_MODE
+          value: {{ default "manual" .Values.agents.discovery.config.subscriptionsApprovalMode | quote }}
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_WEBHOOK_URL
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsWebhookUrl | quote }}
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_WEBHOOK_HEADERS
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsWebhookHeaders | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_APPROVAL_WEBHOOK_URL
+          value: {{ .Values.agents.discovery.config.subscriptionsApprovalWebhookUrl | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_APPROVAL_WEBHOOK_HEADERS
+          value: {{ .Values.agents.discovery.config.subscriptionsApprovalWebhookHeaders | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_APPROVAL_WEBHOOK_AUTHSECRET
+          value: {{ .Values.agents.discovery.config.subscriptionsApprovalWebhookAuthSecret | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_HOST
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpHost | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_PORT
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpPort | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_AUTHTYPE
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpAuthType | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_USERNAME
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpUsername | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_PASSWORD
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpPassword | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_FROMADDRESS
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpFromAddress | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_SUBSCRIBE_SUBJECT
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpSubscribeSubject | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_SUBSCRIBE_BODY
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpSubscribeBody | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_SUBSCRIBE_OAUTH
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpSubscribeOAuth | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_SUBSCRIBE_APIKEYS
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpSubscribeAPIKeys | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_UNSUBSCRIBE_SUBJECT
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpUnsubscribeSubject | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_UNSUBSCRIBE_BODY
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpUnsubscribeBody | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_SUBSCRIBEFAILED_SUBJECT
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpSubscribeFailedSubject | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_SUBSCRIBEFAILED_BODY
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpSubscribeFailedBody | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_UNSUBSCRIBEFAILED_SUBJECT
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpUnsubscribeFailedSubject | quote }} 
+        - name: CENTRAL_SUBSCRIPTIONS_NOTIFICATIONS_SMTP_UNSUBSCRIBEFAILED_BODY
+          value: {{ .Values.agents.discovery.config.subscriptionsNotificationsSmtpUnsubscribeFailedBody | quote }} 
+          
         {{- if .Values.agents.discovery.extraEnvs }}
 {{ toYaml .Values.agents.discovery.extraEnvs | indent 8 }}
         {{- end }}
