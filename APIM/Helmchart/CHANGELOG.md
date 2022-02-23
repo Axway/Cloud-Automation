@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.6.0] 2022-02-23
 
 ### Added
 - Support the Axway Amplify Discovery- and Traceability-Agents
