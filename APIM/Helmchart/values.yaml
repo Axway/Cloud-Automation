@@ -1036,10 +1036,10 @@ agents:
       # Secrets as part of this values.yaml.
       envFrom: 
       - configMapRef:
-        name: axway-apim-traceability-config
+          name: axway-apim-traceability-config
       # Injects usernames, passwords, certificates and keys
       - secretRef:
-        name: axway-apim-amplify-agents-secret
+          name: axway-apim-amplify-agents-secret
 
       readinessProbe:
          httpGet:
