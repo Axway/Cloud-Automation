@@ -135,6 +135,8 @@ spec:
         resources:
 {{ toYaml .Values.anm.resources | indent 10 }}
         env:
+        - name: ACCEPT_GENERAL_CONDITIONS
+          value: {{ required ".Values.global.acceptGeneralConditions must be set to yes" .Values.global.acceptGeneralConditions | quote }}
         - name: EMT_TOPOLOGY_TTL
           value: {{ default "120" .Values.anm.config.emtTopologyTtl | quote }}
         - name: EMT_DEPLOYMENT_ENABLED

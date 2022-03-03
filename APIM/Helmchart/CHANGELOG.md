@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- Support for the 2022-Februray release
+  - Added require the new required flag `global.acceptGeneralConditions` to control the flag ACCEPT_GENERAL_CONDITIONS
+- By default OpenTraffic event log for the traceability agent is now disabled
+
 ## [2.6.0] 2022-02-23
 
 ### Added

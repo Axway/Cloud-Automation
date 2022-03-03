@@ -5,6 +5,7 @@ global:
   domainName: "axway-apim-on-gke.com"
   dockerRepository: "ghcr.io/cwiechmann/axway-api-management-automated"
   imageTag: "77-20211130-1-eed8beb"
+  acceptGeneralConditions: "yes"
 
 ##################################################################################################################################
 #   A D M I N - N O D E M A N A G E R

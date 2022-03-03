@@ -154,6 +154,8 @@ spec:
         resources:
 {{ toYaml .Values.apitraffic.resources | indent 10 }}
         env: 
+        - name: ACCEPT_GENERAL_CONDITIONS
+          value: {{ required ".Values.global.acceptGeneralConditions must be set to yes" .Values.global.acceptGeneralConditions | quote }}
         - name: EMT_ANM_HOSTS
         {{- if .Values.apitraffic.config.emtAnmHosts }}
           value: {{ .Values.apitraffic.config.emtAnmHosts | quote }}

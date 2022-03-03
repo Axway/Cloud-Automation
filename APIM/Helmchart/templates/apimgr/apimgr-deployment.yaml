@@ -133,6 +133,8 @@ spec:
         resources:
 {{ toYaml .Values.apimgr.resources | indent 10 }}
         env:
+        - name: ACCEPT_GENERAL_CONDITIONS
+          value: {{ required ".Values.global.acceptGeneralConditions must be set to yes" .Values.global.acceptGeneralConditions | quote }}
         - name: EMT_ANM_HOSTS
         {{- if .Values.apimgr.config.emtAnmHosts }}
           value: {{ .Values.apimgr.config.emtAnmHosts | quote }}

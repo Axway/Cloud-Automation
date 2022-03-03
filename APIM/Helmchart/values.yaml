@@ -41,6 +41,8 @@ global:
    # If you want to use your own secret, specify the name of the secret here, 
    # which contains the license Base64 encoded with key license
    existingLicenseSecret: 
+   # Sets the required flag ACCEPT_GENERAL_CONDITIONS for ANM, APIMGR and APITRAFFIC container
+   acceptGeneralConditions: 
 
 ##################################################################################################################################
 #   A D M I N - N O D E M A N A G E R
@@ -965,11 +967,12 @@ agents:
       # A selection of the most important parameters for the traceability agent that are used 
       # to create the ConfigMap which is referenced below by envFrom
       config: 
+         # You have to enable either Event-Log or OpenTraffic-Event log, but not both
          eventLogInput: true
          eventLogPaths: /events/DefaultGroup_traffic-*.log
          # Used to disable/enable the OpenTraffic log input for the Traceability Agent
          # Please note: This is required if you want to send Request- and Response-Header information
-         openTrafficInput: true
+         openTrafficInput: false
          # The paths, comma separated, to the open traffic logs that need to be watched
          openTrafficPaths: /opentraffic/DefaultGroup_traffic-*.log
          # The required agent name of this agent on Amplify Central. The agent must have been configed on Central before
