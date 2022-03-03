@@ -7,4 +7,4 @@
   - `./examples/google-gke/README.md`
 - Update the `CHANGELOG.md`
 - Commit and Push
-- Create a release on GitHub with tag schema: `apim-helm-v2.6.0`
+- Create a release on GitHub with tag schema: `apim-helm-v2.7.0`

@@ -2,12 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.7.0] 2022-03-03
 
 ### Added
 - Support for the 2022-Februray release
   - Added require the new required flag `global.acceptGeneralConditions` to control the flag ACCEPT_GENERAL_CONDITIONS
 - By default OpenTraffic event log for the traceability agent is now disabled
+- Updated Helm-Chart dependencies
+  - bitnami/mysql 8.8.25 --> 8.8.26
+  - bitnami/common 1.11.1 --> 1.11.3
 
 ## [2.6.0] 2022-02-23
 

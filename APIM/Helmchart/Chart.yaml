@@ -1,8 +1,8 @@
 apiVersion: v2
 
-appVersion: 7.7-20210830
+appVersion: 7.7-20220228
 
-version: "2.6.0"
+version: "2.7.0"
 
 description: Helm chart for installing the Axway API-Management solution.
 icon: https://images.app.goo.gl/MbQyRo2M2jzAsed79
