@@ -1307,6 +1307,9 @@ mysqlmetrics:
          enabled: true
          existingClaim: apigw-mysql-metrics
 
+      # Configure to remove binLogs are 7 days instead of default 30
+      extraFlags: "--binlog-expire-logs-seconds=604800"
+
    auth: 
       database: "metrics"
       # If not set a password is randomly generated
@@ -1342,6 +1345,9 @@ mysqlapiportal:
       persistence:
          enabled: true
          existingClaim: apigw-mysql-apiportal
+
+      # Configure to remove binLogs are 7 days instead of default 30
+      extraFlags: "--binlog-expire-logs-seconds=604800"
 
    auth: 
       database: "apiportal"

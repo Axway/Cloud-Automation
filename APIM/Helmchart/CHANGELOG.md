@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] 
+
+### Changed
+- Remove Binlogs of Metrics- and API-Portal-MySQL after 7 instead of 30 days
+
 ## [2.7.0] 2022-03-03
 
 ### Added
