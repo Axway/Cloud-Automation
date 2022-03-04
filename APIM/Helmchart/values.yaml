@@ -503,7 +503,7 @@ apitraffic:
       httpGet:
          httpHeaders:
          - name: k8sprobe
-           value: readiness.apimgr
+           value: readiness.apitraffic
          path: /healthcheck
          port: plain
          scheme: HTTP
@@ -518,7 +518,7 @@ apitraffic:
          port: plain
          httpHeaders:
          - name: k8sprobe
-           value: liveness.apimgr
+           value: liveness.apitraffic
          scheme: HTTP
       initialDelaySeconds: 300
       periodSeconds: 30

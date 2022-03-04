@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Remove Binlogs of Metrics- and API-Portal-MySQL after 7 instead of 30 days
+- apitraffic probes now send the header k8sprobe: readiness.apitraffic instead of k8sprobe: readiness.apimgr
 
 ## [2.7.0] 2022-03-03
 
