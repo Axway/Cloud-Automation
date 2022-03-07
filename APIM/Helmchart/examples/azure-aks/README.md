@@ -1,11 +1,12 @@
 # Deploy APIM without ingress controller
-## Create namespace
+## Prerequisites
+### Create namespace
 It's recommended to create a dedicated namespace to deploy this demo.
 ```
 Kubectl create ns apim-demo
 ```
 
-## Add Demo docker registry
+### Add Demo docker registry
 This docker registry contains basic APIM docker images with some defaults parameters.
 Those images have a short license term (Max 2 months). 
 
@@ -18,13 +19,19 @@ kubectl create secret docker-registry axway-demo-registry \
     --docker-email=demo@axway.com -n apim-demo
 ```
 
-## Create External services
+### Create External services
 Create  simple load balancer access
 ```
 kubectl apply -f APIM/Helmchart/examples/azure-aks/azure-externalservices.yaml -n apim-demo
 ```
 
-## Deploy APIM
+### Add APIPortal certificates.
+API-Portal requires some server certificate to start correctly. THe following step import a demo certificate.
+```
+kubectl apply -f APIM/Helmchart/examples/azure-aks/azure-portal-secrets.yaml -n apim-demo
+```
+
+## APIM deployment
 ```
 helm install apim-demo APIM/Helmchart -n apim-demo -f APIM/Helmchart/examples/azure-aks/azure-aks-example-noingress-value.yaml
 ```

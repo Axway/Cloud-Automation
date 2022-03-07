@@ -154,7 +154,7 @@ spec:
         - name: APIMANAGER_HOST
           value: {{ default $apimgrName .Values.apiportal.config.master.host | quote }}
         - name: APIMANAGER_PORT
-          value: {{ default "8075" .Values.apiportal.config.master.host | quote }}
+          value: {{ default "8075" .Values.apiportal.config.master.port | quote }}
 {{ if .Values.apiportal.config.tryIt }}
         - name: TRYIT_METHODS_CONFIGURED
           value: "1"

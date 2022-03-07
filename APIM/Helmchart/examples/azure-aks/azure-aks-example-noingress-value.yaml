@@ -2,7 +2,7 @@ global:
   imagePullSecrets:
   - name: axway-demo-registry
 
-  domainName: ""
+  domainName: "test.demoaxway.int"
   dockerRepository: "docker-registry.demo.axway.com/demo-public"
   imageTag: "1.1.1"
   imagePullPolicy: "Always"
@@ -52,7 +52,7 @@ apiportal:
       master:
          name: "Master"
          host: "apimgr"
-         port: "8075"
+         port: 8075
       ssl:
          enabled: true
          generateCertificates: true
