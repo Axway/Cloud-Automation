@@ -1,0 +1,129 @@
+global:
+  imagePullSecrets:
+  - name: axway-demo-registry
+
+  domainName: "8f4dee74948d48c8aae4.northeurope.aksapp.io"
+  dockerRepository: "docker-registry.demo.axway.com/demo-public"
+  imageTag: "1.1.1"
+  imagePullPolicy: "Always"
+
+##################################################################################################################################
+#   A D M I N - N O D E M A N A G E R
+##################################################################################################################################
+anm:
+   enabled: true
+   image: "anm-demo-7.7-20211130"
+   ingress:
+      enabled: false
+
+##################################################################################################################################
+#   API MANAGER
+##################################################################################################################################
+apimgr:
+   enabled: true
+   image: "gtw-demo-int-7.7-20211130"
+   imageTag: "1.1.0"
+   ingress:
+      enabled: false
+
+##################################################################################################################################
+#   API TRAFFIC
+##################################################################################################################################
+apitraffic:
+   enabled: true
+   image: "gtw-demo-int-7.7-20211130"
+   imageTag: "1.1.0"
+   ingress:
+      enabled: false
+
+##################################################################################################################################
+#   API PORTAL
+##################################################################################################################################
+apiportal:
+   enabled: false
+   image: "apim-portal-7.7"
+   imageTag: "20211130"
+   ingress:
+      enabled: false
+
+   redis:
+      enabled: true
+      internal: true
+
+##################################################################################################################################
+#   INTERNAL CASSANDRA DATABASE
+##################################################################################################################################
+cassandra:
+   internal: true
+
+##################################################################################################################################
+#   INTERNAL ANALYTICS/METRICS DATABASE
+##################################################################################################################################
+mysqlmetrics:
+   internal: true
+
+##################################################################################################################################
+#   INTERNAL API-Portal DATABASE
+##################################################################################################################################
+mysqlapiportal:
+   internal: true
+
+
+##################################################################################################################################
+#   PVCs
+##################################################################################################################################
+pvcs:
+   # Events is used by ANM, APIMGR and APITRAFFIC
+   events:
+      # If disabled an emptyDir volume is used instead
+      # Useful if you stream log information to an external logging system
+      enabled: true
+      eventsVolumeClaim:
+         accessModes: [ "ReadWriteMany" ]
+         storageClassName: azurefile-premium
+         resources:
+            requests:
+               storage: 10Gi
+         #volumeName: apim-events-pv
+
+   opentraffic:
+      enabled: false
+   trace:
+      enabled: false
+
+##################################################################################################################################
+#   AMPLIFY AGENTS
+##################################################################################################################################
+
+agents:
+   central:
+      clientId: DOSA_02ea38d..................b17df8f
+      organizationId: 230.........343
+      environment: my-v7-environment
+      privateKey: |
+         -----BEGIN PRIVATE KEY-----
+         MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCy6I5t5R0qKHWR
+         UN7Cgzz2raYhdZzQKWktVRvNnAVaJKrmK981nNIWqB8enooRTDVFEp7XazAZGDVN
+         .....
+         .........
+         .....
+         UHIriuIHpSr6yz1Foataxpo=
+         -----END PRIVATE KEY-----
+      publicKey: |
+         -----BEGIN PUBLIC KEY-----
+         MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsuiObeUdKih1kVDewoM8
+         9q2mIXWc0ClpLVUbzZwFWiSq5ivfNZzSFqgfHp6KEUw1RRKe12swGRg1TWr5DBs/
+         .....
+         .........
+         .....
+         ClLsxTTMKk0EqOgjnNY/rlNUplgb7tnfHsEhBbtYWzQFhBQQ+sv8nK/DUljXYP9z
+         GwIDAQAB
+         -----END PUBLIC KEY-----
+   discovery:
+      enabled: false
+      agentName: "2312"
+      apimanager:
+         username: apiadmin
+         password: highly-secure
+         insecureSSL: "true"
+ 

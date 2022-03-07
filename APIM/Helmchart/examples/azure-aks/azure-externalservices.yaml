@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: public-svc-anm
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8090
+  selector:
+    app.kubernetes.io/name: anm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: public-svc-mngrui
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8075
+  selector:
+    app.kubernetes.io/name: apimgr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: public-svc-apitraffic
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8065
+  selector:
+    app.kubernetes.io/name: traffic
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: public-svc-apiortal
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 443
+  selector:
+    app.kubernetes.io/name: apiportal
