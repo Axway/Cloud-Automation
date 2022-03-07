@@ -12,7 +12,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: public-svc-mngrui
+  name: public-svc-apimgr
 spec:
   type: LoadBalancer
   ports:
@@ -23,7 +23,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: public-svc-apitraffic
+  name: public-svc-traffic
 spec:
   type: LoadBalancer
   ports:
@@ -34,10 +34,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: public-svc-apiortal
+  name: public-svc-portal
 spec:
   type: LoadBalancer
   ports:
   - port: 443
   selector:
-    app.kubernetes.io/name: apiportal
+    app.kubernetes.io/name: portal

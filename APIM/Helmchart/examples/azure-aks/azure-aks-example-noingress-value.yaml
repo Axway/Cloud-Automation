@@ -2,7 +2,7 @@ global:
   imagePullSecrets:
   - name: axway-demo-registry
 
-  domainName: "8f4dee74948d48c8aae4.northeurope.aksapp.io"
+  domainName: ""
   dockerRepository: "docker-registry.demo.axway.com/demo-public"
   imageTag: "1.1.1"
   imagePullPolicy: "Always"
@@ -15,6 +15,8 @@ anm:
    image: "anm-demo-7.7-20211130"
    ingress:
       enabled: false
+
+   nameOverride: anm
 
 ##################################################################################################################################
 #   API MANAGER
@@ -40,15 +42,26 @@ apitraffic:
 #   API PORTAL
 ##################################################################################################################################
 apiportal:
-   enabled: false
-   image: "apim-portal-7.7"
-   imageTag: "20211130"
+   enabled: true
+   image: "apim-portal-demo-7.7-20211130"
+   imageTag: "1.0.0"
    ingress:
       enabled: false
+
+   config:
+      master:
+         name: "Master"
+         host: "apimgr"
+         port: "8075"
+      ssl:
+         enabled: true
+         generateCertificates: true
 
    redis:
       enabled: true
       internal: true
+
+   nameOverride: "portal"
 
 ##################################################################################################################################
 #   INTERNAL CASSANDRA DATABASE
