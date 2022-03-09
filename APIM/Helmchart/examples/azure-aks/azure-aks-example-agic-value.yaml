@@ -2,9 +2,9 @@ global:
   imagePullSecrets:
   - name: axway-demo-registry
 
-  domainName: "8f4dee74948d48c8aae4.northeurope.aksapp.io"
-  dockerRepository: "axwayproductsdemo.azurecr.io"
-  imageTag: "20211130"
+  domainName: "test.demoaxway.int"
+  dockerRepository: "docker-registry.demo.axway.com/demo-public"
+  imageTag: "1.1.1"
   imagePullPolicy: "Always"
 
 ##################################################################################################################################
@@ -12,7 +12,7 @@ global:
 ##################################################################################################################################
 anm:
    enabled: true
-   image: "apim-anm-7.7"
+   image: "anm-demo-7.7-20211130"
    ingress:
       enabled: true
       annotations: 
@@ -38,21 +38,21 @@ anm:
             - anm.8f4dee74948d48c8aae4.northeurope.aksapp.io
            secretName: anm-tls-secret 
 
+   nameOverride: anm
 
 ##################################################################################################################################
 #   API MANAGER
 ##################################################################################################################################
 apimgr:
    enabled: true
-   image: "apim-gtw-7.7"
-   imageTag: "20211130"
+   image: "gtw-demo-int-7.7-20211130"
+   imageTag: "1.1.0"
    ingress:
       enabled: true
       annotations: 
         # https://azure.github.io/application-gateway-kubernetes-ingress/annotations/
         #kubernetes.io/ingress.class: azure/application-gateway
         #appgw.ingress.kubernetes.io/backend-protocol: https
-
         #appgw.ingress.kubernetes.io/ssl-redirect: "true"
         #appgw.ingress.kubernetes.io/appgw-ssl-certificate: "manager-certificate"
         #appgw.ingress.kubernetes.io/connection-draining: "true"
@@ -76,8 +76,8 @@ apimgr:
 ##################################################################################################################################
 apitraffic:
    enabled: true
-   image: "apim-gtw-7.7"
-   imageTag: "20211130"
+   image: "gtw-demo-int-7.7-20211130"
+   imageTag: "1.1.0"
    ingress:
       enabled: true
       name: traffic
@@ -109,8 +109,8 @@ apitraffic:
 ##################################################################################################################################
 apiportal:
    enabled: true
-   image: "apim-portal-7.7"
-   imageTag: "20211130"
+   image: "apim-portal-demo-7.7-20211130"
+   imageTag: "1.0.0"
    ingress:
       enabled: true
       name: portal
@@ -137,9 +137,20 @@ apiportal:
             - portal.8f4dee74948d48c8aae4.northeurope.aksapp.io
            secretName: apiportal-tls-secret 
 
+   config:
+      master:
+         name: "Master"
+         host: "apimgr"
+         port: 8075
+      ssl:
+         enabled: true
+         generateCertificates: true
+
    redis:
       enabled: true
       internal: true
+
+   nameOverride: "portal"
 
 ##################################################################################################################################
 #   INTERNAL CASSANDRA DATABASE
@@ -158,6 +169,28 @@ mysqlmetrics:
 ##################################################################################################################################
 mysqlapiportal:
    internal: true
+
+##################################################################################################################################
+#   PVCs
+##################################################################################################################################
+pvcs:
+   # Events is used by ANM, APIMGR and APITRAFFIC
+   events:
+      # If disabled an emptyDir volume is used instead
+      # Useful if you stream log information to an external logging system
+      enabled: true
+      eventsVolumeClaim:
+         accessModes: [ "ReadWriteMany" ]
+         storageClassName: azurefile-premium
+         resources:
+            requests:
+               storage: 10Gi
+         #volumeName: apim-events-pv
+
+   opentraffic:
+      enabled: false
+   trace:
+      enabled: false
 
 ##################################################################################################################################
 #   AMPLIFY AGENTS

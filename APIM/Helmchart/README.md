@@ -32,6 +32,7 @@ As a kick-starter, we have already provided sample values files including docume
 | Distribution                             | Helm-Chart version  | Comment                                        | 
 | :---                                     | :---                | :---                                           |
 | [AWS-EKS](examples/aws-eks)              | >= v2.0.0           |                                                |
+| [AZURE-AKS](examples/azure-aks)          | >= v2.0.0           |                                                |
 | [Google GKE](examples/google-gke)        | >= v2.1.0           |                                                |
 | [OpenShift](examples/openshift)          | >= v2.x.x           | To be validated with refactored Helm-Chart     |
 

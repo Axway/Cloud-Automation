@@ -1,7 +1,7 @@
-# Deploy APIM without ingress controller
+# Deploy APIM on AKS without ingress controller
 ## Prerequisites
 ### Create namespace
-It's recommended to create a dedicated namespace to deploy this demo.
+It's recommended to create a dedicated namespace to deploy the demo.
 ```
 Kubectl create ns apim-demo
 ```
