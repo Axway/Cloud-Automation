@@ -92,11 +92,11 @@ spec:
       initContainers:
       {{- if .Values.mysqlapiportal.internal }}
       - name: init-mysql-apiportal
-        image: busybox:1.33
+        image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "mysqlapiportal.name" . }} {{ .Values.mysqlapiportal.primary.service.port }}; do echo waiting for apiportal mysql; sleep 2; done;']
       {{- end }}
       - name: init-apimgmt
-        image: busybox:1.33
+        image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "apimgr.name" . }} 8075; do echo waiting for apimgr; sleep 2; done;']
       {{- if .Values.apiportal.extraInitContainers }}
 {{ tpl .Values.apiportal.extraInitContainers . | indent 6 }}

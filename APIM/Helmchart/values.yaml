@@ -42,6 +42,9 @@ global:
    # which contains the license Base64 encoded with key license
    existingLicenseSecret: 
 
+   # Setup the docker registry of the init image. By default busybox hosted on docker.io
+   # initContainerImage: busybox:1.33
+
 ##################################################################################################################################
 #   A D M I N - N O D E M A N A G E R
 ##################################################################################################################################
