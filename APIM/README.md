@@ -8,7 +8,7 @@ Theses assets to deploy AMPLIFY API Management on a cloud providers and learn ab
 Join the Axway community **Cloud - Automation** to share your needs and have some help.
 
 ## Table of Contents
-- [Techlabs on the solution in EMT mode](Techlabs/techlabsSummary.md) ]
+- [Techlabs on the solution in EMT mode](Techlabs/techlabsSummary.md)
 - [Play with helmchart in a specific context](Helmchart/README.md)
 
 

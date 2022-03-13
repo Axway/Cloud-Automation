@@ -17,22 +17,24 @@ anm:
       enabled: true
       annotations: 
         # https://azure.github.io/application-gateway-kubernetes-ingress/annotations/
-      #   kubernetes.io/ingress.class: azure/application-gateway
-      #   appgw.ingress.kubernetes.io/backend-protocol: https
-      #   cert-manager.io/cluster-issuer: letsencrypt
-      #   cert-manager.io/acme-challenge-type: http01
-      #   appgw.ingress.kubernetes.io/ssl-redirect: "true"
-      #   appgw.ingress.kubernetes.io/appgw-ssl-certificate: "anm-certificate"
-      #   appgw.ingress.kubernetes.io/connection-draining: "true"
-      #   appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
-        # Set this annotation only if the AKS cluster has been configured with the add-on "HTTP application routing".
-        # This add-on create a public DNS zone automatically. It mustn't be used in production.
-        kubernetes.io/ingress.class: addon-http-application-routing
+        kubernetes.io/ingress.class: azure/application-gateway
+        appgw.ingress.kubernetes.io/backend-protocol: https
+        appgw.ingress.kubernetes.io/ssl-redirect: "true"
+        appgw.ingress.kubernetes.io/connection-draining: "true"
+        appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
 
-        # Only if Cert-manager is used. The cluster-issuer letsencrypt-prod must be added as explained in prerequisites.
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-        cert-manager.io/acme-challenge-type: http01
-        
+        # Set this annotation only if the AKS cluster has been configured with the add-on "HTTP application routing".
+        # This add-on create a public DNS zone automatically. It mustn't be used in production. Not tested
+        #kubernetes.io/ingress.class: addon-http-application-routing
+
+        # The following annotations must be used only if cert-manager and issuer is deployed.
+        #cert-manager.io/cluster-issuer: letsencrypt
+        #cert-manager.io/acme-challenge-type: http01
+
+        # The root CA must be imported only if certificates are signed with a private authority
+        #appgw.ingress.kubernetes.io/appgw-trusted-root-certificate: "apim-root-ca" 
+
+      # hosts must be changed and use the domainname.        
       tls:
          - hosts: 
             - anm.8f4dee74948d48c8aae4.northeurope.aksapp.io
@@ -51,21 +53,24 @@ apimgr:
       enabled: true
       annotations: 
         # https://azure.github.io/application-gateway-kubernetes-ingress/annotations/
-        #kubernetes.io/ingress.class: azure/application-gateway
-        #appgw.ingress.kubernetes.io/backend-protocol: https
-        #appgw.ingress.kubernetes.io/ssl-redirect: "true"
-        #appgw.ingress.kubernetes.io/appgw-ssl-certificate: "manager-certificate"
-        #appgw.ingress.kubernetes.io/connection-draining: "true"
-        #appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
+        kubernetes.io/ingress.class: azure/application-gateway
+        appgw.ingress.kubernetes.io/backend-protocol: https
+        appgw.ingress.kubernetes.io/ssl-redirect: "true"
+        appgw.ingress.kubernetes.io/connection-draining: "true"
+        appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
+
         # Set this annotation only if the AKS cluster has been configured with the add-on "HTTP application routing".
-        # This add-on create a public DNS zone automatically. It mustn't be used in production.
-        kubernetes.io/ingress.class: addon-http-application-routing
+        # This add-on create a public DNS zone automatically. It mustn't be used in production. Not tested
+        #kubernetes.io/ingress.class: addon-http-application-routing
 
-        # The following annotations must be used only if cert-manager is deployed.
-        # They specify how the issuer 
-        cert-manager.io/cluster-issuer: letsencrypt
-        cert-manager.io/acme-challenge-type: http01
+        # The following annotations must be used only if cert-manager and issuer is deployed.
+        #cert-manager.io/cluster-issuer: letsencrypt
+        #cert-manager.io/acme-challenge-type: http01
 
+        # The root CA must be imported only if certificates are signed with a private authority
+        #appgw.ingress.kubernetes.io/appgw-trusted-root-certificate: "apim-root-ca" 
+
+      # hosts must be changed and use the domainname.
       tls:
          - hosts: 
             - manager.8f4dee74948d48c8aae4.northeurope.aksapp.io
@@ -83,22 +88,24 @@ apitraffic:
       name: traffic
       annotations: 
         # https://azure.github.io/application-gateway-kubernetes-ingress/annotations/
-        #kubernetes.io/ingress.class: azure/application-gateway
-        #appgw.ingress.kubernetes.io/backend-protocol: https
+        kubernetes.io/ingress.class: azure/application-gateway
+        appgw.ingress.kubernetes.io/backend-protocol: https
+        appgw.ingress.kubernetes.io/ssl-redirect: "true"
+        appgw.ingress.kubernetes.io/connection-draining: "true"
+        appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
 
-        #appgw.ingress.kubernetes.io/ssl-redirect: "true"
-        #appgw.ingress.kubernetes.io/appgw-ssl-certificate: "traffic-certificate"
-        #appgw.ingress.kubernetes.io/connection-draining: "true"
-        #appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
         # Set this annotation only if the AKS cluster has been configured with the add-on "HTTP application routing".
-        # This add-on create a public DNS zone automatically. It mustn't be used in production.
-        kubernetes.io/ingress.class: addon-http-application-routing
+        # This add-on create a public DNS zone automatically. It mustn't be used in production. Not tested
+        #kubernetes.io/ingress.class: addon-http-application-routing
 
-        # The following annotations must be used only if cert-manager is deployed.
-        # They specify how the issuer 
-        cert-manager.io/cluster-issuer: letsencrypt
-        cert-manager.io/acme-challenge-type: http01
+        # The following annotations must be used only if cert-manager and issuer is deployed.
+        #cert-manager.io/cluster-issuer: letsencrypt
+        #cert-manager.io/acme-challenge-type: http01
 
+        # The root CA must be imported only if certificates are signed with a private authority
+        #appgw.ingress.kubernetes.io/appgw-trusted-root-certificate: "apim-root-ca" 
+
+      # hosts must be changed and use the domainname.
       tls:
          - hosts: 
             - traffic.8f4dee74948d48c8aae4.northeurope.aksapp.io
@@ -116,22 +123,24 @@ apiportal:
       name: portal
       annotations: 
         # https://azure.github.io/application-gateway-kubernetes-ingress/annotations/
-        #kubernetes.io/ingress.class: azure/application-gateway
-        #appgw.ingress.kubernetes.io/backend-protocol: https
+        kubernetes.io/ingress.class: azure/application-gateway
+        appgw.ingress.kubernetes.io/backend-protocol: https
+        appgw.ingress.kubernetes.io/ssl-redirect: "true"
+        appgw.ingress.kubernetes.io/connection-draining: "true"
+        appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
 
-        #appgw.ingress.kubernetes.io/ssl-redirect: "true"
-        #appgw.ingress.kubernetes.io/appgw-ssl-certificate: "apiportal-certificate"
-        #appgw.ingress.kubernetes.io/connection-draining: "true"
-        #appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
         # Set this annotation only if the AKS cluster has been configured with the add-on "HTTP application routing".
         # This add-on create a public DNS zone automatically. It mustn't be used in production.
-        kubernetes.io/ingress.class: addon-http-application-routing
+        # kubernetes.io/ingress.class: addon-http-application-routing
 
         # The following annotations must be used only if cert-manager is deployed.
-        # They specify how the issuer 
-        cert-manager.io/cluster-issuer: letsencrypt
-        cert-manager.io/acme-challenge-type: http01
+        #cert-manager.io/cluster-issuer: letsencrypt
+        #cert-manager.io/acme-challenge-type: http01
 
+        # The root CA must be imported only if certificates are signed with a private authority
+        #appgw.ingress.kubernetes.io/appgw-trusted-root-certificate: "apim-root-ca" 
+
+      # hosts must be changed and use the domainname.
       tls:
          - hosts: 
             - portal.8f4dee74948d48c8aae4.northeurope.aksapp.io

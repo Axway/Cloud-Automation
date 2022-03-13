@@ -84,9 +84,11 @@ spec:
 {{ toYaml .Values.global.imagePullSecrets | indent 8 }}
       {{- end }}
       initContainers:
+      {{- if .Values.cassandra.internal }}
       - name: init-cassandra
         image: busybox:1.33
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "cassandra.name" . }} {{ .Values.cassandra.service.port }}; do echo waiting for cassandra-0; sleep 2; done;']
+      {{- end }}
       {{- if .Values.mysqlmetrics.internal }}
       - name: init-mysql
         image: busybox:1.33
