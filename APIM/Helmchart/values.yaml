@@ -468,7 +468,7 @@ apitraffic:
       httpGet:
          httpHeaders:
          - name: k8sprobe
-           value: readiness.apimgr
+           value: readiness.traffic
          path: /healthcheck
          port: plain
          scheme: HTTP
@@ -483,7 +483,7 @@ apitraffic:
          port: plain
          httpHeaders:
          - name: k8sprobe
-           value: liveness.apimgr
+           value: liveness.traffic
          scheme: HTTP
       initialDelaySeconds: 300
       periodSeconds: 30
@@ -1013,6 +1013,8 @@ mysqlmetrics:
       persistence:
          enabled: true
          existingClaim: apigw-mysql-metrics
+
+   ssl: false
 
    auth: 
       database: "metrics"

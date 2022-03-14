@@ -274,7 +274,7 @@ spec:
         {{- end }}
         {{- if .Values.apiportal.envFrom }}
         envFrom:
-{{ toYaml .Values.apiportal.envFrom | indent 8 }}
+{{ toYaml .Values.apiportal.envFrom | indent 10 }}
         {{- end }}
         volumeMounts:
           {{- if .Values.apiportal.persistence.enabled }}
@@ -299,7 +299,7 @@ spec:
             {{- end }}
           {{- end }}
         {{- if .Values.apiportal.extraVolumeMounts }}
-{{ toYaml (.Values.apiportal.extraVolumeMounts ) | indent 8 }}
+{{ toYaml (.Values.apiportal.extraVolumeMounts ) | indent 10 }}
         {{- end }}
         {{- if .Values.apiportal.lifecycle }}
         lifecycle:

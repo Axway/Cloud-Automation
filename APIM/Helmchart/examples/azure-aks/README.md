@@ -9,6 +9,7 @@ Two deployment patterns are proposed here :
 THe Amplify API Management demo containers used are preconfigured for the container mode. Those images contains : 
 - Configuration to externalize all certs.
 - External Env Module to externalize SMTP configuration and TLS listener certificates.
+- All environment variables for container mode.
 
 
 ## Deploy APIM on AKS without ingress controller
@@ -144,7 +145,6 @@ You must proceed to the deployment if pod doesn't exist. please follow this [doc
 #### Certificates
 
 For services, such as the API-Manager, API-Traffic, etc. depending on the configuration one or more HTTPS Load-Balancers are created, that obviously require a certificate. 
-
 Azure doesn't have a service to generate certificates. But external solution exist.
 
 ##### Automatic import 
@@ -162,7 +162,7 @@ cert-manager   cert-manager-6d87886d5c-rwwg6   1/1     Running   0          52s
 
 An issuer is needed to generate a certificates. It's recommended to be deployed inside the same cert-manager namespace. Here is an example to use Let's Encrypt. Please process to any changes.
 ```
-wget -o local-values-aks-noingress.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/azure-aks/letsencrypt-clusterissuer-agic.yaml
+wget -o letsencrypt-clusterissuer-agic.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/azure-aks/letsencrypt-clusterissuer-agic.yaml
 kubectl apply -f ./letsencrypt-clusterissuer-agic.yaml -n cert-manager
 ```
 
@@ -170,18 +170,20 @@ Note: Cert Manager can also generate automatically some certificates signed by a
 
 ##### Manual import
 
-If you want to import custom certificates, you must create them manually.
+If you want to import custom certificates, You must create TLS certificates manually.
+The following command supposed that cert file contains must the fullchain.
 
 ```
 kubectl create secret tls anm-tls-secret --key="path/to/tls.key" --cert="path/to/tls.crt" -n apim
 kubectl create secret tls manager-tls-secret --key="path/to/tls.key" --cert="path/to/tls.crt" -n apim
 kubectl create secret tls traffic-tls-secret --key="path/to/tls.key" --cert="path/to/tls.crt" -n apim
-kubectl create secret generic apiportal-tls-secret --from-file="path/to/apache.key" --from-file="path/to/apache.crt" -n apim
+kubectl create secret tls apiportal-tls-secret --key="path/to/tls.key" --cert="path/to/tls.crt" -n apim
 ```
 
-The root certificate must also be loaded in a secret only if private.
+By default, Application Gateway store all public certificate authority.
+The root certificate must also be loaded in Azure applicationn gateway only if private.
 ```
-kubectl create secret generic apim-root-ca --from-file="path/to/root-ca.crt" -n apim
+az network application-gateway root-cert create --gateway-name <application gateway names --name apim-root-cert --resource-group <AKS managed Resource group or resource group of the application gateway>
 ```
 
 #### Add Demo docker registry
@@ -201,7 +203,7 @@ kubectl create secret docker-registry axway-demo-registry \
 For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our AZURE-AKS with no ingress [example](azure-aks-example-agic-values.yaml) as a base. Use the following command to get a local copy:  
 
 ```
-wget -o local-values-aks-noingress.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/azure-aks/azure-aks-example-agic-values.yaml
+wget -o local-values-aks-agic.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/azure-aks/azure-aks-example-agic-values.yaml
 ```
 
 Some modifications must be done :
@@ -215,13 +217,26 @@ You can overwrite all parameters of the base [`values.yaml`](../../values.yaml),
 
 To finally start the deployment into your Kubernetes Cluster using Helm, use now the following command:
 ```
-helm install axway-apim -n apim -f .\local-values-aks-noingress.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.3.0/helm-chart-axway-apim-2.3.0.tgz
+helm install axway-apim -n apim -f .\local-values-aks-agic.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.3.0/helm-chart-axway-apim-2.3.0.tgz
 ```
 
 Now wait that all containers are up and in running state with the following command : 
 ```
 kubectl get pods -n apim -w
 ```
+
+You can check also the configuration in the Azure Application Gateway.
+Configuration has been updated automatically so never change anything directly from the portal. All changes must be provided by annotation or configuration inside Kubernetes.
+
+
+Listeners
+![Application gateway listener](imgs/agic-listener.png)
+
+HTTP listeners exists because the value file example contains an annotation to redirect requests in https 
+
+Probes:
+![Application gateway probes](imgs/agic-probes.png)
+
 
 ### Access to APIM
 Use the fololowing command to known the URL. 

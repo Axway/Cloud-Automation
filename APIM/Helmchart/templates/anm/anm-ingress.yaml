@@ -31,7 +31,11 @@ spec:
         - path: {{ .path }}
           backend:
             serviceName: {{ template "anm.name" . }}
+            {{- if .Values.anm.trafficPortUI }}
+            servicePort: {{ .Values.anm.trafficPortUI }}
+            {{- else }}
             servicePort: {{ .servicePort | default $httpPort }}
+            {{- end }}
       {{- end }}
   {{- end }}
   {{- else }}
@@ -45,10 +49,18 @@ spec:
           service:
             name: {{ template "anm.name" . }}
             port:
+              {{- if .Values.anm.trafficPortUI }}
+              number: {{ .Values.anm.trafficPortUI }}
+              {{- else }}
               number: {{ .Values.anm.service.port | default .Values.anm.httpPort }}
+              {{- end }}
           {{- else }}
           serviceName: {{ template "anm.name" . }}
+          {{- if .Values.anm.trafficPortUI }}
+          servicePort: {{ .Values.anm.trafficPortUI }}
+          {{- else }}
           servicePort: {{ .Values.anm.service.port | default .Values.anm.httpPort }}
+          {{- end }}
           {{- end }}
 
   {{- end }}

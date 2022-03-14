@@ -1,4 +1,4 @@
-{{- if .Values.apimgr.enabled -}}
+{{- if and (.Values.apimgr.ingress.enabled) (.Values.apimgr.enabled) -}}
 {{- if ne .Values.global.platform "OPENSHIFT" }}
 
 {{- $apimgrName := include "apimgr.name" . -}}
