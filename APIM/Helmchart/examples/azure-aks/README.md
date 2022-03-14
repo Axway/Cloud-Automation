@@ -11,6 +11,7 @@ THe Amplify API Management demo containers used are preconfigured for the contai
 - External Env Module to externalize SMTP configuration and TLS listener certificates.
 - All environment variables for container mode.
 
+Azure Application Gateway requires that listener certificates are not self-signed and it can't ignore a bad SSL certificate. For this reason, the certificate configuration step is really important.
 
 ## Deploy APIM on AKS without ingress controller
 ### Additional AZURE-AKS Prerequisites
@@ -180,7 +181,7 @@ kubectl create secret tls traffic-tls-secret --key="path/to/tls.key" --cert="pat
 kubectl create secret tls apiportal-tls-secret --key="path/to/tls.key" --cert="path/to/tls.crt" -n apim
 ```
 
-By default, Application Gateway store all public certificate authority.
+By default, Application Gateway stores all public certificate authority.
 The root certificate must also be loaded in Azure applicationn gateway only if private.
 ```
 az network application-gateway root-cert create --gateway-name <application gateway names --name apim-root-cert --resource-group <AKS managed Resource group or resource group of the application gateway>
