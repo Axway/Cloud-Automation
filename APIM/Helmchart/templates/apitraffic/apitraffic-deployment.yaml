@@ -109,15 +109,20 @@ spec:
       - name: init-cassandra
         image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "cassandra.name" . }} {{ .Values.cassandra.service.port }}; do echo waiting for cassandra-0; sleep 2; done;']
-      {{- end }}
+        resources:
+{{ toYaml .Values.apitraffic.initResources | indent 10 }}
       {{- if .Values.mysqlmetrics.internal }}
       - name: init-mysql
         image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "mysqlmetrics.name" . }} {{ .Values.mysqlmetrics.primary.service.port }}; do echo waiting for mysql; sleep 2; done;']
+        resources:
+{{ toYaml .Values.apitraffic.initResources | indent 10 }}
       {{- end }}
       - name: init-anm
         image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "anm.name" . }} {{ .Values.anm.service.port }}; do echo waiting for anm; sleep 2; done;']
+        resources:
+{{ toYaml .Values.apitraffic.initResources | indent 10 }}
       {{- if .Values.apitraffic.extraInitContainers }}
 {{ tpl .Values.apitraffic.extraInitContainers . | indent 6 }}
       {{- end }}
@@ -150,6 +155,8 @@ spec:
         resources:
 {{ toYaml .Values.apitraffic.resources | indent 10 }}
         env: 
+        - name: ACCEPT_GENERAL_CONDITIONS
+          value: {{ required ".Values.global.acceptGeneralConditions must be set to yes" .Values.global.acceptGeneralConditions | quote }}
         - name: EMT_ANM_HOSTS
         {{- if .Values.apitraffic.config.emtAnmHosts }}
           value: {{ .Values.apitraffic.config.emtAnmHosts | quote }}
@@ -204,23 +211,23 @@ spec:
         {{- end }}
         volumeMounts:
         {{- if .Values.apitraffic.jvm.enabled }}
-        - name: apitraffic-jvmxml
-          mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
-          subPath: jvm.xml
+          - name: apitraffic-jvmxml
+            mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
+            subPath: jvm.xml
         {{- end }}
 {{- if $licenseSecret }}
-        - name: license
-          mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
-          subPath: license
+          - name: license
+            mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
+            subPath: license
 {{- end }}
-        - name: events
-          mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apitraffic.volumeMountsPaths.events | quote }}
-        - name: opentraffic
-          mountPath: {{ default "/opt/Axway/apigateway/logs/opentraffic" .Values.apitraffic.volumeMountsPaths.opentraffic | quote }}
-        - name: trace
-          mountPath: {{ default "/opt/Axway/apigateway/groups/emt-group/emt-service/trace" .Values.apitraffic.volumeMountsPaths.trace | quote }}
+          - name: events
+            mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apitraffic.volumeMountsPaths.events | quote }}
+          - name: opentraffic
+            mountPath: {{ default "/opt/Axway/apigateway/logs/opentraffic" .Values.apitraffic.volumeMountsPaths.opentraffic | quote }}
+          - name: trace
+            mountPath: {{ default "/opt/Axway/apigateway/groups/emt-group/emt-service/trace" .Values.apitraffic.volumeMountsPaths.trace | quote }}
         {{- if .Values.apitraffic.extraVolumeMounts }}
-{{ toYaml (.Values.apitraffic.extraVolumeMounts ) | indent 8 }}
+{{ toYaml (.Values.apitraffic.extraVolumeMounts ) | indent 10 }}
         {{- end }}
         {{- if .Values.apitraffic.lifecycle }}
         lifecycle:

@@ -32,6 +32,6 @@ spec:
 {{- end }}
   selector:
     {{- include "anm.selectorLabels" . | nindent 4 }}
-  sessionAffinity: ClientIP
+  sessionAffinity: {{ default "ClientIP" .Values.anm.service.sessionAffinity }}
   
 {{- end }}

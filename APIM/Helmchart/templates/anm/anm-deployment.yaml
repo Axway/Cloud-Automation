@@ -95,6 +95,8 @@ spec:
       - name: init-mysql
         image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "mysqlmetrics.name" . }} {{ .Values.mysqlmetrics.primary.service.port }}; do echo waiting for mysql; sleep 2; done;']
+        resources:
+{{ toYaml .Values.anm.initResources | indent 10 }}
       {{- end }}
       {{- if .Values.anm.extraInitContainers }}
 {{ tpl .Values.anm.extraInitContainers . | indent 6 }}
@@ -133,6 +135,8 @@ spec:
         resources:
 {{ toYaml .Values.anm.resources | indent 10 }}
         env:
+        - name: ACCEPT_GENERAL_CONDITIONS
+          value: {{ required ".Values.global.acceptGeneralConditions must be set to yes" .Values.global.acceptGeneralConditions | quote }}
         - name: EMT_TOPOLOGY_TTL
           value: {{ default "120" .Values.anm.config.emtTopologyTtl | quote }}
         - name: EMT_DEPLOYMENT_ENABLED

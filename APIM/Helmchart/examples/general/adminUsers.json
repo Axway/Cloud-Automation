@@ -1,0 +1,59 @@
+{
+    "productVersion":"7.7.0",
+    "version":5,
+    "timestamp":1644824738362,
+    "adminUsers":[
+       {
+          "id":"user-1",
+          "name":"admin",
+          "roles":[
+             "role-1",
+             "role-6",
+             "role-7"
+          ]
+       }
+    ],
+    "adminUserCredentials":{
+       "user-1":{
+          "passwordHistory":[
+             "$AAGQAAAAAQAC$2Qz1ffY5C9l3iI+pUo+waA==$RcjBasncvu6nQC4jG7dUCkPUTqnkziRWDQjdBoHhwWk="
+          ],
+          "passwordTimestamp":1644512468795
+       }
+    },
+    "adminUserRoles":[
+       {
+          "id":"role-1",
+          "name":"API Server Administrator",
+          "displayName":"API Gateway Administrator"
+       },
+       {
+          "id":"role-2",
+          "name":"API Server Operator",
+          "displayName":"API Gateway Operator"
+       },
+       {
+          "id":"role-5",
+          "name":"Deployer",
+          "displayName":"Deployer"
+       },
+       {
+          "id":"role-6",
+          "name":"KPS Administrator",
+          "displayName":"KPS Administrator"
+       },
+       {
+          "id":"role-7",
+          "name":"Policy Developer",
+          "displayName":"Policy Developer"
+       }
+    ],
+    "uniqueIdCounters":{
+       "Role":8,
+       "User":4
+    },
+    "adminUsersVersion":{
+       "version":5,
+       "timestamp":1644824738362
+    }
+ }

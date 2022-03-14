@@ -1,3 +1,6 @@
+{{/*
+Discovery agent name
+*/}}
 {{- define "discoveryAgent.name" -}}
 {{- if .Values.agents.discovery.nameOverride -}}
 {{ .Values.agents.discovery.nameOverride }}
@@ -6,16 +9,19 @@
 {{- end -}}
 {{- end -}}
 
+{{/*
+Traceability agent name
+*/}}
 {{- define "traceabilityAgent.name" -}}
 {{- if .Values.agents.traceability.nameOverride -}}
 {{ .Values.agents.traceability.nameOverride }}
 {{- else -}}
-{{- default .Chart.Name .Values.agents.traceability.nameOverride | trunc 63 | trimSuffix "-" -}}-traceabilityagent
+{{- default .Chart.Name .Values.agents.traceability.nameOverride | trunc 63 | trimSuffix "-" -}}-traceability
 {{- end -}}
 {{- end -}}
 
 {{/*
-Common labels
+Discovery agent common labels
 */}}
 {{- define "discoveryAgent.labels" -}}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -24,6 +30,9 @@ helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 {{ include "discoveryAgent.selectorLabels" . }}
 {{- end }}
 
+{{/*
+Traceability agent common labels
+*/}}
 {{- define "traceabilityAgent.labels" -}}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/version: {{ .Values.global.imageTag | quote }}
@@ -32,10 +41,10 @@ helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 {{- end }}
 
 {{/*
-Selector labels
+Discovery agent selector labels
 */}}
 {{- define "discoveryAgent.selectorLabels" -}}
-app.kubernetes.io/component: "discoveryAgent"
+app.kubernetes.io/component: "AxwayAmplifyAgent"
 app.kubernetes.io/name: {{ include "discoveryAgent.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- range $key, $value := .Values.agents.discovery.labels }}
@@ -43,8 +52,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end }}
 
+{{/*
+Traceability agent selector labels
+*/}}
 {{- define "traceabilityAgent.selectorLabels" -}}
-app.kubernetes.io/component: "traceabilityAgent"
+app.kubernetes.io/component: "AxwayAmplifyAgent"
 app.kubernetes.io/name: {{ include "traceabilityAgent.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- range $key, $value := .Values.agents.traceability.labels }}
@@ -60,27 +72,14 @@ Agents ImagePullPolicy
 {{- end }}
 
 {{/*
-Discovery-Agent secret name
+Agents secret name
 */}}
-{{- define "discoveryAgentSecretName" -}}
+{{- define "agentSecretName" -}}
 
-{{- if .Values.agents.discovery.existingSecret  -}}
-{{ .Values.agents.discovery.existingSecret | quote }}
+{{- if .Values.agents.existingSecret  -}}
+{{ .Values.agents.existingSecret | quote }}
 {{- else -}}
-{{ template "discoveryAgent.name" . }}
-{{- end -}}
-
-{{- end -}}
-
-{{/*
-Traceability-Agent secret name
-*/}}
-{{- define "traceabilityAgentSecretName" -}}
-
-{{- if .Values.agents.traceability.existingSecret  -}}
-{{ .Values.agents.traceability.existingSecret | quote }}
-{{- else -}}
-{{ template "traceabilityAgent.name" . }}
+{{- .Chart.Name }}-amplify-agents-secret
 {{- end -}}
 
 {{- end -}}
