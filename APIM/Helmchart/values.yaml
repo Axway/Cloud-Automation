@@ -44,6 +44,9 @@ global:
    # Sets the required flag ACCEPT_GENERAL_CONDITIONS for ANM, APIMGR and APITRAFFIC container
    acceptGeneralConditions: 
 
+   # Setup the docker registry of the init image. By default busybox hosted on docker.io
+   # initContainerImage: busybox:1.33
+
 ##################################################################################################################################
 #   A D M I N - N O D E M A N A G E R
 ##################################################################################################################################
@@ -76,7 +79,7 @@ anm:
          # appgw.ingress.kubernetes.io/ssl-redirect: "true"
          # appgw.ingress.kubernetes.io/connection-draining: "true"
          # appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
-      hosts: {}
+      hosts: []
          # - host: anm.domain.internal
          #  paths:
          #   - path: /
@@ -1306,9 +1309,10 @@ mysqlmetrics:
       persistence:
          enabled: true
          existingClaim: apigw-mysql-metrics
-
       # Configure to remove binLogs are 7 days instead of default 30
       extraFlags: "--binlog-expire-logs-seconds=604800"
+
+   ssl: false
 
    auth: 
       database: "metrics"

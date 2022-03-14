@@ -105,20 +105,21 @@ spec:
 {{ toYaml .Values.global.imagePullSecrets | indent 8 }}
       {{- end }}
       initContainers:
+      {{- if .Values.cassandra.internal }}
       - name: init-cassandra
-        image: busybox:1.33
+        image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "cassandra.name" . }} {{ .Values.cassandra.service.port }}; do echo waiting for cassandra-0; sleep 2; done;']
         resources:
 {{ toYaml .Values.apitraffic.initResources | indent 10 }}
       {{- if .Values.mysqlmetrics.internal }}
       - name: init-mysql
-        image: busybox:1.33
+        image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "mysqlmetrics.name" . }} {{ .Values.mysqlmetrics.primary.service.port }}; do echo waiting for mysql; sleep 2; done;']
         resources:
 {{ toYaml .Values.apitraffic.initResources | indent 10 }}
       {{- end }}
       - name: init-anm
-        image: busybox:1.33
+        image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "anm.name" . }} {{ .Values.anm.service.port }}; do echo waiting for anm; sleep 2; done;']
         resources:
 {{ toYaml .Values.apitraffic.initResources | indent 10 }}

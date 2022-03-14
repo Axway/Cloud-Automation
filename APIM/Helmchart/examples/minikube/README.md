@@ -127,7 +127,7 @@ AMPLIFY API-Management solution has been deployed on minikube 1.16 installed on 
 
     Execute the following command to install cert-manager :
     ```bash
-    kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.16.1/cert-manager.yaml
+    kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.4.0/cert-manager.yaml
     ```
     
     Check cert-manager is correctly running :
@@ -142,42 +142,34 @@ AMPLIFY API-Management solution has been deployed on minikube 1.16 installed on 
     cert-manager-webhook-845d9df8bf-xxxx     1/1     Running
     ```
 
-6. Update your HELM repository.
+6. Create namespace
+Create an APIM namespace to deploy the solution.
+'''
+Kubectl create ns apim
+'''
 
-    You must update you HELM repository in order to be able to get the latest Axway charts for APIM solution.
+7. Add docker registry manually
 
-    First, execute the following command to add axway repository :
-    ```bash
-    helm repo add axway 'https://axwaysourcesproducts.blob.core.windows.net/helm/?sv=2019-12-12&ss=b&srt=co&sp=rlx&se=2021-12-31T21:28:20Z&st=2021-01-25T13:28:20Z&spr=https&sig=%2FeVcNlH%2BqU8l4qZefbGNxaMhxSnDysmt4fq3ZGG5dRg%3D'
+    The APIM docker images are stored on a private docker registry.
+    Add a registry for the demo
     ```
-    *Note : key access (in the URL) for HELM repository is working until January 2022*
-
-    Expected output :
-    ```bash
-    "axway" has been added to your repositories
-    ```
-
-    Then, perform an update :
-    ```bash
-    helm repo update
+    kubectl create secret docker-registry axway-demo-registry \
+        --docker-server=axwayproductsdemo.azurecr.io \ 
+        --docker-username=apim-demo \
+        --docker-password=3mL3FoB8Pb/lqIWZwmaf3oYV2zKr0W68 \ --docker-email=demo@axway.com -n apim
     ```
 
-    Finally you check repository acces : 
-    ```bash
-    helm search repo
+8. Deploy APIM using HELM.
+
+    For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our Minikube [example](minikube-example-values.yaml) as a base. Use the following command to get a local copy:  
+
+    ```
+    wget -o local-values-minikube.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/minikube/minikube-example-values.yaml
     ```
 
-    Expected output example :
-    ```bash
-    NAME                    CHART VERSION   APP VERSION     DESCRIPTION
-    axway/amplify-apim-7.7  1.2.0           7.7-*           Package for demo instance of Axway AMPLIFY API ...  
+    To finally start the deployment into your Kubernetes Cluster using Helm, use now the following command:
     ```
-
-7. Deploy APIM using HELM.
-
-    Execute the following command to deploy with minimal parameters :
-    ```bash
-    helm install <HELM_RELEASE_NAME> axway/amplify-apim-7.7 --set global.domainName=kube.local.com,apitraffic.replicaCount=1
+    helm install axway-apim -n apim -f .\local-values-minikube.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.3.0/helm-chart-axway-apim-2.3.0.tgz
     ```
 
     Expected output example :
@@ -212,18 +204,20 @@ AMPLIFY API-Management solution has been deployed on minikube 1.16 installed on 
 
     Expected output example :
     ```bash
-    NAMESPACE   NAME             CLASS    HOSTS                    ADDRESS           PORTS     AGE
-    default     apimanager       <none>   api-mgr.kube.local.com   xxx.xxx.xxx.xxx   80, 443   11m
-    default     gatewaymanager   <none>   anm.kube.local.com       xxx.xxx.xxx.xxx   80, 443   11m
-    default     traffic          <none>   api.kube.local.com       xxx.xxx.xxx.xxx   80, 443   11m
+    NAMESPACE   NAME                   CLASS    HOSTS                    ADDRESS           PORTS     AGE
+    apim        apimgr                 <none>   manager.kube.local.com   xxx.xxx.xxx.xxx   80, 443   11m
+    apim        axway-apim-anm         <none>   anm.kube.local.com       xxx.xxx.xxx.xxx   80, 443   11m
+    apim        axway-apim-apiportal   <none>   portal.kube.local.com    xxx.xxx.xxx.xxx   80, 443   11m
+    apim        traffic                <none>   traffic.kube.local.com   xxx.xxx.xxx.xxx   80, 443   11m
     ```
 
-8. Accessing UIs
+9. Accessing UIs
 
     Access APIM UI 
     - Admin node manager UI : https://anm.kube.local.com/
-    - API Manager UI : https://apimgr.kube.local.com/
-    - API traffic : https://api.kube.local.com/healthcheck
+    - API Manager UI : https://manager.kube.local.com/
+    - API Portal UI : https://portal.kube.local.com/
+    - API traffic : https://traffic.kube.local.com/healthcheck
     
     **For Windows 10**
     If you are on a Windows environment you first need to get Minikube IP address :
@@ -238,7 +232,7 @@ AMPLIFY API-Management solution has been deployed on minikube 1.16 installed on 
 
     Then modify your **hosts** file located in "C:\Windows\System32\drivers\etc" and add the following line :
     ```bash
-    <MINIKUBE_IP_ADDRESS> api.kube.local.com anm.kube.local.com api-mgr.kube.local.com
+    <MINIKUBE_IP_ADDRESS> traffic.kube.local.com anm.kube.local.com manager.kube.local.com
     ```
 
 9. Uninstall using HELM

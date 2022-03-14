@@ -92,13 +92,13 @@ spec:
       initContainers:
       {{- if .Values.mysqlapiportal.internal }}
       - name: init-mysql-apiportal
-        image: busybox:1.33
+        image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "mysqlapiportal.name" . }} {{ .Values.mysqlapiportal.primary.service.port }}; do echo waiting for apiportal mysql; sleep 2; done;']
         resources:
 {{ toYaml .Values.apiportal.initResources | indent 10 }}
       {{- end }}
       - name: init-apimgmt
-        image: busybox:1.33
+        image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "apimgr.name" . }} 8075; do echo waiting for apimgr; sleep 2; done;']
         resources:
 {{ toYaml .Values.apiportal.initResources | indent 10 }}
@@ -158,7 +158,7 @@ spec:
         - name: APIMANAGER_HOST
           value: {{ default $apimgrName .Values.apiportal.config.master.host | quote }}
         - name: APIMANAGER_PORT
-          value: {{ default "8075" .Values.apiportal.config.master.host | quote }}
+          value: {{ default "8075" .Values.apiportal.config.master.port | quote }}
 {{ if .Values.apiportal.config.tryIt }}
         - name: TRYIT_METHODS_CONFIGURED
           value: "1"
@@ -278,7 +278,7 @@ spec:
         {{- end }}
         {{- if .Values.apiportal.envFrom }}
         envFrom:
-{{ toYaml .Values.apiportal.envFrom | indent 8 }}
+{{ toYaml .Values.apiportal.envFrom | indent 10 }}
         {{- end }}
         volumeMounts:
           {{- if .Values.apiportal.persistence.enabled }}

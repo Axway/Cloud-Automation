@@ -1,4 +1,4 @@
-{{- if .Values.apitraffic.enabled -}}
+{{- if and (.Values.apitraffic.ingress.enabled) (.Values.apitraffic.enabled) -}}
 {{- if ne .Values.global.platform "OPENSHIFT" }}
 
 {{- $apitrafficName := include "apitraffic.name" . -}}

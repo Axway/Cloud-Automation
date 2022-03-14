@@ -1,0 +1,299 @@
+global:
+  imagePullSecrets:
+  - name: axway-demo-registry
+
+  domainName: "int.demoaxway.com"
+  dockerRepository: "docker-registry.demo.axway.com/demo-public"
+  imageTag: "1.1.0"
+
+   # Setup the docker registry of the image. By default busybox hosted on docker.io
+   #initContainerImage: busybox:1.33
+
+##################################################################################################################################
+#   A D M I N - N O D E M A N A G E R
+##################################################################################################################################
+anm:
+   enabled: true
+   image: "anm-demo-7.7-20211130"
+   containerPorts:
+      anm: 8090
+      anmui: 8091
+   httpPort: 8090
+   trafficPortUI: 8091
+   ingress:
+      enabled: false
+
+   config:
+      emtTraceLevel: INFO
+      emtDeploymentEnabled: true
+
+   extraEnvs:
+      - name: listenercert_anmui
+        value: /opt/Axway/apigateway/certs/anm-cert.pem
+      - name: listenerkey_anmui
+        value: /opt/Axway/apigateway/certs/anm-key.pem
+      - name: listenercacert_anmui
+        value: /opt/Axway/apigateway/certs/anm-ca.pem
+
+   extraVolumes:
+      - name: anm-ingress-cert
+        secret:
+          secretName: anm-ingress-cert
+          optional: false
+          items:
+          - key: chain.pem
+            path: anm-ca.pem
+          - key: privkey.pem
+            path: anm-key.pem
+          - key: cert.pem
+            path: anm-cert.pem
+
+   extraVolumeMounts:
+      - name: anm-ingress-cert
+        mountPath: /opt/Axway/apigateway/certs
+        readOnly: true
+
+   # nameOverride: "anm"
+
+##################################################################################################################################
+#   API MANAGER
+##################################################################################################################################
+apimgr:
+   enabled: true
+   image: "gtw-demo-int-7.7-20211130"
+   imageTag: "1.1.0"
+   ingress:
+      enabled: false
+
+   config:
+      emtTraceLevel: INFO
+      emtDeploymentEnabled: true
+
+   extraEnvs:
+      - name: listenercert_manager
+        value: /opt/Axway/apigateway/certs/manager-cert.pem
+      - name: listenerkey_manager
+        value: /opt/Axway/apigateway/certs/manager-key.pem
+      - name: listenercacert_manager
+        value: /opt/Axway/apigateway/certs/manager-ca.pem
+      - name: cassandraconsistency_readlevel
+        value: ONE
+      - name: cassandraconsistency_writelevel
+        value: ONE
+      # - name: cassandra_disablessl
+      #   value: false
+      # - name: cassandraCert_root
+      #   value: /opt/Axway/apigateway/certs/cassandra.pem
+
+   extraVolumes:
+      - name: manager-ingress-cert
+        secret:
+          secretName: manager-ingress-cert
+          optional: false
+          items:
+          - key: chain.pem
+            path: manager-ca.pem
+          - key: privkey.pem
+            path: manager-key.pem
+          - key: cert.pem
+            path: manager-cert.pem
+
+   extraVolumeMounts:
+      - name: manager-ingress-cert
+        mountPath: /opt/Axway/apigateway/certs
+        readOnly: true
+
+##################################################################################################################################
+#   API TRAFFIC
+##################################################################################################################################
+apitraffic:
+   enabled: true
+   name: traffic
+   image: "gtw-demo-int-7.7-20211130"
+   imageTag: "1.1.0"
+   ingress:
+      enabled: false
+
+   # extraContainers:
+   #   - name: filebeat
+   #     image: docker.elastic.co/beats/filebeat:7.16.3
+   #     envFrom:
+   #       - configMapRef:
+   #           name: axway-elk-apim4elastic-filebeat-env-config
+   #       - secretRef:
+   #           name: axway-elk-apim4elastic-filebeat-secret
+   #     volumeMounts:
+   #       - name: filebeat-config
+   #         mountPath: /usr/share/filebeat/filebeat.yml
+   #         subPath: filebeat.yml
+   #       - name: certificates
+   #         mountPath: /usr/share/filebeat/config/certificates
+   #       - name: opentraffic
+   #         mountPath: /var/opentraffic
+   #       - name: trace
+   #         mountPath: /var/trace/
+   #       - name: events
+   #         mountPath: /var/events/
+   #       - name: audit
+   #         mountPath: /var/audit/
+   config:
+      emtTraceLevel: INFO
+      emtDeploymentEnabled: true
+
+   extraEnvs:
+      - name: listenercert_traffic
+        value: /opt/Axway/apigateway/certs/traffic-cert.pem
+      - name: listenerkey_traffic
+        value: /opt/Axway/apigateway/certs/traffic-key.pem
+      - name: listenercacert_traffic
+        value: /opt/Axway/apigateway/certs/traffic-ca.pem
+
+   extraVolumes:
+      - name: traffic-ingress-cert
+        secret:
+          secretName: traffic-ingress-cert
+          optional: false
+          items:
+          - key: chain.pem
+            path: traffic-ca.pem
+          - key: privkey.pem
+            path: traffic-key.pem
+          - key: cert.pem
+            path: traffic-cert.pem
+   #    - name: filebeat-config
+   #      configMap:
+   #        name: axway-elk-apim4elastic-filebeat-config
+   #    - name: certificates
+   #      secret:
+   #        secretName: axway-elk-apim4elastic-certificates
+
+   extraVolumeMounts:
+      - name: traffic-ingress-cert
+        mountPath: /opt/Axway/apigateway/certs
+        readOnly: true
+
+   autoscaling:
+      enabled: true
+      maxReplicas: 6
+      averageUtilization: 70
+
+##################################################################################################################################
+#   API PORTAL
+##################################################################################################################################
+apiportal:
+   enabled: false
+
+##################################################################################################################################
+#   INTERNAL CASSANDRA DATABASE
+##################################################################################################################################
+cassandra:
+   internal: true
+   cluster:
+      name: axway-apim-int
+      keyspace: axway-apim-int
+   persistence:
+     enabled: true
+     storageClass: "gp2"
+     size: 8Gi
+
+   # # Change that to pull from private registry. 
+   # image:
+   #   registry: docker.io
+   #   repository: bitnami/cassandra
+   #   tag: 3.11.11-debian-10-r4
+   #   #Required only if no service account are configured
+   #   pullSecrets:
+   #       - tobechanged
+
+##################################################################################################################################
+#   INTERNAL ANALYTICS/METRICS DATABASE
+##################################################################################################################################
+mysqlmetrics:
+   internal: true
+
+   # # Change that to pull from private registry. 
+   # image:
+   #   registry: docker.io
+   #   repository: bitnami/mysql
+   #   tag: 8.0.28-debian-10-r0
+   #   #Required only if no service account are configured
+   #   pullSecrets:
+   #       - tobechanged
+
+   auth: 
+      database: "metrics"
+      # If not set a password is randomly generated
+      # Please note: You need to provide the generated password to upgrade the release
+      rootPassword: "changeme"
+      username: "report"
+      # If not set a password is randomly generated
+      # Please note: You need to provide the generated password to upgrade the release
+      password: "changeme"
+
+   ssl: false
+
+##################################################################################################################################
+#   INTERNAL API-Portal DATABASE
+##################################################################################################################################
+mysqlapiportal:
+   internal: false
+
+
+##################################################################################################################################
+#   PVCs
+##################################################################################################################################
+pvcs:
+   # Events is used by ANM, APIMGR and APITRAFFIC
+   events:
+      # If disabled an emptyDir volume is used instead
+      # Useful if you stream log information to an external logging system
+      enabled: true
+      eventsVolumeClaim:
+         accessModes: [ "ReadWriteMany" ]
+         storageClassName: efs-sc
+         resources:
+            requests:
+               storage: 10Gi
+         volumeName: apim-events-pv
+
+   opentraffic:
+      enabled: false
+   trace:
+      enabled: false
+
+
+##################################################################################################################################
+#   AMPLIFY AGENTS
+##################################################################################################################################
+
+agents:
+   central:
+      clientId: DOSA_02ea38d..................b17df8f
+      organizationId: 230.........343
+      environment: my-v7-environment
+      privateKey: |
+         -----BEGIN PRIVATE KEY-----
+         MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCy6I5t5R0qKHWR
+         UN7Cgzz2raYhdZzQKWktVRvNnAVaJKrmK981nNIWqB8enooRTDVFEp7XazAZGDVN
+         .....
+         .........
+         .....
+         UHIriuIHpSr6yz1Foataxpo=
+         -----END PRIVATE KEY-----
+      publicKey: |
+         -----BEGIN PUBLIC KEY-----
+         MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsuiObeUdKih1kVDewoM8
+         9q2mIXWc0ClpLVUbzZwFWiSq5ivfNZzSFqgfHp6KEUw1RRKe12swGRg1TWr5DBs/
+         .....
+         .........
+         .....
+         ClLsxTTMKk0EqOgjnNY/rlNUplgb7tnfHsEhBbtYWzQFhBQQ+sv8nK/DUljXYP9z
+         GwIDAQAB
+         -----END PUBLIC KEY-----
+   discovery:
+      enabled: false
+      agentName: "2312"
+      apimanager:
+         username: apiadmin
+         password: highly-secure
+         insecureSSL: "true"

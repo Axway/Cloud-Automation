@@ -24,6 +24,12 @@ spec:
 {{- end }}
     protocol: TCP
     targetPort: {{ .Values.anm.containerPorts.anm }}
+{{- if .Values.anm.trafficPortUI }}
+  - name: gatewaymanagerui
+    port: {{ .Values.anm.trafficPortUI }}
+    protocol: TCP
+    targetPort: {{ .Values.anm.trafficPortUI }}
+{{- end }}
   selector:
     {{- include "anm.selectorLabels" . | nindent 4 }}
   sessionAffinity: {{ default "ClientIP" .Values.anm.service.sessionAffinity }}
