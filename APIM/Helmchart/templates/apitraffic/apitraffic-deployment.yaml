@@ -111,6 +111,7 @@ spec:
         command: ['sh', '-c', 'until nc -w 3 -v {{ template "cassandra.name" . }} {{ .Values.cassandra.service.port }}; do echo waiting for cassandra-0; sleep 2; done;']
         resources:
 {{ toYaml .Values.apitraffic.initResources | indent 10 }}
+      {{- end }}
       {{- if .Values.mysqlmetrics.internal }}
       - name: init-mysql
         image: {{ default "busybox:1.33" .Values.global.initContainerImage | quote }}
