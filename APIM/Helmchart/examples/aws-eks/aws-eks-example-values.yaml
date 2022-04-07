@@ -195,6 +195,9 @@ agents:
       username: apiadmin
       password: highly-secure
       insecureSSL: "true"
+   apigateway:
+      username: gwadmin
+      password: highly-secure
    discovery:
       enabled: true
       config:
