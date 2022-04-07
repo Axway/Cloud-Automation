@@ -1,4 +1,4 @@
-name: Test examples
+name: Test Helm-Chart examples
 
 env:
   # Multiple GW-Groups
