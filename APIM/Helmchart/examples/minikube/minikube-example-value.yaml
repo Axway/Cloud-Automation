@@ -7,6 +7,7 @@ global:
   imageTag: "20211130"
   # The default pull policy is set to Always because APIM docker images are recreated with the same image tage every 2 months.
   imagePullPolicy: "Always"
+  acceptGeneralConditions: "yes"
 
 ##################################################################################################################################
 #   A D M I N - N O D E M A N A G E R

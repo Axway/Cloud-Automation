@@ -193,7 +193,8 @@ agents:
          -----END PUBLIC KEY-----
    discovery:
       enabled: true
-      agentName: "2312"
+      config:
+         agentName: "2312"
       apimanager:
          username: apiadmin
          password: highly-secure
