@@ -6,6 +6,7 @@ global:
   dockerRepository: "docker-registry.demo.axway.com/demo-public"
   imageTag: "1.1.1"
   imagePullPolicy: "Always"
+  acceptGeneralConditions: "yes"
 
 ##################################################################################################################################
 #   A D M I N - N O D E M A N A G E R

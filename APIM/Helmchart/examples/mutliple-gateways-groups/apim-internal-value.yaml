@@ -5,6 +5,7 @@ global:
   domainName: "int.demoaxway.com"
   dockerRepository: "docker-registry.demo.axway.com/demo-public"
   imageTag: "1.1.0"
+  acceptGeneralConditions: "yes"
 
    # Setup the docker registry of the image. By default busybox hosted on docker.io
    #initContainerImage: busybox:1.33
