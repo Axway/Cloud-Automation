@@ -191,11 +191,11 @@ agents:
          ClLsxTTMKk0EqOgjnNY/rlNUplgb7tnfHsEhBbtYWzQFhBQQ+sv8nK/DUljXYP9z
          GwIDAQAB
          -----END PUBLIC KEY-----
+   apimanager:
+      username: apiadmin
+      password: highly-secure
+      insecureSSL: "true"
    discovery:
       enabled: true
       config:
          agentName: "2312"
-      apimanager:
-         username: apiadmin
-         password: highly-secure
-         insecureSSL: "true"
