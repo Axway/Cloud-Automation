@@ -2,11 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] 
+## [2.8.0] 2022-04-07
+
+### Added
+- Support to provide the FED-Configuration and other config files externally
 
 ### Changed
 - Remove Binlogs of Metrics- and API-Portal-MySQL after 7 instead of 30 days
 - apitraffic probes now send the header k8sprobe: readiness.apitraffic instead of k8sprobe: readiness.apimgr
+- Updated Helm-Chart dependencies
+  - bitnami/mysql 8.8.26 --> 8.8.34
+  - bitnami/common 1.11.3 --> 1.13.0
 
 ## [2.7.0] 2022-03-03
 
