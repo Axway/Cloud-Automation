@@ -1,8 +1,22 @@
-name: Test Mutliple-GW-Groups Examples
+name: Test examples
 
 env:
+  # Multiple GW-Groups
   exampleValuesFiles1: examples/mutliple-gateways-groups/apim-external-value.yaml
   exampleValuesFiles2: examples/mutliple-gateways-groups/apim-internal-value.yaml
+
+  # AWS-EKS
+  exampleValuesFiles3: examples/aws-eks/aws-eks-example-values.yaml
+
+  # Azure-AKS
+  exampleValuesFiles4: examples/azure-aks/azure-aks-example-agic-value.yaml
+  exampleValuesFiles5: examples/azure-aks/azure-aks-example-noingress-values.yaml
+
+  # Google-GKE
+  exampleValuesFiles6: examples/google-gke/google-gke-example-values.yaml
+
+  # Minikube
+  exampleValuesFiles7: examples/minikube/minikube-example-value.yaml
 
 on:
   push:
@@ -12,15 +26,61 @@ on:
       - APIM/Helmchart/**
 
 jobs:
-  test-aws-eks:
-    name: Test Mutliple-GW-Groups Examples
+  multiple-gw-groups:
+    name: Mutliple-GW-Groups Examples
     defaults:
       run:
         working-directory: 'APIM/Helmchart'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Test Example 1
-      run: helm template --validate test -f ${{ env.exampleValuesFiles1 }} . --debug
-    - name: Test Example 2
-      run: helm template --validate test -f ${{ env.exampleValuesFiles2 }} . --debug
+    - name: apim-external-value
+      run: helm template test -f ${{ env.exampleValuesFiles1 }} . --debug
+    - name: apim-internal-value
+      run: helm template test -f ${{ env.exampleValuesFiles2 }} . --debug
+
+  aws-eks:
+    name: AWS-EKS
+    defaults:
+      run:
+        working-directory: 'APIM/Helmchart'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: aws-eks-example-values
+      run: helm template test -f ${{ env.exampleValuesFiles3 }} . --debug
+
+  azure-aks:
+    name: Azure-AKS
+    defaults:
+      run:
+        working-directory: 'APIM/Helmchart'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: azure-aks-example-agic-value
+      run: helm template test -f ${{ env.exampleValuesFiles4 }} . --debug
+    - name: azure-aks-example-noingress-values
+      run: helm template test -f ${{ env.exampleValuesFiles5 }} . --debug
+
+  google-gke:
+    name: Google-GKE
+    defaults:
+      run:
+        working-directory: 'APIM/Helmchart'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: google-gke-example-values
+      run: helm template test -f ${{ env.exampleValuesFiles6 }} . --debug
+
+  minikube:
+    name: Minikube
+    defaults:
+      run:
+        working-directory: 'APIM/Helmchart'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: minikube-example-value
+      run: helm template test -f ${{ env.exampleValuesFiles7 }} . --debug
