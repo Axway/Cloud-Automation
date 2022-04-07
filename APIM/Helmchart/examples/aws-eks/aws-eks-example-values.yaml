@@ -45,8 +45,8 @@ anm:
          - -c 
          - |
            #!/bin/sh
-           echo "Download API-Gateway config from: https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed"
-           wget -O /merge/fed https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed
+           echo "Download API-Gateway config from: https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/anm/fed/anm.fed"
+           wget -O /merge/fed https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/anm/fed/anm.fed
 
 ##################################################################################################################################
 #   API MANAGER
