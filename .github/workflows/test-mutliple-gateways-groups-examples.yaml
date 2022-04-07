@@ -1,5 +1,18 @@
 name: Test Helm-Chart examples
 
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - APIM/Helmchart/**
+
+  pull_request:
+    branches:
+      - master
+    paths:
+      - APIM/Helmchart/**
+
 env:
   # Multiple GW-Groups
   exampleValuesFiles1: examples/mutliple-gateways-groups/apim-external-value.yaml
@@ -17,13 +30,6 @@ env:
 
   # Minikube
   exampleValuesFiles7: examples/minikube/minikube-example-value.yaml
-
-on:
-  push:
-    branches:
-      - master
-    paths:
-      - APIM/Helmchart/**
 
 jobs:
   multiple-gw-groups:
