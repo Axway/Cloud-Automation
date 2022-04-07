@@ -1,0 +1,26 @@
+name: Test Mutliple-GW-Groups Examples
+
+env:
+  exampleValuesFiles1: examples/mutliple-gateways-groups/apim-external-value.yaml
+  exampleValuesFiles2: examples/mutliple-gateways-groups/apim-internal-value.yaml
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - APIM/Helmchart/**
+
+jobs:
+  test-aws-eks:
+    name: Test Mutliple-GW-Groups Examples
+    defaults:
+      run:
+        working-directory: 'APIM/Helmchart'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Test Example 1
+      run: helm template --validate test -f ${{ env.exampleValuesFiles1 }} . --debug
+    - name: Test Example 2
+      run: helm template --validate test -f ${{ env.exampleValuesFiles2 }} . --debug
