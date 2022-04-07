@@ -25,6 +25,29 @@ anm:
         # 302 is also accepted, as Kibana is performing a redirect
         alb.ingress.kubernetes.io/success-codes: 200,302
 
+   # As of API management version 7.7.0.20220228, you can provide the necessary configuration (e.g. policies, settings) 
+   # externally instead of having to bake it into the image.
+   # This init container downloads a provided FED file and places it under /merge/fed before the ANM starts.
+   # 
+   # Please note that the image must be built with the EMT script: apigw-emt-scripts-2.4.0-20220222.150412-10.tar.gz or newer.
+   # 
+   # You can choose any method how the configuration is loaded. For example via git clone 
+   # which is recommended for a YAML entity store as you can store the whole merge dir structure directly in git.
+   extraInitContainers:
+     - name: init-fed
+       image: busybox:1.33
+       volumeMounts:
+         - name: merge-dir
+           mountPath: /merge
+       # command: [ "sh", "-c", "tail -f /dev/null" ]
+       command: 
+         - sh
+         - -c 
+         - |
+           #!/bin/sh
+           echo "Download API-Gateway config from: https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed"
+           wget -O /merge/fed https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed
+
 ##################################################################################################################################
 #   API MANAGER
 ##################################################################################################################################
@@ -43,6 +66,28 @@ apimgr:
         alb.ingress.kubernetes.io/backend-protocol: "HTTPS"
         # 302 is also accepted, as Kibana is performing a redirect
         alb.ingress.kubernetes.io/success-codes: 200,302
+
+   # As of API management version 7.7.0.20220228, you can provide the necessary configuration (e.g. policies, settings) 
+   # externally instead of having to bake it into the image.
+   # This init container downloads a provided FED file and places it under /merge/fed before the API Gateway instance starts.
+   # Please note that the image must be built with the EMT script: apigw-emt-scripts-2.4.0-20220222.150412-10.tar.gz or newer.
+   # 
+   # You can choose any method how the configuration is loaded. For example via git clone 
+   # which is recommended for a YAML entity store as you can store the whole merge dir structure directly in git.
+   extraInitContainers:
+     - name: init-fed
+       image: busybox:1.33
+       volumeMounts:
+         - name: merge-dir
+           mountPath: /merge
+       # command: [ "sh", "-c", "tail -f /dev/null" ]
+       command: 
+         - sh
+         - -c 
+         - |
+           #!/bin/sh
+           echo "Download API-Gateway config from: https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed"
+           wget -O /merge/fed https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed
 
 ##################################################################################################################################
 #   API TRAFFIC
@@ -66,6 +111,28 @@ apitraffic:
         # It's recommended to expose a Healthcheck API
         # alb.ingress.kubernetes.io/healthcheck-path: /healthcheck
         # alb.ingress.kubernetes.io/success-codes: 200
+
+   # As of API management version 7.7.0.20220228, you can provide the necessary configuration (e.g. policies, settings) 
+   # externally instead of having to bake it into the image.
+   # This init container downloads a provided FED file and places it under /merge/fed before the API Gateway instance starts.
+   # Please note that the image must be built with the EMT script: apigw-emt-scripts-2.4.0-20220222.150412-10.tar.gz or newer.
+   # 
+   # You can choose any method how the configuration is loaded. For example via git clone 
+   # which is recommended for a YAML entity store as you can store the whole merge dir structure directly in git.
+   extraInitContainers:
+     - name: init-fed
+       image: busybox:1.33
+       volumeMounts:
+         - name: merge-dir
+           mountPath: /merge
+       # command: [ "sh", "-c", "tail -f /dev/null" ]
+       command: 
+         - sh
+         - -c 
+         - |
+           #!/bin/sh
+           echo "Download API-Gateway config from: https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed"
+           wget -O /merge/fed https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed
 
    # If you want to include the Amplify agent or Filebeat for Elasticsearch integration as a side-car. 
    # Make sure that you use the latest images.

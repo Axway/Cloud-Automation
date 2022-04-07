@@ -39,6 +39,8 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.apimgr.terminationGracePeriod }}
       volumes:
+        - name: merge-dir
+{{ toYaml .Values.apimgr.mergeDirVolume | indent 10 }}
 {{- if $licenseSecret }}
         - name: license
           secret:
@@ -104,7 +106,7 @@ spec:
         resources:
 {{ toYaml .Values.apimgr.initResources | indent 10 }}
       {{- if .Values.apimgr.extraInitContainers }}
-{{ tpl .Values.apimgr.extraInitContainers . | indent 6 }}
+{{ toYaml .Values.apimgr.extraInitContainers | indent 6 }}
       {{- end }}
       containers:
       - name: "{{ template "apimgr.name" . }}"
@@ -189,6 +191,8 @@ spec:
 {{ toYaml .Values.apimgr.extraEnvs | indent 8 }}
         {{- end }}
         volumeMounts:
+          - name: merge-dir
+            mountPath: /merge
         {{- if .Values.apimgr.jvm.enabled }}
           - name: apimgr-jvmxml
             mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"

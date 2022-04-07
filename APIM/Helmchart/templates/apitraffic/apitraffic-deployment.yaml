@@ -39,6 +39,8 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.apitraffic.terminationGracePeriod }}
       volumes:
+        - name: merge-dir
+{{ toYaml .Values.apitraffic.mergeDirVolume | indent 10 }}
         - name: events
 {{- if .Values.pvcs.events.enabled }}
           persistentVolumeClaim:
@@ -125,7 +127,7 @@ spec:
         resources:
 {{ toYaml .Values.apitraffic.initResources | indent 10 }}
       {{- if .Values.apitraffic.extraInitContainers }}
-{{ tpl .Values.apitraffic.extraInitContainers . | indent 6 }}
+{{ toYaml .Values.apitraffic.extraInitContainers | indent 6 }}
       {{- end }}
       containers:
       - name: "{{ template "apitraffic.name" . }}"
@@ -211,6 +213,8 @@ spec:
 {{ toYaml .Values.apitraffic.extraEnvs | indent 8 }}
         {{- end }}
         volumeMounts:
+          - name: merge-dir
+            mountPath: /merge
         {{- if .Values.apitraffic.jvm.enabled }}
           - name: apitraffic-jvmxml
             mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
