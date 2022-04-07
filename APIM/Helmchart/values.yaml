@@ -101,6 +101,16 @@ anm:
       # emtTraceLevel: INFO
       # emtParentHost: "anm"
 
+   # This creates the volume merge-dir, which is always mounted to /merge to provide policy configuration and API-Gateway configuration to the container. 
+   # By default, an empty-dir is used. For example, this can be used to obtain the necessary files through an extraInitContainer before the ANM POD starts.
+   # See the provided examples.
+   # If you want to use a PV or a ConfigMap, then you can configure it here accordingly. 
+   # For more details please see: https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_howto_guides/configuring_apigw_container/index.html
+   mergeDirVolume:
+     emptyDir: {}
+   #   configMap:
+   #     name: mergedir-config
+
    # Allows you to add any environment variables
    extraEnvs: []
    # - name: MY_ENVIRONMENT_VAR
@@ -249,6 +259,16 @@ apimgr:
       # emtHeapSize: 1024
       # emtTraceLevel: INFO
       # emtParentHost: "api-manager"
+
+   # This creates the volume merge-dir, which is always mounted to /merge to provide policy configuration and API-Gateway configuration to the container. 
+   # By default, an empty-dir is used. For example, this can be used to obtain the necessary files through an extraInitContainer before the API-Manager POD starts.
+   # See the provided examples.
+   # If you want to use a PV or a ConfigMap, then you can configure it here accordingly. 
+   # For more details please see: https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_howto_guides/configuring_apigw_container/index.html
+   mergeDirVolume:
+     emptyDir: {}
+   #   configMap:
+   #     name: mergedir-config
 
    # Allows you to add any environment variables
    extraEnvs: []
@@ -438,6 +458,16 @@ apitraffic:
       # emtHeapSize: 1024
       # emtTraceLevel: INFO
       # emtParentHost: "api-gateway"
+
+   # This creates the volume merge-dir, which is always mounted to /merge to provide policy configuration and API-Gateway configuration to the container. 
+   # By default, an empty-dir is used. For example, this can be used to obtain the necessary files through an extraInitContainer before the Traffic POD starts.
+   # See the provided examples.
+   # If you want to use a PV or a ConfigMap, then you can configure it here accordingly. 
+   # For more details please see: https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_howto_guides/configuring_apigw_container/index.html
+   mergeDirVolume: 
+     emptyDir: {}
+   #   configMap:
+   #     name: mergedir-config
 
    ingress:
       enabled: true

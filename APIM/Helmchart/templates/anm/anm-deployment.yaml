@@ -43,6 +43,8 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.anm.terminationGracePeriod }}
       volumes:
+        - name: merge-dir
+{{ toYaml .Values.anm.mergeDirVolume | indent 10 }}
         - name: events
 {{- if .Values.pvcs.events.enabled }}
           persistentVolumeClaim:
@@ -99,7 +101,7 @@ spec:
 {{ toYaml .Values.anm.initResources | indent 10 }}
       {{- end }}
       {{- if .Values.anm.extraInitContainers }}
-{{ tpl .Values.anm.extraInitContainers . | indent 6 }}
+{{ toYaml .Values.anm.extraInitContainers | indent 6 }}
       {{- end }}
       containers:
       - name: "{{ template "anm.name" . }}"
@@ -176,6 +178,8 @@ spec:
 {{ toYaml .Values.anm.envFrom | indent 8 }}
         {{- end }}
         volumeMounts:
+          - name: merge-dir
+            mountPath: /merge
           - name: events
             mountPath: {{ default "/opt/Axway/apigateway/events" .Values.anm.volumeMountsPaths.events | quote }}
           - name: audit

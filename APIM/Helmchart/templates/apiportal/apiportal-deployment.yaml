@@ -103,7 +103,7 @@ spec:
         resources:
 {{ toYaml .Values.apiportal.initResources | indent 10 }}
       {{- if .Values.apiportal.extraInitContainers }}
-{{ tpl .Values.apiportal.extraInitContainers . | indent 6 }}
+{{ toYaml .Values.apiportal.extraInitContainers | indent 6 }}
       {{- end }}
       containers:
       - name: "{{ template "apiportal.name" . }}"
