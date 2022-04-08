@@ -40,7 +40,7 @@ The list is not to say that the Helm chart cannot be used for other Kubernetes d
 
 ## Create Admin-Users
 
-If the API management platform is run in a container platform, then you need to configure the admin users either via an externally provided file: apigateway/conf/adminUsers.json 
+If the API management platform runs in a container platform, then you need to configure the admin users either via an externally provided file: apigateway/conf/adminUsers.json 
 or via an [LDAP connection](https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_administration/apigtw_admin/general_rbac_ad_ldap/index.html) which is the preferred way.  
 
 User management in API Gateway Manager is disabled because changes to the file: `adminUsers.json` are not persisted.  
@@ -55,3 +55,15 @@ The following steps are necessary to set up a secret mount based on the helmet c
 wget -o adminUsers.json https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/general/adminUsers.json
 kubectl create secret generic axway-apigateway-admin-users -n apim --save-config --dry-run=client --from-file=adminUsers.json=adminUsers.json -o yaml | kubectl apply -f -
 ```
+
+## Deploy Policy-Configuration without Image-Recreation
+
+As of API management version 7.7.0-20220228, it is possible to deploy the policy configuration without rebuilding the API gateway image. 
+For this purpose a /merge folder is used, which can contain the FED file, the YAML entity store and other configurations. The configuration artifacts stored there overwrite existing configuration in the image before the API Gateway is started.  
+
+The following video illustrates this process:  
+[![Policy-Configuration rollout](https://img.youtube.com/vi/2fpoCuSxUxs/0.jpg)](https://youtu.be/2fpoCuSxUxs)
+
+
+The Merge folder documentation: https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_howto_guides/configuring_apigw_container/index.html
+The example repository: https://github.com/Axway-API-Management-Plus/axway-api-management-automated
