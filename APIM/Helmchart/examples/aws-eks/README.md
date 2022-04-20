@@ -66,7 +66,7 @@ You can either link the created certificate concretely using an appropriate ingr
 For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our AWS-EKS [example](aws-eks-example-values.yaml) as a base. Use the following command to get a local copy:  
 
 ```
-wget -o local-values-eks.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/aws-eks/aws-eks-example-values.yaml
+curl -o local-values-eks.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/aws-eks/aws-eks-example-values.yaml
 ```
 
 Now adjust the downloaded `local-values-eks.yaml` file according to your needs and version control it to make later upgrades safe and easy or to integrate it properly into your CI/CD-Pipeline.  
