@@ -42,7 +42,7 @@ If everything is set up correctly, DNS records like the one below are automatica
 #### Ingress-Controller
 
 By default, no Ingress controller is installed on the deployed AWS EKS Kubernetes cluster. 
-If this is not yet installed, please set it up as described [here](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html), as the Example-Values.yaml provided with the example annotations assumes that the AWS Load Balancer Controller is used.
+If this is not yet installed, please set it up as described [here](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html), as the Example-Values.yaml provided with the example annotations assumes that the AWS Load Balancer Controller is used.
 
 ```
 kubectl get deployment -n kube-system aws-load-balancer-controller
