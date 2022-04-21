@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- Standard POD Anti-Affinity for apitraffic to ensure API-Gateways are running on different worker nodes
+
 ## [2.8.0] 2022-04-07
 
 ### Added

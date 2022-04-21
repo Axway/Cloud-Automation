@@ -528,6 +528,22 @@ apitraffic:
    #      cpu: "25m"
    #      memory: "80Mi"
 
+   affinity: 
+      # By default this will make sure two API-Gateway pods don't end up on the same worker node
+      podAntiAffinity:
+         # preferredDuringSchedulingIgnoredDuringExecution:
+         requiredDuringSchedulingIgnoredDuringExecution:
+         - labelSelector:
+             matchExpressions:
+             - key: app.kubernetes.io/name
+               operator: In
+               values:
+               - traffic
+           topologyKey: "kubernetes.io/hostname"
+
+   nodeSelector: {}
+   tolerations: []
+
    podSecurityContext:
       runAsUser: 1000
       fsGroup: 1000
