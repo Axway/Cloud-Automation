@@ -165,7 +165,10 @@ spec:
           value: {{ .Values.cassandra.dbUser.user }}
         - name: CASS_PASS
         {{- if .Values.cassandra.dbUser.existingSecret }}
-{{ toYaml .Values.cassandra.dbUser.existingSecret | indent 10 }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.cassandra.dbUser.existingSecret | quote }}
+              key: cassandra-password
         {{- else if .Values.cassandra.dbUser.password }}
           value: {{ .Values.cassandra.dbUser.password }}
         {{- else }}

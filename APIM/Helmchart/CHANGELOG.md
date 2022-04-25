@@ -8,7 +8,8 @@ All notable changes to this project will be documented in this file.
 - Standard POD Anti-Affinity for apitraffic to ensure API-Gateways are running on different worker nodes
 
 ### Fixed
-- apitraffic deployment referenced wrong PCV audit instead of apigw-audit
+- apitraffic deployment referenced wrong PCV audit instead of apigw-audit (#34)
+- Using an existing secret for CASS_PASS failed, when providing just the name of the secret as it's documented (#35)
 
 ## [2.8.0] 2022-04-07
 
