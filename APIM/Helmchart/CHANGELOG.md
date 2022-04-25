@@ -2,10 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.9.0] 2022-04-25
 
 ### Changed
 - Standard POD Anti-Affinity for apitraffic to ensure API-Gateways are running on different worker nodes
+- Updated Helm-Chart dependencies
+  - bitnami/mysql 8.8.34 --> 8.9.2
 
 ### Fixed
 - apitraffic deployment referenced wrong PCV audit instead of apigw-audit (#34)

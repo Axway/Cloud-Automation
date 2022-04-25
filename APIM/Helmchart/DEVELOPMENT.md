@@ -5,6 +5,7 @@
   - `./Chart.yaml` 
   - `./examples/aws-eks/README.md`
   - `./examples/google-gke/README.md`
+  - And other examples
 - Update the `CHANGELOG.md`
 - Commit and Push
 - Create a release on GitHub with tag schema: `apim-helm-v2.8.0`

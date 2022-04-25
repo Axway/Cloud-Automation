@@ -169,7 +169,7 @@ Kubectl create ns apim
 
     To finally start the deployment into your Kubernetes Cluster using Helm, use now the following command:
     ```
-    helm install axway-apim -n apim -f .\local-values-minikube.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.3.0/helm-chart-axway-apim-2.3.0.tgz
+    helm install axway-apim -n apim -f .\local-values-minikube.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.9.0/helm-chart-axway-apim-2.9.0.tgz
     ```
 
     Expected output example :
