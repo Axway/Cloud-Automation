@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Standard POD Anti-Affinity for apitraffic to ensure API-Gateways are running on different worker nodes
 
+### Fixed
+- apitraffic deployment referenced wrong PCV audit instead of apigw-audit
+
 ## [2.8.0] 2022-04-07
 
 ### Added

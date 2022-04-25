@@ -65,7 +65,7 @@ spec:
         - name: audit
 {{- if .Values.pvcs.audit.enabled }}
           persistentVolumeClaim:
-            claimName: audit
+            claimName: apigw-audit
 {{- else }}
           emptyDir: {}
 {{- end }}
