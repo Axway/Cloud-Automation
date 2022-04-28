@@ -84,6 +84,10 @@ spec:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.anm.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       {{- with .Values.anm.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}

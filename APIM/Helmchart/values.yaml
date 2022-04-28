@@ -152,6 +152,7 @@ anm:
    nodeSelector: {}
    tolerations: []
    affinity: {}
+   topologySpreadConstraints: {}
 
    nameOverride: ""
 
@@ -321,6 +322,11 @@ apimgr:
    podSecurityContext:
       runAsUser: 1000
       fsGroup: 1000
+
+   nodeSelector: {}
+   tolerations: []
+   affinity: {}
+   topologySpreadConstraints: {}
 
    readinessProbe:
       httpGet:
@@ -530,16 +536,32 @@ apitraffic:
 
    affinity: 
       # By default this will make sure two API-Gateway pods don't end up on the same worker node
-      podAntiAffinity:
-         # preferredDuringSchedulingIgnoredDuringExecution:
-         requiredDuringSchedulingIgnoredDuringExecution:
-         - labelSelector:
-             matchExpressions:
-             - key: app.kubernetes.io/name
-               operator: In
-               values:
-               - traffic
-           topologyKey: "kubernetes.io/hostname"
+      # podAntiAffinity:
+      #    # preferredDuringSchedulingIgnoredDuringExecution:
+      #    requiredDuringSchedulingIgnoredDuringExecution:
+      #    - labelSelector:
+      #        matchExpressions:
+      #        - key: app.kubernetes.io/name
+      #          operator: In
+      #          values:
+      #          - traffic
+      #      topologyKey: "kubernetes.io/hostname"
+   
+   topologySpreadConstraints: 
+      # Avoid scheduling of API-Gateways in the same availability zone
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: traffic
+      # Avoid scheduling of API-Gateways on the same node
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+           matchLabels:
+            app.kubernetes.io/name: traffic
 
    nodeSelector: {}
    tolerations: []
@@ -738,6 +760,7 @@ apiportal:
    nodeSelector: {}
    tolerations: []
    affinity: {}
+   topologySpreadConstraints: {}
 
    nameOverride: ""
 
