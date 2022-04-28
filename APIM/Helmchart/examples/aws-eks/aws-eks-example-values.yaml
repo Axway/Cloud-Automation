@@ -66,6 +66,9 @@ apimgr:
         alb.ingress.kubernetes.io/backend-protocol: "HTTPS"
         # 302 is also accepted, as Kibana is performing a redirect
         alb.ingress.kubernetes.io/success-codes: 200,302
+        # Even, if not recommended, but when using 2 or more API-Manager anyway, you need to configure AWS Target-Group session stickiness to make sure, 
+        # requests hit the same API-Manager instance. See issue: https://github.com/Axway/Cloud-Automation/issues/39
+        # alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.type=lb_cookie,stickiness.lb_cookie.duration_seconds=43200
 
    # As of API management version 7.7.0.20220228, you can provide the necessary configuration (e.g. policies, settings) 
    # externally instead of having to bake it into the image.

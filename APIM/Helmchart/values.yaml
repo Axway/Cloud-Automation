@@ -52,6 +52,8 @@ global:
 ##################################################################################################################################
 anm:
    enabled: true
+   # Don't configure more than 1 replica as it would lead an inconsitent view of the current topology. 
+   # See issue: https://github.com/Axway/Cloud-Automation/issues/38
    replicas: 1
    image: "anm"
    containerPorts:
@@ -228,6 +230,7 @@ anm:
 apimgr:
    enabled: true
    # For API-Manager it is recommended to have only 1 replica
+   # See issue: https://github.com/Axway/Cloud-Automation/issues/39
    replicas: 1
    nameOverride: ""
    image: "manager"

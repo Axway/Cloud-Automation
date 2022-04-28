@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Changed
+- Now using topologySpreadConstraint instead of podAntiAffinity by default
+
 ## [2.9.0] 2022-04-25
 
 ### Changed
