@@ -40,6 +40,8 @@ global:
 
    # If you want to use your own secret, specify the name of the secret here, 
    # which contains the license Base64 encoded with key license
+   # For example 
+   # kubectl -n apim create secret generic axway-license --from-file=C:\temp\license.lic
    existingLicenseSecret: 
    # Sets the required flag ACCEPT_GENERAL_CONDITIONS for ANM, APIMGR and APITRAFFIC container
    acceptGeneralConditions: 
