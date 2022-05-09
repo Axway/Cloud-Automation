@@ -1311,7 +1311,7 @@ cassandra:
      # If defined, storageClassName: <storageClass>
      # If set to "-", storageClassName: "", which disables dynamic provisioning
      # If undefined (the default) or set to null, no storageClassName spec is
-     #   set, choosing the default provisioner.  (gp2 on AWS, standard on GKE, AWS & OpenStack)
+     #   set, choosing the default provisioner.  (gp3 on AWS, standard on GKE, AWS & OpenStack)
      storageClass: ""
      # @param persistence.size PVC Storage Request for Cassandra data volume
      size: 8Gi

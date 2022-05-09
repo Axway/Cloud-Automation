@@ -194,7 +194,7 @@ cassandra:
       keyspace: axway-apim-int
    persistence:
      enabled: true
-     storageClass: "gp2"
+     storageClass: "gp3"
      size: 8Gi
 
    # # Change that to pull from private registry. 
