@@ -3,6 +3,7 @@
 {{- $imageTag := include "imageTag" . -}}
 {{- $imagePullPolicy := include "imagePullPolicy" . -}}
 {{- $check := include "validateDockerRepo" . -}}
+{{- $licenseSecret := include "licenseSecretName" . -}}
 
 apiVersion: apps/v1
 kind: Deployment
@@ -58,6 +59,11 @@ spec:
             claimName: apigw-audit
 {{- else }}
           emptyDir: {}
+{{- end }}
+{{- if $licenseSecret }}
+        - name: license
+          secret:
+            secretName: {{ $licenseSecret }}
 {{- end }}
         {{- if .Values.anm.jvm.enabled }}
         - name: anm-jvmxml
@@ -193,6 +199,10 @@ spec:
             mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
             subPath: jvm.xml
           {{- end }}
+{{- if $licenseSecret }}
+          - name: license
+            mountPath: "/opt/Axway/apigateway/conf/licenses"
+{{- end }}
           {{- range .Values.anm.secretMounts }}
           - name: {{ .name }}
             mountPath: {{ .path }}

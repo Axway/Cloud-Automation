@@ -222,16 +222,15 @@ spec:
         volumeMounts:
           - name: merge-dir
             mountPath: /merge
+{{- if $licenseSecret }}
+          - name: license
+            mountPath: "/opt/Axway/apigateway/conf/licenses"
+{{- end }}
         {{- if .Values.apitraffic.jvm.enabled }}
           - name: apitraffic-jvmxml
             mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
             subPath: jvm.xml
         {{- end }}
-{{- if $licenseSecret }}
-          - name: license
-            mountPath: "/opt/Axway/apigateway/conf/licenses/lic.lic"
-            subPath: license
-{{- end }}
           - name: events
             mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apitraffic.volumeMountsPaths.events | quote }}
           - name: opentraffic

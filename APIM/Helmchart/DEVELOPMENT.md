@@ -8,4 +8,4 @@
   - And other examples
 - Update the `CHANGELOG.md`
 - Commit and Push
-- Create a release on GitHub with tag schema: `apim-helm-v2.8.0`
+- Create a release on GitHub with tag schema: `apim-helm-2.8.0`

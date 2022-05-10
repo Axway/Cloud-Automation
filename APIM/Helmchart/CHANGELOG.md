@@ -2,9 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.10.0] 2022-05-09
 ### Changed
+- Helm-Chart now released using a version tag without v (e.g. 2.10.0 )
 - Now using topologySpreadConstraint instead of podAntiAffinity by default
+- Updated Helm-Chart dependencies
+  - bitnami/common 1.13.0 --> 1.13.1
+  - bitnami/mysql 8.9.2 --> 8.9.6
+
+### Fixed
+- Using an existing license secret was not working as expected. Now it's.
 
 ## [2.9.0] 2022-04-25
 
