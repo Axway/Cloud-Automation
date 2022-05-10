@@ -79,7 +79,7 @@ You can overwrite all parameters of the base [`values.yaml`](../../values.yaml),
 
 To finally start the deployment into your Kubernetes Cluster using Helm, use now the following command:
 ```
-helm install axway-apim -n apim -f .\local-values-aks-noingress.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.9.0/helm-chart-axway-apim-2.11.0-pre.tgz
+helm install axway-apim -n apim -f .\local-values-aks-noingress.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-v2.9.0/helm-chart-axway-apim-2.10.0.tgz
 ```
 
 Now wait that all containers are up and in running state with the following command : 
@@ -218,7 +218,7 @@ You can overwrite all parameters of the base [`values.yaml`](../../values.yaml),
 
 To finally start the deployment into your Kubernetes Cluster using Helm, use now the following command:
 ```
-helm install axway-apim -n apim -f .\local-values-aks-agic.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-2.11.0-pre/helm-chart-axway-apim-2.11.0-pre.tgz
+helm install axway-apim -n apim -f .\local-values-aks-agic.yaml https://github.com/Axway/Cloud-Automation/releases/download/apim-helm-2.10.0/helm-chart-axway-apim-2.10.0.tgz
 ```
 
 Now wait that all containers are up and in running state with the following command : 
