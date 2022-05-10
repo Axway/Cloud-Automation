@@ -31,10 +31,8 @@ jobs:
         sed -E -i 's|(apim-helm)-[0-9]*\.[0-9]*\.[0-9]*.*\/|\1-${{ env.RELEASE_VERSION }}|' ./examples/aws-eks/README.md
         sed -E -i 's|(helm-chart-axway-apim)-[0-9]*\.[0-9]*\.[0-9]*.*(\.tgz)|\1-${{ env.RELEASE_VERSION }}\2|' ./examples/aws-eks/README.md
         echo "Set version: ${{ env.RELEASE_VERSION }} in Azure Example Readme."
-        # sed -E -i 's|(apim-helm)-[0-9]*\.[0-9]*\.[0-9]*.*\/|\1-${{ env.RELEASE_VERSION }}/' ./examples/azure-aks/README.md
-        # sed -E -i 's|(helm-chart-axway-apim)-[0-9]*\.[0-9]*\.[0-9]*.*(\.tgz)|\1-${{ env.RELEASE_VERSION }}\2|' ./examples/azure-aks/README.md
-        cat ./examples/aws-eks/README.md
-        exit 1
+        sed -E -i 's|(apim-helm)-[0-9]*\.[0-9]*\.[0-9]*.*\/|\1-${{ env.RELEASE_VERSION }}|' ./examples/azure-aks/README.md
+        sed -E -i 's|(helm-chart-axway-apim)-[0-9]*\.[0-9]*\.[0-9]*.*(\.tgz)|\1-${{ env.RELEASE_VERSION }}\2|' ./examples/azure-aks/README.md
     - name: Create packaged Helm-Chart
       run: |
         pwd
