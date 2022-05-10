@@ -1,23 +1,19 @@
 apiVersion: v2
-
 appVersion: 7.7-20220228
-
-version: "2.9.0"
-
+version: "2.10.0-pre"
 description: Helm chart for installing the Axway API-Management solution.
 icon: https://images.app.goo.gl/MbQyRo2M2jzAsed79
 home: https://github.com/Axway/Cloud-Automation/tree/master/APIM/Helmchart
 keywords:
-- API Management, Axway, AMPLIFY API, Demo, Azure
+  - API Management, Axway, AMPLIFY API, Demo, Azure
 maintainers:
-- email: ncomandini@axway.com
-  name: cloud-automation community
-- email: cwiechmann@axway.com
-  name: cloud-automation community
+  - email: ncomandini@axway.com
+    name: cloud-automation community
+  - email: cwiechmann@axway.com
+    name: cloud-automation community
 name: axway-apim
 # Must have the -ro extension to support version such as v1.18.20-eks-8c579e (See https://github.com/helm/helm/issues/3810)
 kubeVersion: ">=v1.11.x-r0"
-
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami
