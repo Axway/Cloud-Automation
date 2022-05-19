@@ -1,7 +1,7 @@
 dependencies:
 - name: common
   repository: https://charts.bitnami.com/bitnami
-  version: 1.13.1
+  version: 1.14.0
 - name: cassandra
   repository: https://charts.bitnami.com/bitnami
   version: 7.7.3
@@ -14,5 +14,5 @@ dependencies:
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 15.7.6
-digest: sha256:ca3ef2662eef212d98cc196738352d312a3921792b44e3d2eabd6d807736380b
-generated: "2022-05-09T16:56:22.1396401+02:00"
+digest: sha256:335a2cd363ab6696e14a112209291aaac1e0c624027cca84abf3c7537e8d8d2c
+generated: "2022-05-19T12:18:12.186173276Z"
