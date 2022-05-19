@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.10.1] 2022-05-19
+### Fixed
+- global.license was mounted to conf/licenses/license which is not acceppted by the API-Gateways. Now it's using helm-global-license.lic
+
 ## [2.10.0] 2022-05-09
 ### Changed
 - Helm-Chart now released using a version tag without v (e.g. 2.10.0 )

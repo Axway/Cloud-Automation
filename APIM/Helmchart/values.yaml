@@ -23,9 +23,10 @@ global:
 
    # AZURE, OPENSHIFT, MINIKUBE
    platform: ""
-   # If you provide your license in your myValues.yaml, a Secret axway-apim-license will be created and automatically mountered 
+   # If you provide your license in your myValues.yaml, a Secret axway-apim-license will be created and automatically mounted 
    # into the API Gateway PODs. 
-   # Alternatively, you can use your own secret and reference it via licenseSecretName below.
+   # Alternatively, you can use your own secret and reference it via existingLicenseSecret below. Make sure, your secret key ends with 
+   # license.lic
    # Or you can build the image with the license included.
    # license: |
       # FIPS=1
