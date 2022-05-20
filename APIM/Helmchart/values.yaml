@@ -632,6 +632,16 @@ apitraffic:
             <VMArg name="-Dio.swagger.v3.parser.util.RemoteUrl.trustAll=true"/>
          </ConfigurationFragment>
 
+   # Configure pod autoscaling
+   # Min replicas uses value apitraffic.replicas if not set.
+   # Default trigger is CPU utilization.
+   autoscaling:
+      enabled: false
+      #minReplicas: 3
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 90
+      # targetMemoryUtilizationPercentage: 80
+
 ##################################################################################################################################
 #   API-Portal
 ##################################################################################################################################
