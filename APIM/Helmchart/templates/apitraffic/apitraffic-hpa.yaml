@@ -1,0 +1,27 @@
+{{- if and (.Values.apitraffic.autoscaling.enabled) (.Values.apitraffic.enabled) -}}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "apitraffic.name" . }}
+  labels: {{ include "apitraffic.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "apitraffic.name" . }}
+  minReplicas: {{ .Values.apitraffic.autoscaling.minReplicas | default .Values.apitraffic.replicas }}
+  maxReplicas: {{ .Values.apitraffic.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.apitraffic.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.apitraffic.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.apitraffic.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.apitraffic.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}
