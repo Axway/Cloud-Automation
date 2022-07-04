@@ -1371,6 +1371,15 @@ externalApiportalDB: {}
      #    secretKeyRef: 
      #      name: my-secret
      #      key: my-key
+     ## Enable SSL encryption
+     ## Requires a secret not included in this chart
+     #- name: MYSQL_SSL_ON
+     #  value: "1"
+     #- name: MYSQL_SSL_CA_CERT
+     #  valueFrom: 
+     #    secretKeyRef: 
+     #      name: my-secret
+     #      key: my-key
 
 ##################################################################################################################################
 #   INTERNAL METRICS DATABASE
