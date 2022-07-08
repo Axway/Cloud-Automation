@@ -1331,6 +1331,16 @@ cassandra:
      # Start a side-car prometheus exporter
      enabled: false
 
+   # We usually recommend not to specify default resources and to leave this as a conscious choice for the user.
+   # This also increases chances charts run on environments with little resources, such as Minikube.
+   # If you do want to specify resources, uncomment the CPU and memory values, adjust them as necessary, and remove the curly braces.
+   resources:
+     limits: {}
+         # cpu: 2
+         # memory: 4Gi
+     requests: {}
+         # cpu: 0.5
+         # memory: 1Gi
 
 ##################################################################################################################################
 #   EXTERNAL Metrics DB
@@ -1422,9 +1432,20 @@ mysqlmetrics:
 
    initdbScriptsConfigMap: metrics
 
-   nodeSelector: {}
-   tolerations: []
-   affinity: {}
+   primary:
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious choice for the user.
+      # This also increases chances charts run on environments with little resources, such as Minikube.
+      # If you do want to specify resources, uncomment the CPU and memory values, adjust them as necessary, and remove the curly braces.
+      resources:
+         limits: {}
+            # cpu: 0.5
+            # memory: 1Gi
+         requests: {}
+            # cpu: 250m
+            # memory: 256Mi
 
 ##################################################################################################################################
 #   INTERNAL API-Portal DATABASE
@@ -1461,9 +1482,20 @@ mysqlapiportal:
 
    securityContext: {}
 
-   nodeSelector: {}
-   tolerations: []
-   affinity: {}
+   primary:
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious choice for the user.
+      # This also increases chances charts run on environments with little resources, such as Minikube.
+      # If you do want to specify resources, uncomment the CPU and memory values, adjust them as necessary, and remove the curly braces.
+      resources:
+         limits: {}
+            # cpu: 0.5
+            # memory: 1Gi
+         requests: {}
+            # cpu: 250m
+            # memory: 256Mi
 
 ##################################################################################################################################
 #   INTERNAL REDIS DATABASE
