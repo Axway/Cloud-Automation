@@ -20,6 +20,9 @@ metadata:
 {{ toYaml . | indent 4 }}
   {{- end }}
 spec:
+  {{- if or (.Values.global.ingressClassName) (.Values.apimgr.ingress.ingressClassName) }}
+  ingressClassName: {{ template "apimgr.ingressClassName" . }}
+  {{- end }}
   {{- if .Values.apimgr.ingress.tls }}
   tls:
 {{ toYaml .Values.apimgr.ingress.tls | indent 4 }}

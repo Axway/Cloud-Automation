@@ -17,6 +17,9 @@ metadata:
 {{ toYaml . | indent 4 }}
   {{- end }}
 spec:
+  {{- if or (.Values.global.ingressClassName) (.Values.anm.ingress.ingressClassName) }}
+  ingressClassName: {{ template "anm.ingressClassName" . }}
+  {{- end }}
   {{- if .Values.anm.ingress.tls }}
   tls:
 {{ toYaml .Values.anm.ingress.tls | indent 4 }}

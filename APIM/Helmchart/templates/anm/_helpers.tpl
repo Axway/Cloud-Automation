@@ -33,3 +33,10 @@ Admin-Node-Manager ImageTag
 {{- define "imageTag" -}}
 {{- if .Values.anm.imageTag }}{{ .Values.anm.imageTag }}{{- else }}{{ required "Either anm.imageTag or global.imageTag is required. Please configure your values.yaml accordingly." .Values.global.imageTag }}{{- end }}
 {{- end }}
+
+{{/*
+Admin-Node-Manager ingressClassName
+*/}}
+{{- define "anm.ingressClassName" -}}
+{{- if .Values.anm.ingress.ingressClassName }}{{ .Values.anm.ingress.ingressClassName }}{{- else }}{{ .Values.global.ingressClassName }}{{- end }}
+{{- end }}

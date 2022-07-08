@@ -50,6 +50,12 @@ global:
    # Setup the docker registry of the init image. By default busybox hosted on docker.io
    # initContainerImage: busybox:1.33
 
+   # Set the name of the ingress class to any components.
+   # It's possible to overwrite this value for each component.
+   # No default value and optional if only one ingress controller is deployed.
+   # Available only for Kubernetes version 1.18.x
+   ingressClassName:
+
 ##################################################################################################################################
 #   A D M I N - N O D E M A N A G E R
 ##################################################################################################################################
@@ -74,6 +80,9 @@ anm:
    # General ingress settings.
    ingress:
       enabled: true
+      # Set this value to overwrite the global value. 
+      # Useful to choose an Ingress controller that is listening on a different IP
+      ingressClassName: ""
       name: anm
       # Set the annotations according to your Ingress-Controller
       annotations: {}
@@ -305,6 +314,9 @@ apimgr:
 
    ingress:
       enabled: true
+      # Set this value to overwrite the global value. 
+      # Useful to choose an Ingress controller that is listening on a differnte IP
+      ingressClassName: ""
       annotations: {}
          # kubernetes.io/ingress.class: azure/application-gateway
          # appgw.ingress.kubernetes.io/backend-protocol: https
@@ -486,6 +498,9 @@ apitraffic:
       # Please note: Only basic ingress settings are configured here. 
       # The individual ingress resources are configured for the individual service ports. 
       # See for example: service.ports.oauth.ingress....
+      # Set this value to overwrite the global value. 
+      # Useful to choose an Ingress controller that is listening on a different IP
+      ingressClassName: ""
       annotations: {}
          # kubernetes.io/ingress.class: azure/application-gateway
          # appgw.ingress.kubernetes.io/backend-protocol: https
@@ -728,6 +743,9 @@ apiportal:
    ingress:
       enabled: true
       name: apiportal
+      # Set this value to overwrite the global value. 
+      # Useful to choose an Ingress controller that is listening on a different IP
+      ingressClassName: ""
       # Set the annotations according to your Ingress-Controller
       annotations: {}
          # kubernetes.io/ingress.class: azure/application-gateway

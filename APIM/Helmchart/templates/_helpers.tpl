@@ -12,11 +12,14 @@
 {{- end -}}
 {{- end -}}
 
+{{/*
+Admin Node Manager name
+*/}}
 {{- define "anm.name" -}}
 {{- if .Values.anm.nameOverride -}}
 {{ .Values.anm.nameOverride }}
 {{- else -}}
-{{- default .Chart.Name .Values.anm.nameOverride | trunc 63 | trimSuffix "-" -}}-anm
+{{- "anm" -}}
 {{- end -}}
 {{- end -}}
 
