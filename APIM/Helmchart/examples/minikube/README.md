@@ -154,9 +154,10 @@ Kubectl create ns apim
     Add a registry for the demo
     ```
     kubectl create secret docker-registry axway-demo-registry \
-        --docker-server=axwayproductsdemo.azurecr.io \ 
-        --docker-username=apim-demo \
-        --docker-password=3mL3FoB8Pb/lqIWZwmaf3oYV2zKr0W68 \ --docker-email=demo@axway.com -n apim
+    --docker-server=docker-registry.demo.axway.com/demo-public \
+    --docker-username='robot$demo-github' \
+    --docker-password="eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjUzMjQwNTUsImlhdCI6MTY1NzU0ODA1NSwiaXNzIjoiaGFyYm9yLXRva2VuLWRlZmF1bHRJc3N1ZXIiLCJpZCI6OTgsInBpZCI6MTYsImFjY2VzcyI6W3siUmVzb3VyY2UiOiIvcHJvamVjdC8xNi9yZXBvc2l0b3J5IiwiQWN0aW9uIjoicHVsbCIsIkVmZmVjdCI6IiJ9XX0.kZUKyR5dO0aBClw3rWCyHQy7gaV80eVN4Yhwbf4kGoti-uhRMhQBnSpeRIvZ3l89I7iLkhNIuQJlJbvYWOR_G_mj3-V1Xy5IL9hzrTRDJhkvJL3yoStIBb7kqPyy3-Cf5TSra4bEWPLC9ssDk2c_CHAh88RfnRH3FNQhAo_hOjJVYSYKmvBP1k5mXjvPjLxNezj1s5hqwDFBBDnvpZ1Sxvwt4n4CCmrwhgU53dGqRLvqTM5FBK7bjqB23hyvcKoS59jUXW5mFjCd8_6EdUmcbRaC0O1StD4MwBr_6DE_p9EHZHLhUAk5tCSg2IRF2LXm40o1MTUiRIOpAPBVyAWieVelsEyeb8TgllaTT4chCL787nIRzIjzIFBf4jA5zlkpQ0_GD0EL41CiUjV96MtE4lgrVLZmj8R9nhrR0FuZlD-01cBg-GID7AG7Q42B43um3H9dJLJ1B8YbUfwofM9tzsH1deljejhYuWeKlniDZzxN8M8JOO6m2WCQEyu1_9FEvsMSECRNix0cJPkc-8OOAQ58S4nW_VrRzcDK4Is-UheNo5cHDmS3vS_37nPQsAQKnF3ovo3eZnditXsaSaAvOZXuUVSeHGFMW9g7puL_KVrsmSVW4eGIzrBphTXgdYmvWEPzEWjvC6iaxQUGrxr4L1KXYTCWySsUvQAZgeq5iQs" \
+    --docker-email=demo@axway.com -n apim
     ```
 
 8. Deploy APIM using HELM.

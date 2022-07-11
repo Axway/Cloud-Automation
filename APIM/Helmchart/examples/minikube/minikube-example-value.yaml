@@ -3,8 +3,8 @@ global:
   - name: axway-demo-registry
 
   domainName: "kube.local.com"
-  dockerRepository: "axwayproductsdemo.azurecr.io"
-  imageTag: "20211130"
+  dockerRepository: "docker-registry.demo.axway.com/demo-public"
+  imageTag: "20211130-1.1.3"
   # The default pull policy is set to Always because APIM docker images are recreated with the same image tage every 2 months.
   imagePullPolicy: "Always"
   acceptGeneralConditions: "yes"
@@ -14,7 +14,7 @@ global:
 ##################################################################################################################################
 anm:
    enabled: true
-   image: "apim-anm-7.7"
+   image: "anm-prod-7.7"
    ingress:
       enabled: true
       annotations: 
@@ -31,8 +31,8 @@ anm:
 ##################################################################################################################################
 apimgr:
    enabled: true
-   image: "apim-gtw-7.7"
-   imageTag: "20211130"
+   image: "gtw-prod-int-7.7"
+   imageTag: "20211130-1.1.1""
    ingress:
       enabled: true
       annotations: 
@@ -49,8 +49,8 @@ apimgr:
 ##################################################################################################################################
 apitraffic:
    enabled: true
-   image: "apim-gtw-7.7"
-   imageTag: "20211130"
+   image: "gtw-prod-int-7.7"
+   imageTag: "20211130-1.1.1"
    replicas: 1
    ingress:
       enabled: true
@@ -71,8 +71,8 @@ apitraffic:
 ##################################################################################################################################
 apiportal:
    enabled: true
-   image: "apim-portal-7.7"
-   imageTag: "20211130"
+   image: ""apim-portal-prod-7.7"
+   imageTag: "20211130-1.0.0"
    ingress:
       enabled: true
       name: portal
