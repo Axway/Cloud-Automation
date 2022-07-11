@@ -1349,6 +1349,16 @@ cassandra:
      # Start a side-car prometheus exporter
      enabled: false
 
+   # We usually recommend not to specify default resources and to leave this as a conscious choice for the user.
+   # This also increases chances charts run on environments with little resources, such as Minikube.
+   # If you do want to specify resources, uncomment the CPU and memory values, adjust them as necessary, and remove the curly braces.
+   resources:
+     limits: {}
+         # cpu: 2
+         # memory: 4Gi
+     requests: {}
+         # cpu: 0.5
+         # memory: 1Gi
 
 ##################################################################################################################################
 #   EXTERNAL Metrics DB
@@ -1424,6 +1434,21 @@ mysqlmetrics:
       # Configure to remove binLogs are 7 days instead of default 30
       extraFlags: "--binlog-expire-logs-seconds=604800"
 
+      nodeSelector: {}
+      securityContext: {}
+      tolerations: []
+      affinity: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious choice for the user.
+      # This also increases chances charts run on environments with little resources, such as Minikube.
+      # If you do want to specify resources, uncomment the CPU and memory values, adjust them as necessary, and remove the curly braces.
+      resources:
+         limits: {}
+            # cpu: 0.5
+            # memory: 1Gi
+         requests: {}
+            # cpu: 250m
+            # memory: 256Mi
+
    ssl: false
 
    auth: 
@@ -1439,10 +1464,6 @@ mysqlmetrics:
       existingSecret: ""
 
    initdbScriptsConfigMap: metrics
-
-   nodeSelector: {}
-   tolerations: []
-   affinity: {}
 
 ##################################################################################################################################
 #   INTERNAL API-Portal DATABASE
@@ -1462,6 +1483,21 @@ mysqlapiportal:
          enabled: true
          existingClaim: apigw-mysql-apiportal
 
+      nodeSelector: {}
+      securityContext: {}
+      tolerations: []
+      affinity: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious choice for the user.
+      # This also increases chances charts run on environments with little resources, such as Minikube.
+      # If you do want to specify resources, uncomment the CPU and memory values, adjust them as necessary, and remove the curly braces.
+      resources:
+         limits: {}
+            # cpu: 0.5
+            # memory: 1Gi
+         requests: {}
+            # cpu: 250m
+            # memory: 256Mi
+
       # Configure to remove binLogs are 7 days instead of default 30
       extraFlags: "--binlog-expire-logs-seconds=604800"
 
@@ -1476,12 +1512,6 @@ mysqlapiportal:
       password: "changeme"
       # An existing secret must contain the keys mysql-root-password / mysql-password
       existingSecret: ""
-
-   securityContext: {}
-
-   nodeSelector: {}
-   tolerations: []
-   affinity: {}
 
 ##################################################################################################################################
 #   INTERNAL REDIS DATABASE
