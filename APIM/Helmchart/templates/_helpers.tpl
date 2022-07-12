@@ -19,7 +19,7 @@ Admin Node Manager name
 {{- if .Values.anm.nameOverride -}}
 {{ .Values.anm.nameOverride }}
 {{- else -}}
-{{- "anm" -}}
+{{- default .Chart.Name .Values.anm.nameOverride | trunc 63 | trimSuffix "-" -}}-anm
 {{- end -}}
 {{- end -}}
 
