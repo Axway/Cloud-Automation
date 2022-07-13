@@ -54,7 +54,7 @@ global:
    # It's possible to overwrite this value for each component.
    # No default value and optional if only one ingress controller is deployed.
    # Available only for Kubernetes version 1.18.x
-   ingressClassName:
+   ingressClassName: ""
 
 ##################################################################################################################################
 #   A D M I N - N O D E M A N A G E R
