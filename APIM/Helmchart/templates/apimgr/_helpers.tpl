@@ -33,3 +33,10 @@ API-Manager ImagePullPolicy
 {{- define "imagePullPolicy" -}}
 {{- if .Values.apimgr.imagePullPolicy }}{{ .Values.apimgr.imagePullPolicy }}{{- else }}{{ .Values.global.imagePullPolicy }}{{- end }}
 {{- end }}
+
+{{/*
+API-Manager ingressClassName
+*/}}
+{{- define "apimgr.ingressClassName" -}}
+{{- if .Values.apimgr.ingress.ingressClassName }}{{ .Values.apimgr.ingress.ingressClassName }}{{- else }}{{ .Values.global.ingressClassName }}{{- end }}
+{{- end }}

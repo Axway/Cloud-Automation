@@ -72,3 +72,10 @@ apache-ca.crt: {{ $ca.Cert | b64enc }}
 apache.crt: {{ $cert.Cert | b64enc }}
 apache.key: {{ $cert.Key | b64enc }}
 {{- end -}}
+
+{{/*
+API-Portal ingressClassName
+*/}}
+{{- define "apiportal.ingressClassName" -}}
+{{- if .Values.apiportal.ingress.ingressClassName }}{{ .Values.apiportal.ingress.ingressClassName }}{{- else }}{{ .Values.global.ingressClassName }}{{- end }}
+{{- end }}

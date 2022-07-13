@@ -37,3 +37,10 @@ API-Gateway Traffic ImageTag
 {{- define "domain.name" -}}
 {{ required "Either apimgr.ingress.name or global.domainName is required. Please configure your values.yaml accordingly." .Values.global.domainName }}
 {{- end -}}
+
+{{/*
+API-Gateway Traffic ingressClassName
+*/}}
+{{- define "apitraffic.ingressClassName" -}}
+{{- if .Values.apitraffic.ingress.ingressClassName }}{{ .Values.apitraffic.ingress.ingressClassName }}{{- else }}{{ .Values.global.ingressClassName }}{{- end }}
+{{- end }}

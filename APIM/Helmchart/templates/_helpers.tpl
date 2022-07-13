@@ -12,6 +12,9 @@
 {{- end -}}
 {{- end -}}
 
+{{/*
+Admin Node Manager name
+*/}}
 {{- define "anm.name" -}}
 {{- if .Values.anm.nameOverride -}}
 {{ .Values.anm.nameOverride }}

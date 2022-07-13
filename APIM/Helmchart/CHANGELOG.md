@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## Not released
+### Fixed
+- It's not possible to set an Ingress class name with a Kubernetes version >1.22.X. Add IngressClassName value in spec section for any ingress. A different value can be set on each ingress. Adding some verifications to force usage of IngressClassName.
+
+### Changed
+- Add Horizontal Pod Autoscaler capability on the APITRAFFIC deployment.
+
+
 ## [2.10.1] 2022-05-19
 ### Fixed
 - global.license was mounted to conf/licenses/license which is not accepted by the API-Gateways. Now it's using helm-global-license.lic
