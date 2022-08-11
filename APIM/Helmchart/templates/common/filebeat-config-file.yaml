@@ -10,7 +10,7 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
 data:
-{{- if .values.filebeat.customConfig }}
+{{- if .Values.filebeat.customConfig }}
 {{- range $path, $config := .Values.filebeat.customConfig }}
   {{ $path }}: |
 {{ $config | indent 4 -}}

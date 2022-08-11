@@ -1559,8 +1559,13 @@ filebeat:
       beatsSystemUsername: "beats_system"
       beatsSystemPassword: ""
 
-  # The Elasticsearch Hosts used by all components
-  # This must point to the Elasticsearch service when running in Kubernetes
+   # The Logstash Hosts used by Filebeat
+   # Set the Headless service when running in Kubernetes
+   # or to an external logstash cluster
+   logstashHosts: ""
+
+  # The Elasticsearch Hosts used by filebeat
+  # This must point to the Elasticsearch headless service when running in Kubernetes
   # or to an exernal Elasticsearch cluster.
    elasticsearchHosts: ""
 

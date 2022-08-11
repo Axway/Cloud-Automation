@@ -72,7 +72,7 @@ spec:
             name: {{ template "filebeat.name" . }}-config
         - name: certificates
           secret:
-            secretName: {{ template "certSecret.name" . }}
+            secretName: {{ template "filebeat.certSecret.name" . }}
       {{- end }}
       {{- if .Values.apimgr.extraVolumes }}
 {{ toYaml ( .Values.apimgr.extraVolumes ) | indent 8 }}
@@ -231,7 +231,7 @@ spec:
         {{- end }}
         {{- if .Values.filebeat.enabled }}
       - name: "{{ template "filebeat.name" . }}"
-        image: {{ .Values.filebeat.image.registry }}/{{ .Values.filebeat.image.repository }}:{{ .Values.filebeat.tag }}
+        image: {{ .Values.filebeat.image.registry }}/{{ .Values.filebeat.image.repository }}:{{ .Values.filebeat.image.tag }}
         resources:
 {{ toYaml .Values.filebeat.resources | indent 10 }}
         env:
@@ -247,8 +247,10 @@ spec:
           value: {{ default "full" .Values.filebeat.validateElasticsearchCertificate | quote }}
         - name: FILEBEAT_WORKER
           value: {{ .Values.filebeat.filebeatWorker | quote }}
-        FILEBEAT_COMPRESSION_LEVEL: {{ .Values.filebeat.compressionLevel | quote }}
-        SELF_MONITORING_ENABLED: {{ .Values.filebeat.selfMonitoringEnabled | quote }}
+        - name: FILEBEAT_COMPRESSION_LEVEL
+          value: {{ .Values.filebeat.compressionLevel | quote }}
+        - name: SELF_MONITORING_ENABLED
+          value: {{ .Values.filebeat.selfMonitoringEnabled | quote }}
         volumeMounts:
           - name: filebeat-config
             mountPath: /usr/share/filebeat/filebeat.yml
