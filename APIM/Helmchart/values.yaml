@@ -1531,3 +1531,83 @@ base:
    useImagestream: false
    imageName: 
    imageTag: 
+
+##################################################################################################################################
+#   Filebeat - Operational Insights
+##################################################################################################################################
+# This section is dedicated to the Operational insights
+# If enabled, all api-agateways pod will have a filebeat container. 
+# Don't forget to adapt the the storage size for events and openlogging as recommended in the documentation.
+# The filebeat config is based on the operational master chart. 
+# The initial Helmchart provide more customization capabilities for Filebeat, like running it as a DaemontSet, etc. 
+# https://github.com/Axway-API-Management-Plus/apigateway-openlogging-elk/tree/develop/helm
+
+filebeat:
+   enabled: false
+   nameOverride:
+   image:
+     registry: docker.elastic.co
+     repository: beats/filebeat
+     tag: 7.17.1
+
+   # Secrets used to generate the secret <releaseName>-apim4elastic-filebeat-secret
+   # which is referenced below. 
+   # You may use your own secret and reference it here. 
+   # See templates/elasticApimKibana/filebeat-secret.yaml for the required environment variable names
+   filebeatSecrets: 
+      enabled: true
+      beatsSystemUsername: "beats_system"
+      beatsSystemPassword: ""
+
+  # The Elasticsearch Hosts used by all components
+  # This must point to the Elasticsearch service when running in Kubernetes
+  # or to an exernal Elasticsearch cluster.
+   elasticsearchHosts: ""
+
+  # Required for the internal stack monitoring to work with Filebeat
+   elasticsearchClusterUUID: ""
+
+   # Used by all components to verify the Elasticsearch certificate. If you 
+   # have mounted your own certificate, you can overwrite the path here.
+   elasticsearchCaPath: "config/certificates/ca.crt"
+   # Define the name of an existing secret that contains the ca.crt
+   # If empty, the value a secret is created with the mamdatory value elasticSearchCa
+   elasticsearchCaSecret: ""
+   # Use this value to load the CA during the deployment
+   # It must be encoded in base64
+   elasticSearchCa: ""
+
+   # The number of Filebeat worker threads sending data to Logstash. See parameter: FILEBEAT_WORKER in env-sample
+   filebeatWorker: 2
+
+   # The gzip compression level. Setting this value to 0 disables compression. The compression level must be in the 
+   # range of 1 (best speed) to 9 (best compression). Increasing the compression level will reduce the network usage but will 
+   # increase the CPU usage.
+   compressionLevel: 3
+
+   # Stack monitoring for Filebeat, Logstash, Elasticsearch and Kibana using Self-Monitoring. 
+   # Metricbeat monitoring is not yet supported in the Kubernetes deployment.
+   selfMonitoringEnabled: "true"
+
+   # Configure the Elasticsearch server certificate validation for APIBuilder4Elastic. Is enabled by default.
+   # validateElasticsearchCertificate: "false"
+
+   # Extra volumes can be added for custom configuration.
+   # They must be added in volume in the apitraffic pod definition.
+   extraVolumeMounts: []
+   # - name: extras
+   #   mountPath: /usr/share/extras
+   #   readOnly: true
+
+   # Replace the standard filebeat configuration by another
+   # It replace data in filebeat configmaps in folders apitraffic and apiportal
+   customConfig: []
+
+  # Recommended resource requests for Filebeat
+   resources:
+      requests:
+         cpu: "500m"
+         memory: "150Mi"
+      limits:
+         cpu: "1000m"
+         memory: "250Mi"

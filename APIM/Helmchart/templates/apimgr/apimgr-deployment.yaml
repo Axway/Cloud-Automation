@@ -66,6 +66,14 @@ spec:
 {{- else }}
           emptyDir: {}
 {{- end }}
+      {{- if .Values.filebeat.enabled }}
+        - name: filebeat-config
+          configMap:
+            name: {{ template "filebeat.name" . }}-config
+        - name: certificates
+          secret:
+            secretName: {{ template "certSecret.name" . }}
+      {{- end }}
       {{- if .Values.apimgr.extraVolumes }}
 {{ toYaml ( .Values.apimgr.extraVolumes ) | indent 8 }}
       {{- end }}
@@ -220,5 +228,46 @@ spec:
         {{- end }}
         {{- if .Values.apimgr.extraContainers }}
 {{ toYaml .Values.apimgr.extraContainers | indent 6 }}
+        {{- end }}
+        {{- if .Values.filebeat.enabled }}
+      - name: "{{ template "filebeat.name" . }}"
+        image: {{ .Values.filebeat.image.registry }}/{{ .Values.filebeat.image.repository }}:{{ .Values.filebeat.tag }}
+        resources:
+{{ toYaml .Values.filebeat.resources | indent 10 }}
+        env:
+        - name: LOGSTASH_HOSTS
+          value: {{ required "The value filebeat.logstashHosts is missing." .Values.filebeat.logstashHosts | quote }}
+        - name: ELASTICSEARCH_HOSTS
+          value: {{ required "The value filebeat.elasticsearchHosts is missing." .Values.filebeat.elasticsearchHosts | quote }}
+        - name: ELASTICSEARCH_CLUSTER_UUID
+          value: {{ .Values.filebeat.elasticsearchClusterUUID | quote }}
+        - name: ELASTICSEARCH_CRT
+          value: {{ required "The path to the CA for Logstash to Elasticsearch communication is missing" .Values.filebeat.elasticsearchCaPath | quote }}
+        - name: ELASTICSEARCH_SSL_VERIFICATIONMODE
+          value: {{ default "full" .Values.filebeat.validateElasticsearchCertificate | quote }}
+        - name: FILEBEAT_WORKER
+          value: {{ .Values.filebeat.filebeatWorker | quote }}
+        FILEBEAT_COMPRESSION_LEVEL: {{ .Values.filebeat.compressionLevel | quote }}
+        SELF_MONITORING_ENABLED: {{ .Values.filebeat.selfMonitoringEnabled | quote }}
+        volumeMounts:
+          - name: filebeat-config
+            mountPath: /usr/share/filebeat/filebeat.yml
+            subPath: filebeat.yml
+          - name: certificates
+            mountPath: /usr/share/filebeat/config/certificates
+          - name: opentraffic
+            mountPath: /var/opentraffic
+          - name: trace
+            mountPath: /var/trace/
+          - name: events
+            mountPath: /var/events/
+          - name: audit
+            mountPath: /var/audit/
+        {{- if .Values.filebeat.extraVolumeMounts }}
+{{ toYaml (.Values.filebeat.extraVolumeMounts ) | indent 10 }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.apitraffic.extraContainers }}
+{{ toYaml .Values.apitraffic.extraContainers | indent 6 }}
         {{- end }}
 {{- end }}

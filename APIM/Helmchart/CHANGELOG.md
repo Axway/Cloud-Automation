@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Add Horizontal Pod Autoscaler capability on the APITRAFFIC deployment.
+- Add filebeat sidecar for Operational Insights component (ELK)
 
 
 ## [2.10.1] 2022-05-19

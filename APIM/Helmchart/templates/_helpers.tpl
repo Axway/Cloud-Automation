@@ -69,6 +69,25 @@ API-Portal name - Short by default as it look nicer in the ANM-Topology view
 {{- end -}}
 
 {{/*
+Filebeat name 
+*/}}
+{{- define "filebeat.name" -}}
+{{- if .Values.filebeat.nameOverride -}}
+{{ .Values.filebeat.nameOverride }}
+{{- else -}}
+{{- default .Chart.Name .Values.filebeat.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Filebeat certificate secret name
+*/}}
+{{- define "filebeat.certSecret.name" -}}
+{{- if .Values.filebeat.elasticsearchCaSecret }}{{ .Values.filebeat.elasticsearchCaSecret }}{{- else }}{{ template "filebeat.name" . }}-cert
+{{- end }}
+{{- end }}
+
+{{/*
 Return the secret with MySQL credentials as the Bitname chart does
 */}}
 {{- define "mysql.metrics.secretName" -}}

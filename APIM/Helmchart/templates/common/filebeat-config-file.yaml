@@ -1,0 +1,121 @@
+{{- if .Values.filebeat.enabled }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "filebeat.name" . }}-config
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+data:
+{{- if .values.filebeat.customConfig }}
+{{- range $path, $config := .Values.filebeat.customConfig }}
+  {{ $path }}: |
+{{ $config | indent 4 -}}
+{{- end -}}
+
+{{- else }}
+  filebeat.yml: |
+      # Please don't change this file as it is supposed to be overwritten as
+      # part of fixes or enhancements.
+      #
+      # If you are missing a certain feature or discover a bug, please raise an issue instead:
+      # https://github.com/Axway-API-Management-Plus/apigateway-openlogging-elk/issues
+      # name: Filebeat ${GATEWAY_NAME:API-Gateway}
+
+      # Wait for max 60 seconds before stopping - This helps to avoid data loss, when stopping filebeat!
+      filebeat.shutdown_timeout: 60s
+      # Endpoint used by Metricbeat
+      http.enabled: true
+      http.host: "0.0.0.0"
+
+      filebeat.inputs:
+      - type: log
+        paths: ["/var/opentraffic/*_traffic*.log"]
+        close_inactive: 5m # Close filehandlers, if the file has not changed anymore
+        json.keys_under_root: true
+        json.overwrite_keys: false
+        json.add_error_key: true
+        fields_under_root: true
+        fields:
+          logtype: openlog
+          gatewayName: ${GATEWAY_NAME:"API-Gateway"}
+          gatewayRegion: ${GATEWAY_REGION:"N/A"}
+          filebeatVersion: "2"
+
+      - type: log
+        paths: ["/var/trace/*.trc"]
+        close_inactive: 5m # Close filehandlers, if the file has not changed anymore
+        multiline.pattern: '^\[ALERT|TRACE|DEBUG|NOTICE|INFO|WARNING|ERROR|CRITICAL|FATAL|SEVERE]'
+        multiline.negate: true
+        # any line that does not match the above pattern belongs to the previous line
+        multiline.match: after
+        fields_under_root: true
+        # The offset is used to sort the trace messages additionally to the timestamp
+        offset: true
+        # When initially started, don't try to read all existing trace message (by default around 7.8GB per API-Gateway)
+        ignore_older: "12h"
+        fields:
+          logtype: trace
+          gatewayName: ${GATEWAY_NAME:"API-Gateway"}
+          gatewayRegion: ${GATEWAY_REGION:"N/A"}
+          filebeatVersion: "2"
+
+      - type: log
+        paths: ["/var/events/*.log", "/var/events/processed/*.log.PROCESSED"]
+        close_inactive: 5m
+        json.keys_under_root: true
+        json.overwrite_keys: false
+        json.add_error_key: true
+        fields_under_root: true
+        # When initially started, don't try to read all existing trace message (by default around 7.8GB per API-Gateway)
+        ignore_older: "12h"
+        fields:
+          logtype: events
+          gatewayName: ${GATEWAY_NAME:"API-Gateway"}
+          gatewayRegion: ${GATEWAY_REGION:"N/A"}
+          filebeatVersion: "2"
+
+      # Required for Trace-Messages logged by the API-Gateway
+      processors:
+        - add_locale:
+
+      output.logstash:
+        hosts: ${LOGSTASH_HOSTS}
+        worker: ${FILEBEAT_WORKERS:2}
+        bulk_max_size: ${FILEBEAT_BULK_MAX_SIZE:3072}
+        compression_level: ${FILEBEAT_COMPRESSION_LEVEL:3}
+        loadbalance: true
+        ttl: 2m
+        # Required to make TTL working
+        pipelining: 0
+
+      monitoring:
+        enabled: ${SELF_MONITORING_ENABLED}
+        # Get the Cluster-ID (cluster_uuid) with this simple query: https://elasticsearch1:9200/
+        # This links this filebeat instance to the Cluster with the given ID to enable monitoring
+        # It's also required to setup the beats_system user
+        cluster_uuid: ${ELASTICSEARCH_CLUSTER_UUID:ELASTICSEARCH_CLUSTER_UUID-NOT-SET}
+        elasticsearch:
+          hosts: ${ELASTICSEARCH_HOSTS}
+          ssl.enabled: true
+          ssl.certificate_authorities: ["${ELASTICSEARCH_CRT:ELASTICSEARCH_CRT-NOT-SET}"]
+          username: "${BEATS_SYSTEM_USERNAME:''}"
+          password: "${BEATS_SYSTEM_PASSWORD:''}"
+
+      logging.level: info
+      logging.to_stderr: true
+      logging.to_files: true
+      #logging.level: debug
+      #logging.to_files: true
+      #logging.files:
+      #  name: filebeat.dbg
+      #  keepfiles: 7
+      #  permissions: 0644
+      #logging.selectors: ["*"]
+
+{{- end }}
+
+{{- end }}
