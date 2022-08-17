@@ -1605,8 +1605,9 @@ filebeat:
    #   readOnly: true
 
    # Replace the standard filebeat configuration by another
-   # It replace data in filebeat configmaps in folders apitraffic and apiportal
-   customConfig: []
+   # It replace data in filebeat configmaps in folders apitraffic and apimgr
+   apimgrCustomConfig: []
+   apitrafficCustomConfig: []
 
   # Recommended resource requests for Filebeat
    resources:

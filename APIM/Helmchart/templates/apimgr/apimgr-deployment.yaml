@@ -66,6 +66,7 @@ spec:
 {{- else }}
           emptyDir: {}
 {{- end }}
+        - name: audit
 {{- if .Values.pvcs.audit.enabled }}
           persistentVolumeClaim:
             claimName: apimgr-audit
