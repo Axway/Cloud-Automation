@@ -62,13 +62,6 @@ spec:
 {{- else }}
           emptyDir: {}
 {{- end }}
-        - name: audit
-{{- if .Values.pvcs.audit.enabled }}
-          persistentVolumeClaim:
-            claimName: apigw-audit
-{{- else }}
-          emptyDir: {}
-{{- end }}
 {{- if $licenseSecret }}
         - name: license
           secret:
@@ -90,7 +83,7 @@ spec:
       {{- if .Values.filebeat.enabled }}
         - name: filebeat-config
           configMap:
-            name: {{ template "filebeat.name" . }}-config
+            name: {{ template "apitraffic.name" . }}-filebeat-config
         - name: certificates
           secret:
             secretName: {{ template "filebeat.certSecret.name" . }}
@@ -285,8 +278,6 @@ spec:
             mountPath: /var/trace/
           - name: events
             mountPath: /var/events/
-          - name: audit
-            mountPath: /var/audit/
         {{- if .Values.filebeat.extraVolumeMounts }}
 {{ toYaml (.Values.filebeat.extraVolumeMounts ) | indent 10 }}
         {{- end }}

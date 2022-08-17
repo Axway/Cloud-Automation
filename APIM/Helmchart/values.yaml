@@ -1240,7 +1240,7 @@ pvcs:
             requests:
                storage: 30Gi
 
-   # Trace is used by ANM
+   # Audit is used by APIMGR. 
    audit:
       # If disabled an emptyDir volume is used instead
       # Useful if you stream log information to an external logging system

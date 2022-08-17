@@ -66,10 +66,16 @@ spec:
 {{- else }}
           emptyDir: {}
 {{- end }}
+{{- if .Values.pvcs.audit.enabled }}
+          persistentVolumeClaim:
+            claimName: apimgr-audit
+{{- else }}
+          emptyDir: {}
+{{- end }}
       {{- if .Values.filebeat.enabled }}
         - name: filebeat-config
           configMap:
-            name: {{ template "filebeat.name" . }}-config
+            name: {{ template "apimgr.name" . }}-filebeat-config
         - name: certificates
           secret:
             secretName: {{ template "filebeat.certSecret.name" . }}
@@ -257,12 +263,6 @@ spec:
             subPath: filebeat.yml
           - name: certificates
             mountPath: /usr/share/filebeat/config/certificates
-          - name: opentraffic
-            mountPath: /var/opentraffic
-          - name: trace
-            mountPath: /var/trace/
-          - name: events
-            mountPath: /var/events/
           - name: audit
             mountPath: /var/audit/
         {{- if .Values.filebeat.extraVolumeMounts }}
