@@ -1552,6 +1552,12 @@ filebeat:
      repository: beats/filebeat
      tag: 7.17.1
 
+   # Boulean to activate or not filbeat on any components
+   componentEnabled:
+      anm: true
+      apimgr: true
+      apitraffic: true
+
    # Secrets used to generate the secret <releaseName>-apim4elastic-filebeat-secret
    # which is referenced below. 
    # You may use your own secret and reference it here. 
@@ -1560,6 +1566,14 @@ filebeat:
       enabled: true
       beatsSystemUsername: "beats_system"
       beatsSystemPassword: ""
+
+   # Set the APi-Group name.
+   gatewayName: ""
+
+   # Set the region name of the APIM Deployment used by Kibana Dashboard
+   # One per Admin Node Manager.
+   # Default value is N/A
+   region: ""
 
    # The Logstash Hosts used by Filebeat
    # Set the Headless service when running in Kubernetes
@@ -1607,7 +1621,8 @@ filebeat:
    #   readOnly: true
 
    # Replace the standard filebeat configuration by another
-   # It replace data in filebeat configmaps in folders apitraffic and apimgr
+   # It replace data in filebeat configmaps in folders anm, apitraffic and apimgr
+   anmCustomConfig: []
    apimgrCustomConfig: []
    apitrafficCustomConfig: []
 

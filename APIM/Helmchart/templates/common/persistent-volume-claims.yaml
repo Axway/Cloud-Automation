@@ -41,6 +41,16 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: anm-audit
+  namespace: {{ .Release.Namespace | quote }}
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.audit.auditVolumeClaim | indent 2 }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: apimgr-audit
   namespace: {{ .Release.Namespace | quote }}
   annotations:

@@ -238,7 +238,7 @@ spec:
         {{- if .Values.apimgr.extraContainers }}
 {{ toYaml .Values.apimgr.extraContainers | indent 6 }}
         {{- end }}
-        {{- if .Values.filebeat.enabled }}
+        {{- if and (.Values.filebeat.enabled) (.Values.filebeat.componentEnabled.apimgr) }}
       - name: "{{ template "filebeat.name" . }}"
         image: {{ .Values.filebeat.image.registry }}/{{ .Values.filebeat.image.repository }}:{{ .Values.filebeat.image.tag }}
         resources:
@@ -260,6 +260,10 @@ spec:
           value: {{ .Values.filebeat.compressionLevel | quote }}
         - name: SELF_MONITORING_ENABLED
           value: {{ .Values.filebeat.selfMonitoringEnabled | quote }}
+        - name: GATEWAY_NAME
+          value: {{ default "API-Gateway" .Values.filebeat.gatewayName | quote }}
+        - name: GATEWAY_REGION
+          value: {{ default "N/A" .Values.filebeat.region | quote }}
         volumeMounts:
           - name: filebeat-config
             mountPath: /usr/share/filebeat/filebeat.yml
