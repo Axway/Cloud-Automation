@@ -75,7 +75,7 @@ Filebeat name
 {{- if .Values.filebeat.nameOverride -}}
 {{ .Values.filebeat.nameOverride }}
 {{- else -}}
-{{- default .Chart.Name .Values.filebeat.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- "filebeat" -}}
 {{- end -}}
 {{- end -}}
 

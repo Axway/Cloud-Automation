@@ -295,6 +295,8 @@ apimgr:
    volumeMountsPaths:
       # Where to mount events (defaults to /opt/Axway/apigateway/events)
       events: ""
+      # Where to mount audit (defaults to /opt/Axway/apigateway/groups/emt-group/emt-service/logs)
+      audit: ""
 
    # Allows you to add any config files
    extraVolumes: []

@@ -215,6 +215,8 @@ spec:
         volumeMounts:
           - name: merge-dir
             mountPath: /merge
+          - name: audit
+            mountPath: {{ default "/opt/Axway/apigateway/groups/emt-group/emt-service/logs" .Values.apimgr.volumeMountsPaths.audit | quote }}
         {{- if .Values.apimgr.jvm.enabled }}
           - name: apimgr-jvmxml
             mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
