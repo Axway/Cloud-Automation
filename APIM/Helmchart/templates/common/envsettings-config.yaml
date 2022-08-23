@@ -1,0 +1,85 @@
+{{- if or .Values.anm.envSettings.enabled .Values.apimgr.envSettings.enabled .Values.apitraffic.envSettings.enabled }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-envsettings
+  namespace: {{ .Release.Namespace | quote }}
+data:
+  {{- if .Values.anm.envSettings.enabled }}
+  anm-envsettings: |
+    # the default port which the Node Manager listens on for HTTP traffic
+    env.PORT.TRAFFIC={{ .Values.anm.containerPorts.anm }}
+
+    # the default port which the Node Manager listens on for management/configuration HTTP traffic
+    env.PORT.MANAGEMENT={{ .Values.anm.containerPorts.anm }}
+
+    # the default port which the Node Manager listens on for sample messages
+    env.PORT.SAMPLE.SERVICES={{ .Values.anm.containerPorts.anm }}
+
+    # the timeout for web manager user sessions, 12 hours
+    env.WEBMANAGER.SESSION.TIMEOUT={{ default 43200000 .Values.anm.envSettings.webmanagerSessionTimeout }}
+
+    # the idle timout for web manager user session, 30 minutes
+    # number of seconds of inactivity for session to be invalidated
+    env.WEBMANAGER.SESSION.IDLE.TIMEOUT={{ default 1800 .Values.anm.envSettings.webmanagerSessionIdleTimeout }}
+
+    # Content Security Policy Header value for Gateway/Node Manager
+    env.MANAGEMENT.CONTENTSECURITYPOLICY=script-src 'self' https://*.{{ .Values.global.domainName }} 'unsafe-eval'; img-src 'self' https://*.{{ .Values.global.domainName }} data: blob:; style-src 'self' 'unsafe-inline' https://*.{{ .Values.global.domainName }}; font-src 'self' data: blob:; object-src 'self'; media-src 'self'; frame-src 'self';frame-ancestors 'none'; upgrade-insecure-requests
+
+    {{- if .Values.filebeat.enabled }}
+    # The minimal configuration for Operational Insights component.
+    env.API_BUILDER_URL=https://{{ default "apibuilder4elastic" .Values.filebeat.apibuilder4elasticHost }}:{{ default 8443 .Values.filebeat.apibuilder4elasticPort }}
+    env.REGION={{ default "N/A" .Values.filebeat.region | quote }}
+    {{- end }}
+
+    {{- if .Values.anm.envSettings.extraConfig }}
+    {{ .Values.anm.envSettings.extraConfig | indent 4 }}
+    {{- end -}}
+{{- end }}
+
+{{- if or .Values.apimgr.envSettings.enabled .Values.apitraffic.envSettings.enabled }}
+  apigw-envsettings: |
+    # the default port which the Instance listens on for HTTP traffic
+    env.PORT.TRAFFIC={{ .Values.apitraffic.containerPorts.plain }}
+
+    # the default port which the Instance listens on for management/configuration HTTP traffic
+    env.PORT.MANAGEMENT={{ .Values.apitraffic.containerPorts.mngt }}
+
+    # the default port which the Instance listens on for sample messages
+    env.PORT.SAMPLE.SERVICES={{ .Values.apitraffic.containerPorts.tls }}
+
+    # the hostname of the OAuth Server defaults to localhost
+    env.OAUTH.SERVER={{ default "localhost" .Values.apitraffic.envSettings.oauthServer }}
+
+    # the default port which OAuth 2.0 Services listen on for traffic
+    env.PORT.OAUTH2.SERVICES={{ .Values.apitraffic.containerPorts.oauth }}
+
+    # the hostname of the OAuth Client defaults to localhost
+    env.OAUTH.CLIENT={{ default "localhost" .Values.apitraffic.envSettings.oauthClient }}
+
+    # the default port which OAuth 2.0 Client Services listen on for traffic
+    env.PORT.OAUTH2.CLIENT={{ default 8088 .Values.apitraffic.envSettings.oauthClientPort }}
+
+    # the default AMA broker port
+    env.BROKER.PORT={{ default 61616 .Values.apitraffic.envSettings.brokerPort }}
+
+    # API Portal Port
+    env.PORT.APIPORTAL={{ .Values.apimgr.containerPorts.manager }}
+
+    # API Portal Traffic Port
+    env.PORT.PORTAL.TRAFFIC={{ .Values.apitraffic.containerPorts.traffic }}
+
+    # Content Security Policy Header value for API Portal and Client Application Registry
+    env.SERVICES.CONTENTSECURITYPOLICY=script-src 'self' https://*.{{ .Values.global.domainName }} 'unsafe-eval'; img-src 'self' https://*.{{ .Values.global.domainName }} data: blob:; style-src 'self' 'unsafe-inline' https://*.{{ .Values.global.domainName }}; font-src 'self' data: blob:; object-src 'self'; media-src 'self'; frame-src 'self';frame-ancestors 'none'; upgrade-insecure-requests
+
+    # Content Security Policy Header value for Anlaytics
+    env.ANALYTICS.CONTENTSECURITYPOLICY=script-src 'self' https://*.{{ .Values.global.domainName }} 'unsafe-eval'; img-src 'self' https://*.{{ .Values.global.domainName }} data: blob:; style-src 'self' 'unsafe-inline' https://*.{{ .Values.global.domainName }}; font-src 'self' data: blob:; object-src 'self'; media-src 'self'; frame-src 'self';frame-ancestors 'none'; upgrade-insecure-request
+
+    {{- if .Values.apitraffic.envSettings.extraConfig }}
+    {{ .Values.apitraffic.envSettings.extraConfig | indent 4 }}
+    {{- end -}}
+{{- end }}
+
+{{- end }}

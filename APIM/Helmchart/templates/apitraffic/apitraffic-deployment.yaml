@@ -82,6 +82,14 @@ spec:
               - key: apitraffic-jvmxml
                 path: jvm.xml
       {{- end }}
+{{- if .Values.apitraffic.envSettings.enabled }}
+        - name: envsettings
+          configMap:
+            name: {{ .Release.Name }}-envsettings
+            items:
+              - key: apigw-envsettings
+                path: envSettings.props
+{{- end }}
       {{- range .Values.apitraffic.secretMounts }}
         - name: {{ .name }}
           secret:
@@ -230,6 +238,11 @@ spec:
           - name: apitraffic-jvmxml
             mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
             subPath: jvm.xml
+        {{- end }}
+        {{- if .Values.apitraffic.envSettings.enabled }}
+          - name: envsettings
+            mountPath: {{ "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/envSettings.props" }}
+            subPath: envSettings.props
         {{- end }}
           - name: events
             mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apitraffic.volumeMountsPaths.events | quote }}
