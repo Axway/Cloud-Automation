@@ -1680,3 +1680,17 @@ filebeat:
       limits:
          cpu: "1000m"
          memory: "250Mi"
+
+   # Set the gateway name.
+   # It's recommended to set a different name par API-Gateway Group.
+   # Value by default is API-Manager
+   gatewayName: ""
+   # Set the region name.
+   # It's recommended to set a different name per Admin Node Manager.
+   # Value by default is N/A
+   region: ""
+
+   # Set the value of the API-Builder component.
+   # By default, host value is apibuilder4elastic and port value is 8443
+   apibuilder4elasticHost: ""
+   apibuilder4elasticPort: ""
