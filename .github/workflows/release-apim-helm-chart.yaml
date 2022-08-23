@@ -37,6 +37,7 @@ jobs:
     - name: Create packaged Helm-Chart
       run: |
         pwd
+         echo "test2"
         helm repo add bitnami helm repo add bitnami https://charts.bitnami.com/bitnami
         helm repo add bitnami-pre-2022 https://raw.githubusercontent.com/bitnami/charts/pre-2022/bitnami
         helm repo update
