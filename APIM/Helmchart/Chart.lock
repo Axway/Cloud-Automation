@@ -3,7 +3,7 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   version: 1.17.1
 - name: cassandra
-  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  repository: https://raw.githubusercontent.com/bitnami/charts/pre-2022/bitnami
   version: 7.7.3
 - name: mysql
   repository: https://charts.bitnami.com/bitnami
@@ -14,5 +14,5 @@ dependencies:
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 15.7.6
-digest: sha256:d80ac71f07f9043ac419f52f8f604176a82862ef476d6acc34489430da4c3579
-generated: "2022-08-23T11:16:02.569220887+02:00"
+digest: sha256:4ed0ccab7d21969538aac76e073fcdd96d3d30c149569e73686c4157ba2f8e2a
+generated: "2022-08-23T13:47:06.004538244+02:00"

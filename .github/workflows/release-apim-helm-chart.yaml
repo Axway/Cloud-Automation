@@ -37,6 +37,9 @@ jobs:
     - name: Create packaged Helm-Chart
       run: |
         pwd
+        helm repo add bitnami helm repo add bitnami https://charts.bitnami.com/bitnami
+        helm repo add bitnami-pre-2022 https://raw.githubusercontent.com/bitnami/charts/pre-2022/bitnami
+        helm repo update
         helm package . --dependency-update --app-version ${{ env.RELEASE_VERSION }} --version ${{ env.RELEASE_VERSION }} --destination /tmp
     - name: upload-helm-chart
       uses: actions/upload-release-asset@v1
