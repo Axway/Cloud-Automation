@@ -236,6 +236,26 @@ anm:
             <VMArg name="-Ddont.expect.100.continue=true"/>
          </ConfigurationFragment>
 
+   # Enable envSettings.props. 
+   # No changes to do by default
+   envSettings:
+      enabled: false
+      #If not set, default value is the listener value service.port.
+      PortTraffic: ""
+      portSampleServices: ""
+      # the timeout for web manager user sessions in seconds
+      # Default value is 12 hours
+      webmanagerSessionTimeout: ""
+      # the idle timout for web manager user session, 30 minutes
+      # number of seconds of inactivity for session to be invalidated
+      webmanagerSessionIdleTimeout: ""
+      # Add custom config at the end of this file.
+      extraConfig: []
+         # An example of how you might bind a reference to a host-specific certificate to a given deployment. The
+         # SSL X509 Certificate in the 'SSL Interface' configuration item can then reference it using the binding
+         # variable '${env.serverCertificate}'
+         #env.serverCertificate=${system.prefix.cert}CN=MYHOST
+
 ##################################################################################################################################
 #   API MANAGER
 ##################################################################################################################################
@@ -414,6 +434,12 @@ apimgr:
             <VMArg name="-Dio.swagger.v3.parser.util.RemoteUrl.trustAll=true"/>
          </ConfigurationFragment>
 
+   # Enable envSettings.props. 
+   # No changes to do by default
+   # Custom value is on apitraffic.envSettings section
+   envSettings:
+      enabled: false
+
 ##################################################################################################################################
 #   API TRAFFIC
 ##################################################################################################################################
@@ -435,6 +461,7 @@ apitraffic:
       plain: 8080
       tls: 8081
       oauth: 8089
+      mngt: 8085
    
    # Service and Ingress configuration for the API-Traffic PoD
    service:
@@ -659,6 +686,25 @@ apitraffic:
       maxReplicas: 10
       targetCPUUtilizationPercentage: 90
       # targetMemoryUtilizationPercentage: 80
+
+   # Enable envSettings.props. 
+   # No changes to do by default
+   envSettings:
+      enabled: false
+      # The hostname of the OAuth Server 
+      # Defaults to localhost
+      oauthServer: ""
+      # The hostname of the OAuth Client 
+      # Defaults to localhost
+      oauthClient: ""
+      # the default port which OAuth 2.0 Client Services listen on for traffic
+      # Default value is 8088
+      oauthClientPort: ""
+      # the default AMA broker port
+      # Default value is 61616
+      brokerPort: ""
+      # Add additional lines at the end of the envSettings
+      extraConfig: []
 
 ##################################################################################################################################
 #   API-Portal
@@ -1634,3 +1680,17 @@ filebeat:
       limits:
          cpu: "1000m"
          memory: "250Mi"
+
+   # Set the gateway name.
+   # It's recommended to set a different name par API-Gateway Group.
+   # Value by default is API-Manager
+   gatewayName: ""
+   # Set the region name.
+   # It's recommended to set a different name per Admin Node Manager.
+   # Value by default is N/A
+   region: ""
+
+   # Set the value of the API-Builder component.
+   # By default, host value is apibuilder4elastic and port value is 8443
+   apibuilder4elasticHost: ""
+   apibuilder4elasticPort: ""

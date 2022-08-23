@@ -59,6 +59,14 @@ spec:
               - key: apimgr-jvmxml
                 path: jvm.xml
       {{- end }}
+{{- if .Values.apimgr.envSettings.enabled }}
+        - name: envsettings
+          configMap:
+            name: {{ .Release.Name }}-envsettings
+            items:
+              - key: apigw-envsettings
+                path: envSettings.props
+{{- end }}
         - name: events
 {{- if .Values.pvcs.events.enabled }}
           persistentVolumeClaim:
@@ -222,6 +230,11 @@ spec:
             mountPath: "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/jvm.xml"
             subPath: jvm.xml
         {{- end }}
+          {{- if .Values.apimgr.envSettings.enabled }}
+          - name: envsettings
+            mountPath: {{ "/opt/Axway/apigateway/groups/emt-group/emt-service/conf/envSettings.props" }}
+            subPath: envSettings.props
+          {{- end }}
 {{- if $licenseSecret }}
           - name: license
             mountPath: "/opt/Axway/apigateway/conf/licenses"

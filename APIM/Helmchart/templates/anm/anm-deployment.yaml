@@ -66,6 +66,14 @@ spec:
               - key: anm-jvmxml
                 path: jvm.xml
         {{- end }}
+{{- if .Values.anm.envSettings.enabled }}
+        - name: envsettings
+          configMap:
+            name: {{ .Release.Name }}-envsettings
+            items:
+              - key: anm-envsettings
+                path: envSettings.props
+{{- end }}
         - name: audit
 {{- if .Values.pvcs.audit.enabled }}
           persistentVolumeClaim:
@@ -206,6 +214,11 @@ spec:
           - name: anm-jvmxml
             mountPath: "/opt/Axway/apigateway/conf/jvm.xml"
             subPath: jvm.xml
+          {{- end }}
+          {{- if .Values.anm.envSettings.enabled }}
+          - name: envsettings
+            mountPath: {{ "/opt/Axway/apigateway/conf/envSettings.props" }}
+            subPath: envSettings.props
           {{- end }}
 {{- if $licenseSecret }}
           - name: license
