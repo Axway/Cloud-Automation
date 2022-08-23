@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [2.11.0] 2022-08-17
 ### Fixed
 - It's not possible to set an Ingress class name with a Kubernetes version >1.22.X. Add IngressClassName value in spec section for any ingress. A different value can be set on each ingress. Adding some verifications to force usage of IngressClassName.
+- Change the Cassandra dependency repository to unblock generation of helm package.
 
 ### Changed
 - Add Horizontal Pod Autoscaler capability on the APITRAFFIC deployment.

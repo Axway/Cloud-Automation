@@ -22,7 +22,7 @@ dependencies:
     version: 1.x.x
   - name: cassandra
     alias: cassandra
-    repository: https://charts.bitnami.com/bitnami
+    repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
     version: 7.7.3 # Installs Cassandra 3.11.11
     condition: cassandra.internal
   - name: mysql
