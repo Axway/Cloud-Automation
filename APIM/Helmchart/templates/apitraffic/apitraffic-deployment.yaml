@@ -62,13 +62,6 @@ spec:
 {{- else }}
           emptyDir: {}
 {{- end }}
-        - name: audit
-{{- if .Values.pvcs.audit.enabled }}
-          persistentVolumeClaim:
-            claimName: apigw-audit
-{{- else }}
-          emptyDir: {}
-{{- end }}
 {{- if $licenseSecret }}
         - name: license
           secret:
@@ -94,6 +87,14 @@ spec:
         - name: {{ .name }}
           secret:
             secretName: {{ .secretName }}
+      {{- end }}
+      {{- if .Values.filebeat.enabled }}
+        - name: filebeat-config
+          configMap:
+            name: {{ template "apitraffic.name" . }}-filebeat-config
+        - name: certificates
+          secret:
+            secretName: {{ template "filebeat.certSecret.name" . }}
       {{- end }}
       {{- if .Values.apitraffic.extraVolumes }}
 {{ toYaml ( .Values.apitraffic.extraVolumes ) | indent 8 }}
@@ -186,7 +187,6 @@ spec:
           value: {{ default "INFO" .Values.apitraffic.config.emtTraceLevel | quote }}
         - name: EMT_PARENT_HOST
           value: {{ default "api-gateway" .Values.apitraffic.config.emtParentHost | quote }}
-
         - name: CASS_HOST
           value: "{{ template "cassandra.name" . }}"
         - name: CASS_PORT
@@ -256,6 +256,48 @@ spec:
         {{- if .Values.apitraffic.lifecycle }}
         lifecycle:
 {{ toYaml .Values.apitraffic.lifecycle | indent 10 }}
+        {{- end }}
+        {{- if and (.Values.filebeat.enabled) (.Values.filebeat.componentEnabled.apitraffic) }}
+      - name: "{{ template "filebeat.name" . }}"
+        image: {{ .Values.filebeat.image.registry }}/{{ .Values.filebeat.image.repository }}:{{ .Values.filebeat.image.tag }}
+        resources:
+{{ toYaml .Values.filebeat.resources | indent 10 }}
+        env:
+        - name: LOGSTASH_HOSTS
+          value: {{ required "The value filebeat.logstashHosts is missing." .Values.filebeat.logstashHosts | quote }}
+        - name: ELASTICSEARCH_HOSTS
+          value: {{ required "The value filebeat.elasticsearchHosts is missing." .Values.filebeat.elasticsearchHosts | quote }}
+        - name: ELASTICSEARCH_CLUSTER_UUID
+          value: {{ .Values.filebeat.elasticsearchClusterUUID | quote }}
+        - name: ELASTICSEARCH_CRT
+          value: {{ required "The path to the CA for Logstash to Elasticsearch communication is missing" .Values.filebeat.elasticsearchCaPath | quote }}
+        - name: ELASTICSEARCH_SSL_VERIFICATIONMODE
+          value: {{ default "full" .Values.filebeat.validateElasticsearchCertificate | quote }}
+        - name: FILEBEAT_WORKER
+          value: {{ .Values.filebeat.filebeatWorker | quote }}
+        - name: FILEBEAT_COMPRESSION_LEVEL
+          value: {{ .Values.filebeat.compressionLevel | quote }}
+        - name: SELF_MONITORING_ENABLED
+          value: {{ .Values.filebeat.selfMonitoringEnabled | quote }}
+        - name: GATEWAY_NAME
+          value: {{ default "API-Gateway" .Values.filebeat.gatewayName | quote }}
+        - name: GATEWAY_REGION
+          value: {{ default "N/A" .Values.filebeat.region | quote }}
+        volumeMounts:
+          - name: filebeat-config
+            mountPath: /usr/share/filebeat/filebeat.yml
+            subPath: filebeat.yml
+          - name: certificates
+            mountPath: /usr/share/filebeat/config/certificates
+          - name: opentraffic
+            mountPath: /var/opentraffic
+          - name: trace
+            mountPath: /var/trace/
+          - name: events
+            mountPath: /var/events/
+        {{- if .Values.filebeat.extraVolumeMounts }}
+{{ toYaml (.Values.filebeat.extraVolumeMounts ) | indent 10 }}
+        {{- end }}
         {{- end }}
         {{- if .Values.apitraffic.extraContainers }}
 {{ toYaml .Values.apitraffic.extraContainers | indent 6 }}
