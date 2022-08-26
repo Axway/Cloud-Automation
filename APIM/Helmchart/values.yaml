@@ -1613,12 +1613,13 @@ filebeat:
       beatsSystemUsername: "beats_system"
       beatsSystemPassword: ""
 
-   # Set the APi-Group name.
+   # Set the gateway name.
+   # It's recommended to set a different name par API-Gateway Group.
+   # Value by default is API-Manager
    gatewayName: ""
-
-   # Set the region name of the APIM Deployment used by Kibana Dashboard
-   # One per Admin Node Manager.
-   # Default value is N/A
+   # Set the region name.
+   # It's recommended to set a different name per Admin Node Manager.
+   # Value by default is N/A
    region: ""
 
    # The Logstash Hosts used by Filebeat
@@ -1681,14 +1682,6 @@ filebeat:
          cpu: "1000m"
          memory: "250Mi"
 
-   # Set the gateway name.
-   # It's recommended to set a different name par API-Gateway Group.
-   # Value by default is API-Manager
-   gatewayName: ""
-   # Set the region name.
-   # It's recommended to set a different name per Admin Node Manager.
-   # Value by default is N/A
-   region: ""
 
    # Set the value of the API-Builder component.
    # By default, host value is apibuilder4elastic and port value is 8443

@@ -264,6 +264,18 @@ spec:
           value: {{ default "ANM" .Values.filebeat.gatewayName | quote }}
         - name: GATEWAY_REGION
           value: {{ default "N/A" .Values.filebeat.region | quote }}
+        {{- if .Values.filebeat.filebeatSecrets.enabled }}
+        - name: BEATS_SYSTEM_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "filebeat.name" . }}-secret
+              key: BEATS_SYSTEM_USERNAME
+        - name: BEATS_SYSTEM_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "filebeat.name" . }}-secret
+              key: BEATS_SYSTEM_PASSWORD
+        {{- end }}
         volumeMounts:
           - name: filebeat-config
             mountPath: /usr/share/filebeat/filebeat.yml
