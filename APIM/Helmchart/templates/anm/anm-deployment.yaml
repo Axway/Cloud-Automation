@@ -276,6 +276,9 @@ spec:
               name: {{ template "filebeat.name" . }}-secret
               key: BEATS_SYSTEM_PASSWORD
         {{- end }}
+        {{- if .Values.filebeat.extraEnvs }}
+{{ toYaml .Values.filebeat.extraEnvs | indent 8 }}
+        {{- end }}
         volumeMounts:
           - name: filebeat-config
             mountPath: /usr/share/filebeat/filebeat.yml

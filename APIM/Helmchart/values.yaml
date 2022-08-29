@@ -1667,6 +1667,20 @@ filebeat:
    #   mountPath: /usr/share/extras
    #   readOnly: true
 
+   # Environment variables can be added for custom configuration.
+   # Add the Logstash login/password secrets
+   extraEnvs: []
+      # - name: BEATS_SYSTEM_USERNAME
+      #    valueFrom:
+      #    secretKeyRef:
+      #       name: logstash-secret
+      #       key: BEATS_SYSTEM_USERNAME
+      # - name: BEATS_SYSTEM_PASSWORD
+      #    valueFrom:
+      #    secretKeyRef:
+      #       name: logstash-secret
+      #       key: BEATS_SYSTEM_PASSWORD
+
    # Replace the standard filebeat configuration by another
    # It replace data in filebeat configmaps in folders anm, apitraffic and apimgr
    anmCustomConfig: []
