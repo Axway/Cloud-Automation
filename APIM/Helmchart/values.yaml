@@ -1671,12 +1671,12 @@ filebeat:
    # Add the Logstash login/password secrets
    extraEnvs: []
       # - name: BEATS_SYSTEM_USERNAME
-      #    valueFrom:
+      #   valueFrom:
       #    secretKeyRef:
       #       name: logstash-secret
       #       key: BEATS_SYSTEM_USERNAME
       # - name: BEATS_SYSTEM_PASSWORD
-      #    valueFrom:
+      #   valueFrom:
       #    secretKeyRef:
       #       name: logstash-secret
       #       key: BEATS_SYSTEM_PASSWORD
