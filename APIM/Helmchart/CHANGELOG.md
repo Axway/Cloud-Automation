@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 # [2.11.1] 2022-08-29
 ### Fixed
-- Add beats system login/paswword environment variables on filebeat container
+- Add beats system login/paswword environment variables on filebeat container.
 
 
 ## [2.11.0] 2022-08-17

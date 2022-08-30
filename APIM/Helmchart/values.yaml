@@ -1608,6 +1608,7 @@ filebeat:
    # which is referenced below. 
    # You may use your own secret and reference it here. 
    # See templates/elasticApimKibana/filebeat-secret.yaml for the required environment variable names
+   # Disable the filebeatSecrets to use existing secret. Add custom values in extraEnvs section.
    filebeatSecrets: 
       enabled: true
       beatsSystemUsername: "beats_system"
@@ -1668,7 +1669,7 @@ filebeat:
    #   readOnly: true
 
    # Environment variables can be added for custom configuration.
-   # Add the Logstash login/password secrets
+   # The following example add Logstash login/password secrets from an existing secret.
    extraEnvs: []
       # - name: BEATS_SYSTEM_USERNAME
       #   valueFrom:
