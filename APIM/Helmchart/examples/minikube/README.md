@@ -165,7 +165,7 @@ Kubectl create ns apim
     For the installation of our Helmchart you have to create and maintain for future upgrades your own `local-values.yaml` file. As a starter, you may use our Minikube [example](minikube-example-values.yaml) as a base. Use the following command to get a local copy:  
 
     ```
-    wget -o local-values-minikube.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/minikube/minikube-example-values.yaml
+    wget -o local-values-minikube.yaml https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Helmchart/examples/minikube/minikube-example-value.yaml
     ```
 
     To finally start the deployment into your Kubernetes Cluster using Helm, use now the following command:
