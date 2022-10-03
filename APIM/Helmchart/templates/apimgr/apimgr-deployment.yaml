@@ -241,6 +241,13 @@ spec:
 {{- end }}
           - name: events
             mountPath: {{ default "/opt/Axway/apigateway/events" .Values.apimgr.volumeMountsPaths.events | quote }}
+          {{- range .Values.apimgr.secretMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .path }}
+            {{- if .subPath }}
+            subPath: {{ .subPath }}
+            {{- end }}
+          {{- end }}
         {{- if .Values.apimgr.extraVolumeMounts }}
 {{ toYaml (.Values.apimgr.extraVolumeMounts ) | indent 10 }}
         {{- end }}

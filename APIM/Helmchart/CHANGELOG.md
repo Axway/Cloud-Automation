@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+# [2.11.2] 2022-10-03
+### Fixed
+- Add missing secretMount values in volumeMounts section for apimgr and apitraffic.
+
 # [2.11.1] 2022-08-29
 ### Fixed
 - Add beats system login/paswword environment variables on filebeat container.
