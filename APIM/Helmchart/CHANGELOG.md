@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# [Unreleased] 
+### Fixed
+- Add persistent volume for apiportal plugin folder.
+
+### Changed
+
+
 # [2.11.2] 2022-10-03
 ### Fixed
 - Add missing secretMount values in volumeMounts section for apimgr and apitraffic.
