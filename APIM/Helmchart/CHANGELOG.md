@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+# [Unreleased]
+### Fixed
+- Remove FED injection for AWS example.
+
+### Changed
+- Init documentation for helm configuration.
+- Migrate APIM demo docker images on the Clou-Automation repository.
+
+
 # [2.11.2] 2022-10-03
 ### Fixed
 - Add missing secretMount values in volumeMounts section for apimgr and apitraffic.
