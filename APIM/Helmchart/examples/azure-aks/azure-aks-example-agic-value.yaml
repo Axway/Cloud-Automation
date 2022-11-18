@@ -1,11 +1,8 @@
 global:
-  imagePullSecrets:
-  - name: axway-demo-registry
 
   domainName: "azure.demoaxway.com"
-  dockerRepository: "docker-registry.demo.axway.com/demo-public"
-  imageTag: "1.1.1"
-  imagePullPolicy: "Always"
+  dockerRepository: "ghcr.io/axway"
+  imageTag: "20220830-1.0.0"
   acceptGeneralConditions: "yes"
 
 ##################################################################################################################################
@@ -13,7 +10,7 @@ global:
 ##################################################################################################################################
 anm:
    enabled: true
-   image: "anm-demo-7.7-20211130"
+   image: "anm-demo-7.7"
    # Must be set only if an additional https listener has been configured on the ANM project. 
    # This methods allows to import custom certificates for external access because it isn't possible on the default topology port 8090.
    trafficPortUI: "8091"
@@ -105,8 +102,8 @@ anm:
 ##################################################################################################################################
 apimgr:
    enabled: true
-   image: "gtw-demo-int-7.7-20211130"
-   imageTag: "1.1.0"
+   image: "gtw-demo-7.7"
+   imageTag: "20220830-1.0.0"
    ingress:
       enabled: true
       annotations: 
@@ -163,8 +160,8 @@ apimgr:
 ##################################################################################################################################
 apitraffic:
    enabled: true
-   image: "gtw-demo-int-7.7-20211130"
-   imageTag: "1.1.0"
+   image: "gtw-demo-7.7"
+   imageTag: "20220830-1.0.0"
    ingress:
       enabled: true
       name: traffic
@@ -249,8 +246,8 @@ apitraffic:
 ##################################################################################################################################
 apiportal:
    enabled: true
-   image: "apim-portal-demo-7.7-20211130"
-   imageTag: "1.0.0"
+   image: "portal-demo-7.7"
+   imageTag: "20220830-1.0.0"
    ingress:
       enabled: true
       name: portal

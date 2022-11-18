@@ -1,10 +1,8 @@
 global:
-  imagePullSecrets:
-  - name: axway-demo-registry
 
   domainName: "axway-apim-on-gke.com"
-  dockerRepository: "ghcr.io/cwiechmann/axway-api-management-automated"
-  imageTag: "77-20211130-1-eed8beb"
+  dockerRepository: "ghcr.io/axway"
+  imageTag: "20220830-1.0.0"
   acceptGeneralConditions: "yes"
 
 ##################################################################################################################################
@@ -12,6 +10,7 @@ global:
 ##################################################################################################################################
 anm:
   enabled: true
+  image: "anm-demo-7.7"
   ingress:
     enabled: true
     annotations:
@@ -50,7 +49,8 @@ anm:
 
 apimgr:
   enabled: true
-  imageTag: 77-20211130-v1-eed8beb
+  image: "gtw-demo-7.7"
+  imageTag: "20220830-1.0.0"
   ingress:
     enabled: true
     annotations:
@@ -79,7 +79,8 @@ apimgr:
 
 apitraffic:
   enabled: true
-  imageTag: 77-20211130-v1-eed8beb
+  image: "gtw-demo-7.7"
+  imageTag: "20220830-1.0.0"
   ingress:
     enabled: true
     annotations:
@@ -168,9 +169,8 @@ apitraffic:
 ##################################################################################################################################
 apiportal:
   enabled: true
-  image: portal
-  imageTag: 7.7-20210830
-  dockerRepository: docker-registry.demo.axway.com/other-demo
+  image: "portal-demo-7.7"
+  imageTag: "20220830-1.0.0"
   ingress:
     enabled: true
     # Using portal instead of apiportal as the ingress resource name
