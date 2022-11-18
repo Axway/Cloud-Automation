@@ -1,9 +1,8 @@
 global:
   platform: "OPENSHIFT"
-  domainName: "apps.ocp.axwayita.com"
-  imageTag: "7.7-20200530"
-  imagePullSecrets:
-  - name: docker-registry.demo.axway.com
+  dockerRepository: "ghcr.io/axway"
+  domainName: "test.demoaxway.com"
+  imageTag: "20220830-1.0.0"
 
   license: |
     FIPS=1
@@ -33,7 +32,7 @@ global:
 base: 
    useImagestream: false
    imageName: base
-   imageTag: 77-20210530
+   imageTag: 20220830-1.0.0
 
 anm:
   enabled: true
