@@ -63,13 +63,17 @@ This helm is compatible to pull docker images from another (private) repository.
 | apiportalredis.image.pullSecrets | Specify docker-registry secret names. | "" |
 
 
-### Ingress name
+### Ingress Class name
 
 The helm is compatible to use a different ingress class per ingress and it's also possible to set a custom name.
 
 | value | Description | Default value |
 | ------------------ | -------------------- | ------------- |
-| global.ingressClassName | | "" |
+| global.ingressClassName | Set the ingressclassname for components ANM, APIMGR, APITRAFFIC, APIPORTAL | "" |
+| anm.ingress.ingressClassName | Set the ingressclassname for the ANM component | "" |
+| apimgr.ingress.ingressClassName | Set the ingressclassname for the APIMGR component | "" |
+| apitraffic.ingress.ingressClassName | Set the ingressclassname for the APITRAFFIC component | "" |
+| apiportal.ingress.ingressClassName | Set the ingressclassname for the APIPORTAL component  | "" |
 
 ### FED Injection
 
@@ -167,5 +171,5 @@ kubectl -n apim create secret generic axway-license --from-file=C:\temp\license.
 
 | value | Description | Default value |
 | ------------------ | -------------------- | ------------- |
-| global.license | Content of the license file that will be injected in a secret. ||
-| global.existingLicenseSecret | Use an existing Kubernetes secret. | |
+| global.license | Content of the license file that will be injected in a secret. | "" |
+| global.existingLicenseSecret | Use an existing Kubernetes secret. | "" |
