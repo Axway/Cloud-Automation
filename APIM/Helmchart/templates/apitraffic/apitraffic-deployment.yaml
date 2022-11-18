@@ -250,6 +250,13 @@ spec:
             mountPath: {{ default "/opt/Axway/apigateway/logs/opentraffic" .Values.apitraffic.volumeMountsPaths.opentraffic | quote }}
           - name: trace
             mountPath: {{ default "/opt/Axway/apigateway/groups/emt-group/emt-service/trace" .Values.apitraffic.volumeMountsPaths.trace | quote }}
+          {{- range .Values.apitraffic.secretMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .path }}
+            {{- if .subPath }}
+            subPath: {{ .subPath }}
+            {{- end }}
+          {{- end }}
         {{- if .Values.apitraffic.extraVolumeMounts }}
 {{ toYaml (.Values.apitraffic.extraVolumeMounts ) | indent 10 }}
         {{- end }}
