@@ -40,7 +40,13 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.apimgr.terminationGracePeriod }}
       volumes:
         - name: merge-dir
-{{ toYaml .Values.apimgr.mergeDirVolume | indent 10 }}
+          persistentVolumeClaim:
+            claimName: apigw-fed
+#       {{- if .Values.apimgr.mergeDirVolume }}
+# {{ toYaml .Values.apimgr.mergeDirVolume | indent 10 }}
+#       {{- else }}
+#           emptyDir: {}
+#       {{- end }}
 {{- if $licenseSecret }}
         - name: license
           secret:
@@ -222,7 +228,7 @@ spec:
         {{- end }}
         volumeMounts:
           - name: merge-dir
-            mountPath: /merge
+            mountPath: "/merge"
           - name: audit
             mountPath: {{ default "/opt/Axway/apigateway/groups/emt-group/emt-service/logs" .Values.apimgr.volumeMountsPaths.audit | quote }}
         {{- if .Values.apimgr.jvm.enabled }}
