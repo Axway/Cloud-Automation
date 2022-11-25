@@ -154,6 +154,13 @@ apitraffic:
             wget -O /merge/fed https://raw.githubusercontent.com/Axway/Cloud-Automation/master/APIM/Automation/gateway-config/gtw/fed/gtw-demo-7.7-20220830.fed
 ```
 
+3. Inject FED from local file
+```
+kubectl get pods -n <namespace>
+kubectl exec <apimgr pod name> -c apimgr -n <namespace> -- mkdir -p /merge/fed /merge/apigateway/exec/lib
+kubectl cp <localpath/fed-file.fed> <apimgr pod name>:/merge/fed/fed.fed -c apimgr -n <namespace>
+kubectl rollout restart deployment apimgr apitraffic -n <namespace>
+```
 
 ### APIM configuration
 
