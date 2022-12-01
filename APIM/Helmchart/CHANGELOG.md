@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - Add persistent volume for apiportal plugin folder.
 
 ### Changed
-
+- Refine API-Portal PV default values.
 
 # [2.11.2] 2022-10-03
 ### Fixed
