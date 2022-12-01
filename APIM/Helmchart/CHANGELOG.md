@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 # [Unreleased]
 ### Fixed
 - Remove FED injection for AWS example.
+- Add persistent volume for apiportal plugin folder.
 
 ### Changed
 - Init documentation for helm configuration.
 - Migrate APIM demo docker images on the Clou-Automation repository.
-
+- Refine API-Portal PV default values.
 
 # [2.11.2] 2022-10-03
 ### Fixed

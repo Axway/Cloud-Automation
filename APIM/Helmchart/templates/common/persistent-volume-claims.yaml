@@ -152,4 +152,15 @@ metadata:
     helm.sh/resource-policy: "keep"
 spec:
 {{ toYaml .Values.pvcs.apiportalCertsVolumeClaim | indent 2 }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apiportal-plugins
+  labels:
+    data: apiportal-plugins
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+{{ toYaml .Values.pvcs.apiportalPluginsVolumeClaim | indent 2 }}
 {{- end}}

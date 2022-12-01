@@ -63,6 +63,9 @@ spec:
         - name: certs
           persistentVolumeClaim:
             claimName: apiportal-certs
+        - name: plugins
+          persistentVolumeClaim:
+            claimName: apiportal-plugins
       {{- end }}
         {{- range .Values.apiportal.secretMounts }}
         - name: {{ .name }}
@@ -294,6 +297,8 @@ spec:
             mountPath: /opt/axway/apiportal/htdoc/language
           - name: templates
             mountPath: /opt/axway/apiportal/htdoc/templates
+          - name: plugins
+            mountPath: /opt/axway/apiportal/htdoc/plugins
           - name: admlanguage
             mountPath: /opt/axway/apiportal/htdoc/administrator/language
           - name: certs
