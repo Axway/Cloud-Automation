@@ -1,10 +1,8 @@
 global:
-  imagePullSecrets:
-  - name: axway-demo-registry
 
   domainName: "axway-apim-on-eks.de"
-  dockerRepository: "ghcr.io/cwiechmann/axway-api-management-automated"
-  imageTag: "77-20210830-1-8224e79"
+  dockerRepository: "ghcr.io/axway"
+  imageTag: "20220830-1.0.0"
   acceptGeneralConditions: "yes"
 
 ##################################################################################################################################
@@ -12,6 +10,7 @@ global:
 ##################################################################################################################################
 anm:
    enabled: true
+   image: "anm-demo-7.7"
    ingress:
       enabled: true
       annotations: 
@@ -25,35 +24,13 @@ anm:
         # 302 is also accepted, as Kibana is performing a redirect
         alb.ingress.kubernetes.io/success-codes: 200,302
 
-   # As of API management version 7.7.0.20220228, you can provide the necessary configuration (e.g. policies, settings) 
-   # externally instead of having to bake it into the image.
-   # This init container downloads a provided FED file and places it under /merge/fed before the ANM starts.
-   # 
-   # Please note that the image must be built with the EMT script: apigw-emt-scripts-2.4.0-20220222.150412-10.tar.gz or newer.
-   # 
-   # You can choose any method how the configuration is loaded. For example via git clone 
-   # which is recommended for a YAML entity store as you can store the whole merge dir structure directly in git.
-   extraInitContainers:
-     - name: init-fed
-       image: busybox:1.33
-       volumeMounts:
-         - name: merge-dir
-           mountPath: /merge
-       # command: [ "sh", "-c", "tail -f /dev/null" ]
-       command: 
-         - sh
-         - -c 
-         - |
-           #!/bin/sh
-           echo "Download API-Gateway config from: https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/anm/fed/anm.fed"
-           wget -O /merge/fed https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/anm/fed/anm.fed
-
 ##################################################################################################################################
 #   API MANAGER
 ##################################################################################################################################
 apimgr:
    enabled: true
-   imageTag: 77-20210830-v1-1161c0c
+   image: "gtw-demo-7.7"
+   imageTag: "20220830-1.0.0"
    ingress:
       enabled: true
       annotations: 
@@ -70,34 +47,13 @@ apimgr:
         # requests hit the same API-Manager instance. See issue: https://github.com/Axway/Cloud-Automation/issues/39
         # alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.type=lb_cookie,stickiness.lb_cookie.duration_seconds=43200
 
-   # As of API management version 7.7.0.20220228, you can provide the necessary configuration (e.g. policies, settings) 
-   # externally instead of having to bake it into the image.
-   # This init container downloads a provided FED file and places it under /merge/fed before the API Gateway instance starts.
-   # Please note that the image must be built with the EMT script: apigw-emt-scripts-2.4.0-20220222.150412-10.tar.gz or newer.
-   # 
-   # You can choose any method how the configuration is loaded. For example via git clone 
-   # which is recommended for a YAML entity store as you can store the whole merge dir structure directly in git.
-   extraInitContainers:
-     - name: init-fed
-       image: busybox:1.33
-       volumeMounts:
-         - name: merge-dir
-           mountPath: /merge
-       # command: [ "sh", "-c", "tail -f /dev/null" ]
-       command: 
-         - sh
-         - -c 
-         - |
-           #!/bin/sh
-           echo "Download API-Gateway config from: https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed"
-           wget -O /merge/fed https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed
-
 ##################################################################################################################################
 #   API TRAFFIC
 ##################################################################################################################################
 apitraffic:
    enabled: true
-   imageTag: 77-20210830-v1-1161c0c
+   image: "gtw-demo-7.7"
+   imageTag: "20220830-1.0.0"
    ingress:
       enabled: true
       name: traffic
@@ -115,90 +71,13 @@ apitraffic:
         # alb.ingress.kubernetes.io/healthcheck-path: /healthcheck
         # alb.ingress.kubernetes.io/success-codes: 200
 
-   # As of API management version 7.7.0.20220228, you can provide the necessary configuration (e.g. policies, settings) 
-   # externally instead of having to bake it into the image.
-   # This init container downloads a provided FED file and places it under /merge/fed before the API Gateway instance starts.
-   # Please note that the image must be built with the EMT script: apigw-emt-scripts-2.4.0-20220222.150412-10.tar.gz or newer.
-   # 
-   # You can choose any method how the configuration is loaded. For example via git clone 
-   # which is recommended for a YAML entity store as you can store the whole merge dir structure directly in git.
-   extraInitContainers:
-     - name: init-fed
-       image: busybox:1.33
-       volumeMounts:
-         - name: merge-dir
-           mountPath: /merge
-       # command: [ "sh", "-c", "tail -f /dev/null" ]
-       command: 
-         - sh
-         - -c 
-         - |
-           #!/bin/sh
-           echo "Download API-Gateway config from: https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed"
-           wget -O /merge/fed https://raw.githubusercontent.com/cwiechmann/axway-api-management-automated/main/gateway-config/apigateway/fed/apigateway.fed
-
-   # If you want to include the Amplify agent or Filebeat for Elasticsearch integration as a side-car. 
-   # Make sure that you use the latest images.
-   # extraContainers:
-   #   - name: filebeat
-   #     image: docker.elastic.co/beats/filebeat:7.16.3
-   #     envFrom:
-   #       - configMapRef:
-   #           name: axway-elk-apim4elastic-filebeat-env-config
-   #       - secretRef:
-   #           name: axway-elk-apim4elastic-filebeat-secret
-   #     volumeMounts:
-   #       - name: filebeat-config
-   #         mountPath: /usr/share/filebeat/filebeat.yml
-   #         subPath: filebeat.yml
-   #       - name: certificates
-   #         mountPath: /usr/share/filebeat/config/certificates
-   #       - name: opentraffic
-   #         mountPath: /var/opentraffic
-   #       - name: trace
-   #         mountPath: /var/trace/
-   #       - name: events
-   #         mountPath: /var/events/
-   #       - name: audit
-   #         mountPath: /var/audit/
-   #   - name: traceability
-   #     image: axway.jfrog.io/ampc-public-docker-release/agent/v7-traceability-agent:1.1.11
-   #     envFrom:
-   #       - configMapRef:
-   #           name: axway-apim-traceability-config
-   #       - secretRef:
-   #           name: axway-apim-amplify-agents-secret
-   #     volumeMounts:
-   #       - name: agents-secret
-   #         mountPath: /opt/keys/private_key.pem
-   #         subPath: private_key.pem
-   #       - name: agents-secret
-   #         mountPath: /opt/keys/public_key.pem
-   #         subPath: public_key.pem
-   #       - name: opentraffic
-   #         mountPath: /opentraffic
-   #       - name: events
-   #         mountPath: /events/
-
-   # extraVolumes:
-   #    - name: filebeat-config
-   #      configMap:
-   #        name: axway-elk-apim4elastic-filebeat-config
-   #    - name: certificates
-   #      secret:
-   #        secretName: axway-elk-apim4elastic-certificates
-   #    - name: agents-secret
-   #      secret:
-   #        secretName: axway-apim-amplify-agents-secret
-
 ##################################################################################################################################
 #   API PORTAL
 ##################################################################################################################################
 apiportal:
    enabled: true
-   image: portal
-   imageTag: 7.7-20210830
-   dockerRepository: docker-registry.demo.axway.com/other-demo
+   image: "portal-demo-7.7"
+   imageTag: "20220830-1.0.0"
    ingress:
       enabled: true
       name: portal

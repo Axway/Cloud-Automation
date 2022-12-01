@@ -1,10 +1,8 @@
 global:
-  imagePullSecrets:
-  - name: axway-demo-registry
 
   domainName: "test.demoaxway.int"
-  dockerRepository: "docker-registry.demo.axway.com/demo-public"
-  imageTag: "1.1.0"
+  dockerRepository: "ghcr.io/axway"
+  imageTag: "20220830-1.0.0"
   acceptGeneralConditions: "yes"
 
    # Setup the docker registry of the image. By default busybox hosted on docker.io
@@ -22,8 +20,8 @@ anm:
 ##################################################################################################################################
 apimgr:
    enabled: true
-   image: "gtw-demo-ext-7.7-20211130"
-   imageTag: "1.1.0"
+   image: "gtwext-demo-7.7"
+   imageTag: "20220830-1.0.0"
    ingress:
       enabled: false
 
@@ -63,8 +61,8 @@ apimgr:
 ##################################################################################################################################
 apitraffic:
    enabled: true
-   image: "gtw-demo-ext-7.7-20211130"
-   imageTag: "1.1.0"
+   image: "gtwext-demo-7.7"
+   imageTag: "20220830-1.0.0"
    ingress:
       enabled: false
 
@@ -108,8 +106,8 @@ apitraffic:
 ##################################################################################################################################
 apiportal:
    enabled: true
-   image: "apim-portal-demo-7.7-20211130"
-   imageTag: "1.0.0"
+   image: "portal-demo-7.7"
+   imageTag: "20220830-1.0.0"
    ingress:
       enabled: false
 

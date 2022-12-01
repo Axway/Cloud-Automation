@@ -28,6 +28,7 @@ global:
    # Alternatively, you can use your own secret and reference it via existingLicenseSecret below. Make sure, your secret key ends with 
    # license.lic
    # Or you can build the image with the license included.
+   # For example
    # license: |
       # FIPS=1
       # SalesForce Connector=1
@@ -38,6 +39,7 @@ global:
       # ...
       # # SIGNATURE: 8eee280ede1a7fd94b91130c78da44f403f8bd9f927bc96bfd6a2a94839c049b
       # # SIGNATURE: 096e86bb928c5865c77596de3814f116b9b3f4923441ac0cb8e7189f9c0f5971
+   license: {}
 
    # If you want to use your own secret, specify the name of the secret here, 
    # which contains the license Base64 encoded with key license
