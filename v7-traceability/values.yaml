@@ -1,0 +1,103 @@
+replicaCount: 1
+
+image:
+  repository: axway.jfrog.io/ampc-public-docker-release/agent/v7-traceability-agent
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Health Check port
+statusPort: 8990
+
+# Info on how to fetch the values for the env parameters can ve found in the below doc.
+# https://docs.axway.com/bundle/axway-open-docs/page/docs/central/connect-api-manager/gateway-administation/index.html#customizing-the-traceability-agent-environment-variable-file
+# More environment value: https://docs.axway.com/bundle/axway-open-docs/page/docs/central/connect-api-manager/agent-variables/index.html#common-variables-to-both-agents
+env:
+  LOG_LEVEL: info
+  CENTRAL_AGENTNAME: "<AGENT_NAME>"
+  CENTRAL_URL: "https://apicentral.axway.com"
+  CENTRAL_AUTH_URL: "https://login.axway.com/auth"
+  CENTRAL_DEPLOYMENT: "prod"
+  CENTRAL_AUTH_CLIENTID: "<CLIENT_ID>"
+  CENTRAL_ORGANIZATIONID: "<ORGANIZATION_ID>"
+  CENTRAL_ENVIRONMENT: "<ENVIRONMENT_NAME>"
+  CENTRAL_TEAM: "<TEAM>"
+  # EVENT_LOG_PATHS: "/opt/Axway/apigateway/events/axwaydemo_traffic-*.log"
+  EVENT_LOG_PATHS: "/events/*.log"
+  EVENT_LOG_INPUT: true
+  OPENTRAFFIC_LOG_INPUT: false
+  OPENTRAFFIC_LOG_PATHS: /events/*.log
+  #DOSA-ID: https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_central/cli_install/index.html#authorize-your-cli-to-use-the-amplify-central-apis
+  TRACEABILITY_HOST: "ingestion.datasearch.axway.com:5044"
+  TRACEABILITY_PROTOCOL: "tcp"
+  TRACEABILITY_SAMPLING_PERCENTAGE: 10
+  TRACEABILITY_SAMPLING_REPORTALLERRORS: true
+
+  APIMANAGER_HOST: "<APIMANAGER_HOST_URL>"
+  APIMANAGER_PORT: "443"
+  # flip to true if API manager is using a self signed certificate
+  APIMANAGER_SSL_INSECURESKIPVERIFY: false
+  APIGATEWAY_ONLY: false
+  APIGATEWAY_HOST: "<APIGATEWAY_HOST_URL>"
+  APIGATEWAY_PORT: "443"
+  # flip to true if API gateway is using a self signed certificate
+  APIGATEWAY_SSL_INSECURESKIPVERIFY: false
+  APIGATEWAY_HEALTHCHECKPORT: 8090
+  APIGATEWAY_HEALTHCHECKPROTOCOL: "https"
+  APIGATEWAY_HEALTHCHECKURI: login
+
+# The below secret are a pre-requisite. Please refer to the readme file for more info on it.
+secrets:
+  credentials: "traceability-creds"
+  keys: "traceability-keys"
+
+podAnnotations:
+
+podSecurityContext:
+  supplementalGroups: [ 2500 ]
+  fsGroupChangePolicy: "OnRootMismatch"
+
+securityContext:
+
+tolerations:
+
+affinity:
+
+nodeSelector: {}
+
+# Add additional labels to the agent deployment which may be required based on your configuration
+additionalLabels:
+
+# Add selector labels for deployment purposes
+selectorLabels:
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+persistentVolumeClaimConfig:
+  data:
+    # storage class to persist contents of data directory in the agent - should be available in the cluster i.e gp2, gp2-csi, default
+    storageClass: gp2-csi
+    name: data-claim
+  events:
+    name: events-claim

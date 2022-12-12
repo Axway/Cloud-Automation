@@ -96,6 +96,20 @@ spec:
           secret:
             secretName: {{ template "filebeat.certSecret.name" . }}
       {{- end }}
+      {{- if .Values.amplifyTA.enabled }}
+        - name: agents-secret
+          secret:
+          {{- if .Values.amplifyTA.existingSecretCert }}
+            secretName: {{ .Values.amplifyTA.existingSecretCert }}
+          {{- else }}
+            secretName: {{ template "traceabilityAgent.name" . }}-cert
+          {{- end }}
+          {{- range .Values.amplifyTA.secretMounts }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+          {{- end }}
+      {{- end }}
       {{- if .Values.apitraffic.extraVolumes }}
 {{ toYaml ( .Values.apitraffic.extraVolumes ) | indent 8 }}
       {{- end }}
@@ -321,6 +335,83 @@ spec:
 {{ toYaml (.Values.filebeat.extraVolumeMounts ) | indent 10 }}
         {{- end }}
         {{- end }}
+      {{- if .Values.amplifyTA.enabled }}
+      - name: "{{ template "traceabilityAgent.name" . }}"
+        {{- if .Values.amplifyTA.args }}
+        args:
+{{ toYaml .Values.amplifyTA.args | indent 8 }}
+        {{- end }}
+        {{- if .Values.amplifyTA.command }}
+        command:
+{{ toYaml .Values.amplifyTA.command | indent 8 }}
+        {{- end }}
+        securityContext:
+{{ toYaml .Values.amplifyTA.securityContext | indent 10 }}
+        image: {{ .Values.amplifyTA.dockerRepository }}/{{ .Values.amplifyTA.image }}:{{ .Values.amplifyTA.imageTag }}
+        imagePullPolicy: {{ template "imagePullPolicy" . }}
+        livenessProbe:
+{{ toYaml .Values.amplifyTA.livenessProbe | indent 10 }}
+        readinessProbe:
+{{ toYaml .Values.amplifyTA.readinessProbe | indent 10 }}
+        ports:
+        {{- range $key, $value := .Values.amplifyTA.containerPorts }}
+        - name: {{ $key }}
+          containerPort: {{ $value }}
+        {{- end }}
+        {{- if .Values.amplifyTA.extraPorts }}
+          {{- toYaml .Values.amplifyTA.extraPorts | nindent 8 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.amplifyTA.resources | indent 10 }}
+        env:
+        {{- with .Values.env }}
+        {{- range $key, $value := . }}
+        {{- if and (not (eq (toString $value) "")) (not (eq (toString $key) "")) }} # ignore any items with empty key or value
+          - name: {{ $key }}
+            value: {{ $value | quote }} 
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.amplifyTA.extraEnvs }}
+{{ toYaml .Values.amplifyTA.extraEnvs | indent 8 }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "traceabilityAgent.name" . }}-config
+        # Injects usernames, passwords, certificates and keys
+        - secretRef:
+          {{- if .Values.amplifyTA.existingSecretCred }}
+            {{ .Values.amplifyTA.existingSecretCred | quote }}
+          {{- else }}
+            name: {{ template "traceabilityAgent.name" . }}-cred
+        {{- end }}
+        volumeMounts:
+          - name: agents-secret
+            mountPath: /opt/keys/private_key.pem
+            subPath: private_key.pem
+          - name: agents-secret
+            mountPath: /opt/keys/public_key.pem
+            subPath: public_key.pem
+        {{- if .Values.amplifyTA.config.eventLogInput }}
+          - name: events
+            mountPath: {{ default "/events" .Values.amplifyTA.config.eventLogBasePath | quote }}
+        {{- else if .Values.amplifyTA.config.openTrafficInput }}
+          - name: opentraffic
+            mountPath: {{ default "/opentraffic" .Values.amplifyTA.config.openTrafficBasePath | quote }}
+        {{- else }}
+          {{- fail "No value amplifyTA.config.eventLogInput or amplifyTA.config.openTrafficInput log in input has been set." }}
+        {{- end }}
+          {{- range .Values.amplifyTA.secretMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .path }}
+            {{- if .subPath }}
+            subPath: {{ .subPath }}
+            {{- end }}
+          {{- end }}
+        {{- if .Values.amplifyTA.extraVolumeMounts }}
+{{ toYaml (.Values.amplifyTA.extraVolumeMounts ) | indent 8 }}
+        {{- end }}
+    {{- end }}
         {{- if .Values.apitraffic.extraContainers }}
 {{ toYaml .Values.apitraffic.extraContainers | indent 6 }}
         {{- end }}

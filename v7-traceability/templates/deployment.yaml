@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "v7-traceability.fullname" . }}
+  labels:
+    {{- include "v7-traceability.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "v7-traceability.selectorLabels" . | nindent 6 }}
+      {{- with .Values.additionalLabels }}
+      {{- range $key, $value := . }}
+      {{ default "none" $key }}: {{ default "none" $value | quote }}
+      {{- end }}
+      {{- end }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "v7-traceability.selectorLabels" . | nindent 8 }}
+        {{- with .Values.additionalLabels }}
+        {{- range $key, $value := . }}
+        {{ default "none" $key }}: {{ default "none" $value | quote }}
+        {{- end }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "v7-traceability.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          - name: probe-port
+            containerPort: 8990
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: probe-port
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: probe-port
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          env:
+          {{- with .Values.env }}
+          {{- range $key, $value := . }}
+          {{- if and (not (eq (toString $value) "")) (not (eq (toString $key) "")) }} # ignore any items with empty key or value
+            - name: {{ $key }}
+              value: {{ $value | quote }} 
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.env.APIGATEWAY_ONLY}}
+          {{- else}}
+            - name: APIMANAGER_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.credentials }}
+                  key: APIMANAGER_AUTH_USERNAME
+            - name: APIMANAGER_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.credentials }}
+                  key: APIMANAGER_AUTH_PASSWORD
+          {{- end}}
+          {{- if .Values.env.EVENT_LOG_INPUT}}
+            - name: APIGATEWAY_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.credentials }}
+                  key: APIGATEWAY_AUTH_USERNAME
+            - name: APIGATEWAY_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.credentials }}
+                  key: APIGATEWAY_AUTH_PASSWORD
+          {{- end}}
+          volumeMounts:
+            - name: "traceability-keys-secrets"
+              mountPath: "/keys"
+            - name: events
+              mountPath: /events
+            - name: data
+              mountPath: /data
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: events
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistentVolumeClaimConfig.events.name }}
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistentVolumeClaimConfig.data.name }}
+      - name: traceability-keys-secrets
+        secret:
+          secretName: {{ .Values.secrets.keys }}
+          items:
+          - key: private_key
+            path: private_key.pem
+          - key: public_key
+            path: public_key.pem
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

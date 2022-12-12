@@ -44,3 +44,12 @@ API-Gateway Traffic ingressClassName
 {{- define "apitraffic.ingressClassName" -}}
 {{- if .Values.apitraffic.ingress.ingressClassName }}{{ .Values.apitraffic.ingress.ingressClassName }}{{- else }}{{ .Values.global.ingressClassName }}{{- end }}
 {{- end }}
+
+{{/*
+Agents secret name
+*/}}
+{{- define "agentSecretName" -}}
+{{- if .Values.amplifyTA.existingSecret  -}}{{ .Values.amplifyTA.existingSecret | quote }}{{- else -}}amplify-agents-secret
+{{- end -}}
+{{- end -}}
+

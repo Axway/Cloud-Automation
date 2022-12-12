@@ -80,6 +80,17 @@ Filebeat name
 {{- end -}}
 
 {{/*
+Traceability agent name
+*/}}
+{{- define "traceabilityAgent.name" -}}
+{{- if .Values.amplifyTA.nameOverride -}}
+{{ .Values.amplifyTA.nameOverride }}
+{{- else -}}
+{{- "amplify-ta" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Filebeat certificate secret name
 */}}
 {{- define "filebeat.certSecret.name" -}}

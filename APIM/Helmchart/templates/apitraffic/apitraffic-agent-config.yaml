@@ -1,0 +1,70 @@
+{{- if (.Values.amplifyTA.enabled) }}
+
+{{- $apimgrName := include "apimgr.name" . -}}
+{{- $anmName := include "anm.name" . -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "traceabilityAgent.name" . }}-config
+  labels:
+    app: "{{ template "traceabilityAgent.name" . }}"
+    chart: "{{ .Chart.Name }}"
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+data: 
+  CENTRAL_AUTH_CLIENTID: {{ required "Missing .Values.amplifyTA.config.centralAuthClientId" .Values.amplifyTA.config.centralAuthClientId | quote }}
+  CENTRAL_AUTH_URL: {{ default "https://login.axway.com/auth" .Values.amplifyTA.config.centralAuthUrl | quote }}
+  CENTRAL_ORGANIZATIONID: {{ required "Missing .Values.amplifyTA.config.centralOrganizationId" .Values.amplifyTA.config.centralOrganizationId | quote }}
+  CENTRAL_AUTH_PRIVATEKEY: {{ default "/opt/keys/private_key.pem" .Values.amplifyTA.config.centralPrivateKeyLocation | quote }}
+  CENTRAL_AUTH_PUBLICKEY: {{ default "/opt/keys/public_key.pem" .Values.amplifyTA.config.centralPublicKeyLocation | quote }}
+  CENTRAL_AGENTNAME: {{ required "Missing .Values.amplifyTA.config.centralAgentName" .Values.amplifyTA.config.centralAgentName | quote }}
+  CENTRAL_DEPLOYMENT: {{ default "US" .Values.amplifyTA.config.centralDeployment | quote }}
+  CENTRAL_ENVIRONMENT: {{ required "Missing .Values.amplifyTA.config.centralEnvironment" .Values.amplifyTA.config.centralEnvironment | quote }}
+  CENTRAL_PROXYURL: {{ .Values.amplifyTA.config.centralProxyUrl | quote }}
+  CENTRAL_TEAM: {{ .Values.amplifyTA.config.centralTeam | quote }}
+  CENTRAL_URL: {{ .Values.amplifyTA.config.centralUrl | quote }}
+
+  APIMANAGER_HOST: {{ default $apimgrName .Values.amplifyTA.apimanager.host | quote }}
+  APIMANAGER_PORT: {{ default "8075" .Values.amplifyTA.apimanager.port | quote }}
+  APIMANAGER_AUTH_USERNAME: {{ required "Missing .Values.amplifyTA.apimanager.username" .Values.amplifyTA.apimanager.username | quote }}
+  APIMANAGER_SSL_INSECURESKIPVERIFY: {{ default "false" .Values.amplifyTA.apimanager.insecureSSL | quote }}
+
+  APIGATEWAY_HOST: {{ default $anmName .Values.amplifyTA.apigateway.host | quote }}
+  APIGATEWAY_PORT: {{ default "8090" .Values.amplifyTA.apigateway.port | quote }}
+  APIGATEWAY_AUTH_USERNAME: {{ required "Missing .Values.amplifyTA.apigateway.username" .Values.amplifyTA.apigateway.username | quote }}
+  APIGATEWAY_SSL_INSECURESKIPVERIFY: {{ default "false" .Values.amplifyTA.apigateway.insecureSSL | quote }}
+  APIGATEWAY_HEALTHCHECKURI: {{ default "login" .Values.amplifyTA.apigateway.healthcheckUri | quote }}
+  APIGATEWAY_HEALTHCHECKPORT: {{ default "8090" .Values.amplifyTA.apigateway.healthcheckPort | quote }}
+  APIGATEWAY_HEALTHCHECKPROTOCOL: {{ default "https" .Values.amplifyTA.apigateway.healthcheckProtocol | quote }}
+
+  LOG_LEVEL: {{ default "info" .Values.amplifyTA.config.logLevel | quote }}
+  LOG_OUTPUT: {{ default "stdout" .Values.amplifyTA.config.logOutput | quote }}
+  LOG_FILE_PATH: {{ default "logs" .Values.amplifyTA.config.logFilePath | quote }}  
+
+  EVENT_LOG_INPUT: {{ default "true" .Values.amplifyTA.config.eventLogInput | quote }}
+  EVENT_LOG_PATHS: {{ default "/events/DefaultGroup_traffic-*.log" .Values.amplifyTA.config.eventLogBasePath "/" .Values.amplifyTA.config.eventLogFiles | quote }}
+  OPENTRAFFIC_LOG_INPUT: {{ default "false" .Values.amplifyTA.config.openTrafficInput | quote }}
+  OPENTRAFFIC_LOG_PATHS: {{ default "/opentraffic/DefaultGroup_traffic-*.log" .Values.amplifyTA.config.openTrafficBasePath "/" .Values.amplifyTA.config.openTrafficBasePath | quote }}
+
+  TRACEABILITY_REDACTION_PATH_SHOW: {{ .Values.amplifyTA.config.redactionPathShow | quote }}
+  TRACEABILITY_REDACTION_QUERYARGUMENT_SHOW: {{ .Values.amplifyTA.config.redactionQueryArgumentShow | quote }}
+  TRACEABILITY_REDACTION_QUERYARGUMENT_SANITIZE: {{ .Values.amplifyTA.config.redactionQueryArgumentSanitize | quote }}
+  TRACEABILITY_REDACTION_REQUESTHEADER_SHOW: {{ .Values.amplifyTA.config.redactionRequestHeaderShow | quote }}
+  TRACEABILITY_REDACTION_REQUESTHEADER_SANITIZE: {{ .Values.amplifyTA.config.redactionRequestHeaderSanitize | quote }}
+  TRACEABILITY_REDACTION_RESPONSEHEADER_SHOW: {{ .Values.amplifyTA.config.redactionResponseHeaderShow | quote }}
+  TRACEABILITY_REDACTION_RESPONSEHEADER_SANITIZE: {{ .Values.amplifyTA.config.redactionResponseHeaderSanitize | quote }}
+  TRACEABILITY_REDACTION_JMSPROPERTIES_SHOW: {{ .Values.amplifyTA.config.redactionJmsPropertiesShow | quote }}
+  TRACEABILITY_REDACTION_JMSPROPERTIES_SANITIZE: {{ .Values.amplifyTA.config.redactionJmsPropertiesSanitize | quote }}
+  TRACEABILITY_REDACTION_MASKING_CHARACTERS: {{ .Values.amplifyTA.config.redactionMaskingCharacters | quote }}
+
+  TRACEABILITY_SAMPLING_PERCENTAGE: {{ .Values.amplifyTA.config.samplingPercentage | quote }}
+  TRACEABILITY_SAMPLING_PER_API: {{ .Values.amplifyTA.config.samplingPerApi | quote }}
+
+  TRACEABILITY_EXCEPTION_LIST: {{ .Values.amplifyTA.config.exceptionList | quote }}
+  TRACEABILITY_HOST: {{ default "ingestion.datasearch.axway.com:5044" .Values.amplifyTA.config.host | quote }}
+  TRACEABILITY_PROTOCOL: {{ default "tcp" .Values.amplifyTA.config.protocol | quote }}
+  TRACEABILITY_PROXYURL: {{ .Values.amplifyTA.config.centralProxyUrl | quote }}
+  TRACEABILITY_COMPRESSIONLEVEL: {{ default "3" .Values.amplifyTA.config.compressionLevel | quote }}
+  CENTRAL_USAGEREPORTING_INTERVAL: {{ default "15" .Values.amplifyTA.config.usageReportingInterval | quote }}
+{{- end }}
