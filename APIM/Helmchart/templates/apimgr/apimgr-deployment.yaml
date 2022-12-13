@@ -40,6 +40,10 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.apimgr.terminationGracePeriod }}
       volumes:
         - name: merge-dir
+      {{- if .Values.apimgr.mergeDirVolume }}
+{{- else }}
+          emptyDir: {}
+{{- end }}
 {{ toYaml .Values.apimgr.mergeDirVolume | indent 10 }}
 {{- if $licenseSecret }}
         - name: license
