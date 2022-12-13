@@ -41,10 +41,10 @@ spec:
       volumes:
         - name: merge-dir
       {{- if .Values.apimgr.mergeDirVolume }}
+{{ toYaml .Values.apimgr.mergeDirVolume | indent 10 }}
 {{- else }}
           emptyDir: {}
 {{- end }}
-{{ toYaml .Values.apimgr.mergeDirVolume | indent 10 }}
 {{- if $licenseSecret }}
         - name: license
           secret:
