@@ -40,7 +40,11 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.apitraffic.terminationGracePeriod }}
       volumes:
         - name: merge-dir
+      {{- if .Values.apitraffic.mergeDirVolume }}
 {{ toYaml .Values.apitraffic.mergeDirVolume | indent 10 }}
+{{- else }}
+          emptyDir: {}
+{{- end }}
         - name: events
 {{- if .Values.pvcs.events.enabled }}
           persistentVolumeClaim:

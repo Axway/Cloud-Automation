@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+# [2.11.4] 2022-12-13
+### Fixed
+- Remove the merge-dir volume configuration from the value file for anm, apimgr and apitraffic.
+
 # [2.11.3] 2022-12-01
 ### Fixed
 - Remove FED injection for AWS example.

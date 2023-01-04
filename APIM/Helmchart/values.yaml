@@ -123,7 +123,6 @@ anm:
    # If you want to use a PV or a ConfigMap, then you can configure it here accordingly. 
    # For more details please see: https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_howto_guides/configuring_apigw_container/index.html
    mergeDirVolume:
-     emptyDir: {}
    #   configMap:
    #     name: mergedir-config
 
@@ -304,7 +303,6 @@ apimgr:
    # If you want to use a PV or a ConfigMap, then you can configure it here accordingly. 
    # For more details please see: https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_howto_guides/configuring_apigw_container/index.html
    mergeDirVolume:
-     emptyDir: {}
    #   configMap:
    #     name: mergedir-config
 
@@ -520,7 +518,6 @@ apitraffic:
    # If you want to use a PV or a ConfigMap, then you can configure it here accordingly. 
    # For more details please see: https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_howto_guides/configuring_apigw_container/index.html
    mergeDirVolume: 
-     emptyDir: {}
    #   configMap:
    #     name: mergedir-config
 
