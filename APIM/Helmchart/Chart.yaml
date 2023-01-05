@@ -27,21 +27,21 @@ dependencies:
     condition: cassandra.internal
   - name: mysql
     alias: mysqlmetrics
-    repository: https://charts.bitnami.com/bitnami
+    repository: https://raw.githubusercontent.com/bitnami/charts/pre-2022/bitnami
     tags:
       - bitnami/mysql
     version: 8.x.x
     condition: mysqlmetrics.internal
   - name: mysql
     alias: mysqlapiportal
-    repository: https://charts.bitnami.com/bitnami
+    repository: https://raw.githubusercontent.com/bitnami/charts/pre-2022/bitnami
     tags:
       - bitnami/mysql
     version: 8.x.x
     condition: mysqlapiportal.internal
   - name: redis
     alias: apiportalredis
-    repository: https://charts.bitnami.com/bitnami
+    repository: https://raw.githubusercontent.com/bitnami/charts/pre-2022/bitnami
     tags:
       - bitnami/redis
     version: 15.x.x
