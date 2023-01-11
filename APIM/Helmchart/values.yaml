@@ -1308,13 +1308,13 @@ pvcs:
       accessModes: [ "ReadWriteOnce" ]
       resources:
          requests:
-            storage: 2Gi
+            storage: 100Gi
 
    apiportalImagesVolumeClaim: 
       accessModes: [ "ReadWriteOnce" ]
       resources:
          requests:
-            storage: 25Mi
+            storage: 50Mi
 
    apiportalEnckeyVolumeClaim: 
       accessModes: [ "ReadWriteOnce" ]
@@ -1326,19 +1326,19 @@ pvcs:
       accessModes: [ "ReadWriteOnce" ]
       resources:
          requests:
-            storage: 5Mi
+            storage: 20Mi
 
    apiportalTemplatesVolumeClaim: 
       accessModes: [ "ReadWriteOnce" ]
       resources:
          requests:
-            storage: 30Mi
+            storage: 100Mi
 
    apiportalAdmLanguageVolumeClaim: 
       accessModes: [ "ReadWriteOnce" ]
       resources:
          requests:
-            storage: 10Mi
+            storage: 20Mi
 
    apiportalCertsVolumeClaim: 
       accessModes: [ "ReadWriteOnce" ]
@@ -1350,7 +1350,7 @@ pvcs:
       accessModes: [ "ReadWriteOnce" ]
       resources:
          requests:
-            storage: 30Mi
+            storage: 50Mi
 
 ##################################################################################################################################
 #   CASSANDRA DATABASE
